@@ -1,0 +1,21 @@
+Package: rPraat
+Type: Package
+Title: Read, write and manipulate Praat TextGrid and PitchTier
+Version: 1.0.0
+Authors@R: person("Tomas", "Boril", email = "borilt@gmail.com", role = c("aut", "cre"))
+Maintainer: Tomas Boril <borilt@gmail.com>
+Description: rPraat package for R which constitutes an interface between the
+    most popular software for phonetic analyses, Praat, and R.
+URL: https://github.com/bbTomas/rPraat/
+BugReports: https://github.com/bbTomas/rPraat/issues
+License: MIT + file LICENSE
+LazyData: TRUE
+Depends:
+    R (>= 3.2.0)
+Imports:
+    dplyr (>= 0.4.3),
+    tidyr (>= 0.4.1),
+    stringr (>= 1.0.0),
+    dygraphs (>= 0.8),
+    tbTools (>= 1.0.0)
+RoxygenNote: 5.0.1
