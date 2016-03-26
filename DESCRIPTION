@@ -19,3 +19,4 @@ Imports:
     dygraphs (>= 0.8),
     tbTools (>= 1.0.0)
 RoxygenNote: 5.0.1
+Remotes: bbTomas/tbTools
