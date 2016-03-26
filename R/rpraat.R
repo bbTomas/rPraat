@@ -2,6 +2,21 @@
 
 library(dplyr)   # we need this for pipeline operator %>%
 
+#' tgCheckTierInd
+#'
+#' Returns tier index. Input can be either index (number) or tier name (character string).
+#' It performs checks whether the tier exists.
+#'
+#' @param tg TextGrid object
+#' @param tierInd Tier index or "name"
+#'
+#' @return Tier index
+#'
+#' @export
+#' @examples
+#' tg <- tg.sample()
+#' tgCheckTierInd(tg, 4)
+#' tgCheckTierInd(tg, 'word')
 tgCheckTierInd <- function(tg, tierInd) {
     ntiers <- length(tg)
 
@@ -40,16 +55,24 @@ tgCheckTierInd <- function(tg, tierInd) {
     return(tierInd)
 }
 
-#################
 
 
-## Nacte TextGrid z Praat ve formatu Short text file ci plnem Text file, UTF-8,
-## jednotlive vrstvy mohou byt jak typu IntervalTier, tak PointTier.
-##
-## Zvlada i labely obsahujici vice radek ci uvozovky.
-## v1.4, Tomas Boril, borilt@gmail.com
-##     tg <- tg.read("demo/H.TextGrid")
-##     tg.plot(tg)
+#' tg.read
+#'
+#' Loads TextGrid from Praat in Text or Short text format (UTF-8),
+#' it handles both Interval and Point tiers.
+#' Labels can may contain quotation marks and new lines.
+#'
+#' @param fileNameTextGrid Input file name
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' tg <- tg.read("demo/H.TextGrid")
+#' tg.plot(tg)
+#' }
 tg.read <- function(fileNameTextGrid) {
     if (!tbTools::isString(fileNameTextGrid)) {
         stop("Invalid 'fileNameTextGrid' parameter.")
@@ -60,12 +83,12 @@ tg.read <- function(fileNameTextGrid) {
     fid <- file(fileNameTextGrid, open = "r", encoding = "UTF-8")
     flines <- readLines(fid)
     close(fid)
-    find <- 4   # index nacitaneho radku, prvni 3 ignorujeme
+    find <- 4   # index of line to read, we ignore the first three
 
     xminStr <- flines[find]; find <- find + 1 # xmin
     xmaxStr <- flines[find]; find <- find + 1; # xmax
 
-    r <- flines[find]; find <- find + 1; # bud '<exists>' -> shorttext nebo 'tiers? <exists> ' -> plny format
+    r <- flines[find]; find <- find + 1; # either '<exists>' -> shorttext or 'tiers? <exists> ' -> full text format
 
     if (r == '<exists>') {
         shortFormat <- TRUE
@@ -311,18 +334,26 @@ tg.read <- function(fileNameTextGrid) {
 }
 
 
-#################
 
-## Ulozi textgrid s libovolnym poctem tiers (intervalove i bodove).
-## Pokud v tier neni specifikovan $type, je automaticky brana jako
-## intervalova (kvuli zpetne kompatibilite). Jinak je doporucovano $type
-## uvadet ('interval' nebo 'point').
-## Pokud neobsahuje textgrid class(tg)["tmin"] a class(tg)["tmin"], jsou urceny automaticky jako
-## nejkrajnejsi hodnoty ze vsech tiers.
-## Uklada ve formatu Short text file, UTF-8.
-## v1.5 Tomas Boril, borilt@gmail.com
-##     tg <- readTextGrid("demo/H.TextGrid")
-##     tg.write(tg, "demo/vystup.TextGrid")
+
+#' tg.write
+#'
+#' Saves TextGrid to the file. TextGrid may contain both interval and point
+#' tiers (tg[[1]], tg[[2]], tg[[3]], etc.). If tier type is not specified in $type,
+#' is is assumed to be "interval". If specified, $type have to be "interval" or "point".
+#' If there is no class(tg)["tmin"] and class(tg)["tmax"], they are calculated as min and max of
+#' all tiers. The file is saved in Short text file, UTF-8 format.
+#'
+#' @param tg TextGrid object
+#' @param fileNameTextGrid Output file name
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' tg <- tg.sample()
+#' tg.write(tg, "demo_output.TextGrid")
+#' }
 tg.write <- function(tg, fileNameTextGrid) {
     if (!tbTools::isString(fileNameTextGrid)) {
         stop("Invalid 'fileNameTextGrid' parameter.")
@@ -430,15 +461,21 @@ tg.write <- function(tg, fileNameTextGrid) {
     close(fid)
 }
 
-#############
 
-
-## Zobrazi textgrid ve schematicke a interaktivni podobe pomoci knihovny dygraphs.
-## Nepovinny parametr group (string character) slouzi k synchronizaci skupin pripadne
-## vice grafu dygraphs.
-## v1.01 Tomas Boril, borilt@gmail.com
-##     tg <- tg.read("demo/H.TextGrid")
-##     tg.plot(tg)
+#' tg.plot
+#'
+#' Plots interactive TextGrid using dygraphs package.
+#'
+#' @param tg TextGrid object
+#' @param group [optional] character string, name of group for dygraphs synchronization
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' tg <- tg.sample()
+#' tg.plot(tg)
+#' }
 tg.plot <- function(tg, group = "") {
     ntiers <- length(tg)
 
@@ -543,17 +580,28 @@ tg.plot <- function(tg, group = "") {
 }
 
 
-#################
 
-
-## Opravi problem s navaznosti t2 a t1 v intervalovych vrstvach, ktery vznikl diky chybnemu zaokrouhlovani
-## napr. v automatickem segmentatoru Prague Labeller, diky cemu nebylo mozne tyto hranice v Praatu manualne presunovat.
-##
-## Parametrem verbose = TRUE lze vypnout vypis problemovych mist.
-## v1.0, Tomas Boril, borilt@gmail.com
-##     tgProblem <- tg.read("demo/H_problem.TextGrid")
-##     tgNew <- tg.repairContinuity(tgProblem)
-##     tg.write(tgNew, "demo/H_problem_OK.TextGrid")
+#' tg.repairContinuity
+#'
+#' Repairs problem of continuity of T2 and T1 in interval tiers. This
+#' problem is very rare and it should not appear. However, e.g.,
+#' automatic segmentation tool Prague Labeller produces random numeric
+#' round-up errors featuring, e.g., T2 of preceding interval is slightly
+#' higher than the T1 of the current interval. Because of that, the boundary
+#' cannot be manually moved in Praat edit window.
+#'
+#' @param tg TextGrid object
+#' @param verbose [optional, default=FALSE] If TRUE, the function performs everything quietly.
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' tgProblem <- tg.sampleProblem()
+#' tgNew <- tg.repairContinuity(tgProblem)
+#' tg.write(tgNew, "demo_problem_OK.TextGrid")
+#' }
 tg.repairContinuity <- function(tg, verbose = FALSE) {
     for (I in tbTools::seqM(1, length(tg))) {
         if (tg[[I]]$type == "interval") {
@@ -575,15 +623,27 @@ tg.repairContinuity <- function(tg, verbose = FALSE) {
 }
 
 
-#################
 
-## Vytvori novy zcela prazdny textgrid. Parametry tMin a tMax
-## nastavi tmin a tmax, ktere jsou napr. pouzivany, kdyz se prida nova
-## vrstva IntervaTier bez udaneho rozsahu.
-## Tento prazdny textgrid je samostatne nepouzitelny, je potreba do nej
-## pridat alespon jednu vrstvu pomoci tg.insertNewIntervalTier() nebo
-## tg.insertNewPointTier().
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.createNewTextGrid
+#'
+#' Creates new and empty TextGrid. tStart and tEnd specify the total start
+#' and end time for the TextGrid. If a new interval tier is added later
+#' without specified start and end, they are set to TextGrid start and end.
+#'
+#' This empty TextGrid cannot be used for almost anything. At least one tier
+#' should be inserted using tg.insertNewIntervalTier() or tg.insertNewPointTier().
+#'
+#' @param tMin Start time of TextGrid
+#' @param tMax End time of TextGrid
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' tg <- tg.createNewTextGrid(0, 5)
+#' tg <- tg.insertNewIntervalTier(tg, 1, "word")
+#' tg <- tg.insertInterval(tg, "word", 1, 2, "hello")
+#' tg.plot(tg)
 tg.createNewTextGrid <- function(tMin, tMax) {
     if (!tbTools::isNum(tMin)) {
         stop("tMin must be a number")
@@ -605,12 +665,21 @@ tg.createNewTextGrid <- function(tMin, tMax) {
 }
 
 
-#################
 
-## Vrati TRUE/FALSE, zda tier je typu IntervalTier
-## v1.0, Tomas Boril, borilt@gmail.com
-##
-## tierInd ... index vrstvy (tier)
+#' tg.isIntervalTier
+#'
+#' Returns TRUE if the tier is IntervalTier, FALSE otherwise.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#'
+#' @return TRUE / FALSE
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.isIntervalTier(tg, 1)
+#' tg.isIntervalTier(tg, 'word')
 tg.isIntervalTier <- function(tg, tierInd) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -625,12 +694,21 @@ tg.isIntervalTier <- function(tg, tierInd) {
     return(b)
 }
 
-#################
 
-## Vrati TRUE/FALSE, zda tier je typu PointTier
-## v1.0, Tomas Boril, borilt@gmail.com
-##
-## tierInd ... index vrstvy (tier)
+#' tg.isPointTier
+#'
+#' Returns TRUE if the tier is PointTier, FALSE otherwise.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#'
+#' @return TRUE / FALSE
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.isPointTier(tg, 1)
+#' tg.isPointTier(tg, 'word')
 tg.isPointTier <- function(tg, tierInd) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -646,10 +724,20 @@ tg.isPointTier <- function(tg, tierInd) {
 }
 
 
-#################
 
-## Vrati jmeno vrstvy (tier).
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.getTierName
+#'
+#' Returns name of the tier.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#'
+#' @return character string
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getTierName(tg, 2)
 tg.getTierName <- function(tg, tierInd) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -661,10 +749,24 @@ tg.getTierName <- function(tg, tierInd) {
 
 
 
-#################
-
 ## Nastavi (zmeni) jmeno vrstvy (tier) s danym indexem.
 ## v1.0, Tomas Boril, borilt@gmail.com
+
+
+#' tg.setTierName
+#'
+#' Sets (changes) name of tier of the given index.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param name new 'name' of the tier
+#'
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg2 <- tg.setTierName(tg, "word", "WORDTIER")
+#' tg.getTierName(tg2, 4)
 tg.setTierName <- function(tg, tierInd, name) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -686,11 +788,21 @@ tg.setTierName <- function(tg, tierInd, name) {
 }
 
 
-#################
 
-
-## Vrati pocet labelu v dane vrstve (tier), ktere se rovnaji pozadovanemu retezci.
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.countLabels
+#'
+#' Returns number of labels with the specified label.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param label character string: label to be counted
+#'
+#' @return integer number
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.countLabels(tg, "phone", "a")
 tg.countLabels <- function(tg, tierInd, label) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -711,13 +823,29 @@ tg.countLabels <- function(tg, tierInd, label) {
 }
 
 
-#################
 
-## Duplikuje vrstvu (tier) textgridu s danym indexem (1 = prvni) na pozici noveho indexu.
-## Puvodni vrstvy od pozice newInd vyse posune o jednu dal.
-## Doporucujeme nastavit nove vrstve jine jmeno parametrem newTierName, i kdyz to neni nutne,
-## protoze dve vrstvy se mohou v Praatu jmenovat stejne. Komplikuje se tim ale moznost indexovani vrstev jmenem.
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.duplicateTier
+#'
+#' Duplicates tier originalInd to new tier with specified index newInd
+#' (existing tiers are shifted).
+#' It is highly recommended to set a name to the new tier
+#' (this can also be done later by tg.setTierName). Otherwise, both original and new tiers have the
+#' same name which is permitted but not recommended. In such a case, we
+#' cannot use the comfort of using tier name instead of its index in other
+#' functions.
+#'
+#' @param tg TextGrid object
+#' @param originalInd tier index or "name"
+#' @param newInd new tier index (1 = the first)
+#' @param newTierName [optional but recommended] name of the new tier
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg2 <- tg.duplicateTier(tg, "word", 1, "NEW")
+#' tg.plot(tg2)
 tg.duplicateTier <- function(tg, originalInd, newInd, newTierName = "") {
     originalInd <- tgCheckTierInd(tg, originalInd)
     ntiers <- length(tg)
@@ -762,12 +890,23 @@ tg.duplicateTier <- function(tg, originalInd, newInd, newTierName = "") {
 }
 
 
-#################
 
-## Vrati pocatecni cas. Bud minimum vsech vrstev (default)
-## ci konkretni vrstvy - tier (v takovem pripade vraci NA, kdyz vrsta nic
-## neobsahuje).
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.getStartTime
+#'
+#' Returns start time. If tier index is specified, it returns start time
+#' of the tier, if it is not specified, it returns start time of the whole
+#' TextGrid.
+#'
+#' @param tg TextGrid object
+#' @param tierInd [optional] tier index or "name"
+#'
+#' @return numeric
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getStartTime(tg)
+#' tg.getStartTime(tg, "phone")
 tg.getStartTime <- function(tg, tierInd = 0) {
     if (tbTools::isInt(tierInd) & tierInd == 0) {
         t <- as.numeric(class(tg)["tmin"])
@@ -797,12 +936,24 @@ tg.getStartTime <- function(tg, tierInd = 0) {
 }
 
 
-#################
 
-## Vrati konecny cas. Bud maximum vsech vrstev (default)
-## ci konkretni vrstvy - tier (v takovem pripade vraci NA, kdyz vrsta nic
-## neobsahuje).
-## v1.0, Tomas Boril, borilt@gmail.com
+
+#' tg.getEndTime
+#'
+#' Returns end time. If tier index is specified, it returns end time
+#' of the tier, if it is not specified, it returns end time of the whole
+#' TextGrid.
+#'
+#' @param tg TextGrid object
+#' @param tierInd [optional] tier index or "name"
+#'
+#' @return numeric
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getEndTime(tg)
+#' tg.getEndTime(tg, "phone")
 tg.getEndTime <- function(tg, tierInd = 0) {
     if (tbTools::isInt(tierInd) & tierInd == 0) {
         t <- as.numeric(class(tg)["tmax"])
@@ -834,12 +985,23 @@ tg.getEndTime <- function(tg, tierInd = 0) {
 
 
 
-#################
 
-## Vrati celkove trvani. Bud maximum vsech vrstev (default)
-## ci konkretni vrstvy - tier (v takovem pripade vraci NA, kdyz vrsta nic
-## neobsahuje).
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.getTotalDuration
+#'
+#' Returns total duration. If tier index is specified, it returns duration
+#' of the tier, if it is not specified, it returns total duration of the
+#' TextGrid.
+#'
+#' @param tg TextGrid object
+#' @param tierInd [optional] tier index or "name"
+#'
+#' @return numeric
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getTotalDuration(tg)
+#' tg.getTotalDuration(tg, "phone")
 tg.getTotalDuration <- function(tg, tierInd = 0) {
     if (tbTools::isInt(tierInd) & tierInd == 0) {
         t <- tg.getEndTime(tg) - tg.getStartTime(tg)
@@ -854,10 +1016,19 @@ tg.getTotalDuration <- function(tg, tierInd = 0) {
 }
 
 
-#################
 
-## Vrati celkovy pocet vrstev (tiers) textgridu.
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.getNumberOfTiers
+#'
+#' Returns number of tiers.
+#'
+#' @param tg TextGrid object
+#'
+#' @return integer
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getNumberOfTiers(tg)
 tg.getNumberOfTiers <- function(tg) {
     ntiers <- length(tg)
 
@@ -865,10 +1036,21 @@ tg.getNumberOfTiers <- function(tg) {
 }
 
 
-#################
 
-## Vrati pocet bodu v dane vrstve (tier) typu PointTier.
-## v1.0, Tomas Boril, borilt@gmail.com
+
+#' tg.getNumberOfPoints
+#'
+#' Returns number of points in the given point tier.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#'
+#' @return integer
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getNumberOfPoints(tg, "phoneme")
 tg.getNumberOfPoints <- function(tg, tierInd) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -883,10 +1065,21 @@ tg.getNumberOfPoints <- function(tg, tierInd) {
 }
 
 
-#################
 
-## Vrati pocet intervalu v dane vrstve (tier) typu IntervalTier.
-## v1.0, Tomas Boril, borilt@gmail.com
+
+#' tg.getNumberOfIntervals
+#'
+#' Returns number of intervals in the given interval tier.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#'
+#' @return integer
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getNumberOfIntervals(tg, "phone")
 tg.getNumberOfIntervals <- function(tg, tierInd) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -901,10 +1094,21 @@ tg.getNumberOfIntervals <- function(tg, tierInd) {
 }
 
 
-#################
 
-## Vrati label intervalu ci bodu s danym indexem ve vybrane vrstve (tier) typu IntervalTier ci PointTier.
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.getLabel
+#'
+#' Return label of point or interval at the specified index.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param index index of point or interval
+#'
+#' @return character string
+#' @export
+#'
+#' @examples tg <- tg.sample()
+#' tg.getLabel(tg, "phoneme", 4)
+#' tg.getLabel(tg, "phone", 4)
 tg.getLabel <- function(tg, tierInd, index) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -934,9 +1138,23 @@ tg.getLabel <- function(tg, tierInd, index) {
 }
 
 
-#################
-## Zmeni label intervalu ci bodu s danym indexem ve vybrane vrstve (tier) typu IntervalTier ci PointTier.
-## v1.0, Tomas Boril, borilt@gmail.com
+
+#' tg.setLabel
+#'
+#' Sets (changes) label of interval or point of the given index in the
+#' interval or point tier.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param index index of interval or point
+#' @param newLabel new "label"
+#'
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg2 <- tg.setLabel(tg, "word", 3, "New Label")
+#' tg.getLabel(tg2, "word", 3)
 tg.setLabel <- function(tg, tierInd, index, newLabel) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -973,11 +1191,20 @@ tg.setLabel <- function(tg, tierInd, index, newLabel) {
 
 
 
-
-#################
-
-## Vrati cas zacatku intervalu s danym indexem ve vybrane vrstve (tier) typu IntervalTier.
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.getIntervalStartTime
+#'
+#' Returns start time of interval in interval tier.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param index index of interval
+#'
+#' @return numeric
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getIntervalStartTime(tg, "phone", 5)
 tg.getIntervalStartTime <- function(tg, tierInd, index) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1002,10 +1229,23 @@ tg.getIntervalStartTime <- function(tg, tierInd, index) {
 }
 
 
-#################
 
-## Vrati cas konce intervalu s danym indexem ve vybrane vrstve (tier) typu IntervalTier.
-## v1.0, Tomas Boril, borilt@gmail.com
+
+
+#' tg.getIntervalEndTime
+#'
+#' Return end time of interval in interval tier.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param index index of interval
+#'
+#' @return numeric
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getIntervalEndTime(tg, "phone", 5)
 tg.getIntervalEndTime <- function(tg, tierInd, index) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1030,10 +1270,22 @@ tg.getIntervalEndTime <- function(tg, tierInd, index) {
 }
 
 
-#################
 
-## Vrati trvani intervalu s danym indexem ve vybrane vrstve (tier) typu IntervalTier.
-## v1.0, Tomas Boril, borilt@gmail.com
+
+#' tg.getIntervalDuration
+#'
+#' Return duration (i.e., end - start time) of interval in interval tier.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param index index of interval
+#'
+#' @return numeric
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getIntervalDuration(tg, "phone", 5)
 tg.getIntervalDuration <- function(tg, tierInd, index) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1058,10 +1310,22 @@ tg.getIntervalDuration <- function(tg, tierInd, index) {
 }
 
 
-#################
 
-## Vrati cas bodu s danym indexem ve vybrane vrstve (tier) typu PointTier.
-## v1.0, Tomas Boril, borilt@gmail.com
+
+#' tg.getPointTime
+#'
+#' Return time of point at the specified index in point tier.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param index index of point
+#'
+#' @return numeric
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getPointTime(tg, "phoneme", 4)
 tg.getPointTime <- function(tg, tierInd, index) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1086,10 +1350,24 @@ tg.getPointTime <- function(tg, tierInd, index) {
 }
 
 
-#################
 
-## Odstrani vrstvu (tier) textgridu s danym indexem (1 = prvni).
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.removeTier
+#'
+#' Removes tier of the given index.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' tg <- tg.sample()
+#' tg.plot(tg)
+#' tg2 <- tg.removeTier(tg, "word")
+#' tg.plot(tg2)
+#' }
 tg.removeTier <- function(tg, tierInd) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1108,12 +1386,26 @@ tg.removeTier <- function(tg, tierInd) {
 }
 
 
-#################
 
-## Vytvori novou vrstvu (tier) textgridu typu PointTier a vlozi ji na dany index (1 = prvni).
-## Nasledujici vrstvy posune o jednu dal.
-## Je treba zadat jmeno nove vrstvy - retezec newTierName.
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.insertNewPointTier
+#'
+#' Inserts new point tier to the specified index (existing tiers are
+#' shifted).
+#'
+#' @param tg TextGrid object
+#' @param newInd new tier index (1 = the first)
+#' @param newTierName new tier name
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' tg <- tg.sample()
+#' tg2 <- tg.insertNewPointTier(tg, 1, "POINTS")
+#' tg2 <- tg.insertPoint(tg2, "POINTS", 3, "MY POINT")
+#' tg.plot(tg2)
+#' }
 tg.insertNewPointTier <- function(tg, newInd, newTierName) {
     ntiers <- length(tg)
 
@@ -1150,17 +1442,33 @@ tg.insertNewPointTier <- function(tg, newInd, newTierName) {
 }
 
 
-#################
 
-## Vytvori novou vrstvu (tier) textgridu typu IntervalTier a vlozi ji na dany index (1 = prvni).
-## Nasledujici vrstvy posune o jednu dal.
-## Je treba zadat jmeno nove vrstvy - retezec newTierName.
-## Po vzoru Praatu prazdna intervalova tier obsahuje jeden interval
-## s prazdnym labelem pres cely casovy rozsah xmin az xmax textgridu,
-## jedine tak je totiz mozne v Praatu tento interval "delit" na mensi, a tim vlastne
-## vkladat nove intervaly.
-## Rozsah tmin az tmax je mozne zadat nepovinnymi parametry tMin a tMax.
-## v1.0, Tomas Boril, borilt@gmail.com
+
+#' tg.insertNewIntervalTier
+#'
+#' Inserts new interval tier to the specified index (existing tiers are
+#' shifted). The new tier contains one empty interval from beginning to end.
+#' Then, if we add new boundaries, this interval is divided to smaller
+#' pieces.
+#'
+#' @param tg TextGrid object
+#' @param newInd new tier index (1 = the first)
+#' @param newTierName new tier name
+#' @param tMin [optional] start time of the new tier
+#' @param tMax [optional] end time of the new tier
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' tg <- tg.sample()
+#' tg2 <- tg.insertNewIntervalTier(tg, 1, 'INTERVALS')
+#' tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.8)
+#' tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.1, "Interval A")
+#' tg2 <- tg.insertInterval(tg2, "INTERVALS", 1.2, 2.5, "Interval B")
+#' tg.plot(tg2)
+#' }
 tg.insertNewIntervalTier <- function(tg, newInd, newTierName, tMin=NA, tMax=NA) {
     ntiers <- length(tg)
 
@@ -1242,12 +1550,22 @@ tg.insertNewIntervalTier <- function(tg, newInd, newTierName, tMin=NA, tMax=NA) 
 
 
 
-#################
 
-## Vrati index intervalu obsahujici dany cas, vybrana vrstva (tier) musi byt typu IntervalTier.
-## Interval musi splnovat tmin <= time < tmax. Pokud nenalezne, vrati NaN.
-## Pro opravu nenavazujicich intervalu je mozne pouzit funkci tg.repairContinuity()
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.getIntervalIndexAtTime
+#'
+#' Returns index of interval which includes the given time, i.e.
+#' tStart <= time < tEnd. Tier index must belong to interval tier.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param time time which is going to be found in intervals
+#'
+#' @return integer
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getIntervalIndexAtTime(tg, "word", 0.5)
 tg.getIntervalIndexAtTime <- function(tg, tierInd, time) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1275,11 +1593,22 @@ tg.getIntervalIndexAtTime <- function(tg, tierInd, time) {
 }
 
 
-#################
 
-## Vrati index bodu, ktery je nejblize zprava danemu casu (vcetne), vybrana vrstva (tier) musi byt typu PointTier.
-## Pokud nenalezne, vrati NA.
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.getPointIndexHigherThanTime
+#'
+#' Returns index of point which is nearest the given time from right, i.e.
+#' time <= pointTime. Tier index must belong to point tier.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param time time which is going to be found in points
+#'
+#' @return integer
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getPointIndexHigherThanTime(tg, "phoneme", 0.5)
 tg.getPointIndexHigherThanTime <- function(tg, tierInd, time) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1308,11 +1637,22 @@ tg.getPointIndexHigherThanTime <- function(tg, tierInd, time) {
 
 
 
-#################
 
-## Vrati index bodu, ktery je nejblize zleva danemu casu (vcetne), vybrana vrstva (tier) musi byt typu PointTier.
-## Pokud nenalezne, vrati NA.
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.getPointIndexLowerThanTime
+#'
+#' Returns index of point which is nearest the given time from left, i.e.
+#' pointTime <= time. Tier index must belong to point tier.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param time time which is going to be found in points
+#'
+#' @return integer
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getPointIndexLowerThanTime(tg, "phoneme", 0.5)
 tg.getPointIndexLowerThanTime <- function(tg, tierInd, time) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1341,11 +1681,22 @@ tg.getPointIndexLowerThanTime <- function(tg, tierInd, time) {
 
 
 
-#################
 
-## Vrati index bodu, ktery je nejblize danemu casu (z obou smeru), vybrana vrstva (tier) musi byt typu PointTier.
-## Pokud nenalezne, vrati NA.
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.getPointIndexNearestTime
+#'
+#' Returns index of point which is nearest the given time (from both sides).
+#' Tier index must belong to point tier.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param time time which is going to be found in points
+#'
+#' @return integer
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg.getPointIndexNearestTime(tg, "phoneme", 0.5)
 tg.getPointIndexNearestTime <- function(tg, tierInd, time) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1379,10 +1730,23 @@ tg.getPointIndexNearestTime <- function(tg, tierInd, time) {
 }
 
 
-#################
 
-## Odstrani bod s danym indexem z PointTier.
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.removePoint
+#'
+#' Remove point of the given index from the point tier.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param index index of point to be removed
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg$phoneme$label
+#' tg2 <- tg.removePoint(tg, "phoneme", 1)
+#' tg2$phoneme$label
 tg.removePoint <- function(tg, tierInd, index) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1415,10 +1779,26 @@ tg.removePoint <- function(tg, tierInd, index) {
 }
 
 
-#################
 
-## Vlozi novy bod do PointTier.
-## v1.0, Tomas Boril, borilt@gmail.com
+
+#' tg.insertPoint
+#'
+#' Inserts new point to point tier of the given index.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param time time of the new point
+#' @param label time of the new point
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' tg <- tg.sample()
+#' tg2 <- tg.insertPoint(tg, "phoneme", 1.4, "NEW POINT")
+#' tg.plot(tg2)
+#' }
 tg.insertPoint <- function(tg, tierInd, time, label) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1463,15 +1843,31 @@ tg.insertPoint <- function(tg, tierInd, time, label) {
 }
 
 
-#################
-
-## Odstrani levou hranici intervalu s danym indexem z vrstvy (tier) tierInd typu IntervalTier.
-## Slouci se tim dva intervaly do jednoho (spoji se i labely). Nelze pouzit
-## pro prvni interval, protoze to je pocatecni hranice vrstvy.
-## Napr. mam intervaly 1-2-3, dam odstranit levou hranici 2. intervalu.
-## Vysledkem budou dva intervaly 12-3. Pokud mi vadi slouceni labelu, mohu
-## label jeste pred odstranovanim hranice nastavit na prazdny retezec.
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.removeIntervalLeftBoundary
+#'
+#' Remove left boundary of the interval of the given index in Interval tier.
+#' In fact, it concatenates two intervals into one (and their labels). It
+#' cannot be applied to the first interval because it is the start boundary
+#' of the tier.
+#' E.g., we have interval 1-2-3, we remove the left boundary of the 2nd
+#' interval, the result is two intervals 12-3.
+#' If we do not want to concatenate labels, we have to set the label
+#' to the empty string '' before this operation.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param index index of the interval
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' tg <- tg.sample()
+#' tg.plot(tg)
+#' tg2 <- tg.removeIntervalLeftBoundary(tg, "word", 3)
+#' tg.plot(tg2)
+#' }
 tg.removeIntervalLeftBoundary <- function(tg, tierInd, index) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1516,15 +1912,35 @@ tg.removeIntervalLeftBoundary <- function(tg, tierInd, index) {
 }
 
 
-#################
 
-## Odstrani pravou hranici intervalu s danym indexem z vrstvy (tier) tierInd typu IntervalTier.
-## Slouci se tim dva intervaly do jednoho (spoji se i labely). Nelze pouzit
-## pro posledni interval, protoze to je konecna hranice vrstvy.
-## Napr. mam intervaly 1-2-3, dam odstranit pravou hranici 2. intervalu.
-## Vysledkem budou dva intervaly 1-23. Pokud mi vadi slouceni labelu, mohu
-## label jeste pred odstranovanim hranice nastavit na prazdny retezec.
-## v1.0, Tomas Boril, borilt@gmail.com
+
+
+
+#' tg.removeIntervalRightBoundary
+#'
+#' Remove right boundary of the interval of the given index in Interval tier.
+#' In fact, it concatenates two intervals into one (and their labels). It
+#' cannot be applied to the last interval because it is the end boundary
+#' of the tier.
+#' E.g., we have interval 1-2-3, we remove the right boundary of the 2nd
+#' interval, the result is two intervals 1-23.
+#' If we do not want to concatenate labels, we have to set the label
+#' to the empty string '' before this operation.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param index index of the interval
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' tg <- tg.sample()
+#' tg.plot(tg)
+#' tg2 <- tg.removeIntervalRightBoundary(tg, "word", 3)
+#' tg.plot(tg2)
+#' }
 tg.removeIntervalRightBoundary <- function(tg, tierInd, index) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1569,19 +1985,38 @@ tg.removeIntervalRightBoundary <- function(tg, tierInd, index) {
 }
 
 
-#################
 
-## Odstrani levou i pravou hranici intervalu s danym indexem z vrstvy (tier) tierInd typu IntervalTier.
-## Slouci se tim tri intervaly do jednoho (spoji se i labely). Nelze pouzit
-## pro prvni a posledni interval, protoze to je konecna hranice vrstvy.
-## Napr. mam intervaly 1-2-3, dam odstranit obe hranice 2. intervalu.
-## Vysledkem bude jeden interval 123. Pokud mi vadi slouceni labelu (chtel
-## jsem "odstranit interval vcetne labelu"), mohu
-## label jeste pred odstranovanim hranice nastavit na prazdny retezec.
-## Pokud chci jen "odstranit interval bez slucovani", tedy obdrzet 1-nic-3,
-## nejedna se o odstranovani hranic. Staci pouze nastavit label 2. intervalu
-## na prazdny retezec "".
-## v1.0, Tomas Boril, borilt@gmail.com
+
+#' tg.removeIntervalBothBoundaries
+#'
+#' Remove both left and right boundary of interval of the given index in
+#' Interval tier. In fact, this operation concatenate three intervals into
+#' one (and their labels). It cannot be applied to the first and the last
+#' interval because they contain beginning or end boundary of the tier.
+#' E.g., let's assume interval 1-2-3. We remove both boundaries of the
+#' 2nd interval. The result is one interval 123.
+#' If we do not want to concatenate labels (we wanted to remove the label
+#' including its interval), we can set the label of the second interval
+#' to the empty string "" before this operation.
+#' If we only want to remove the label of interval "without concatenation",
+#' i.e., the desired result is 1-empty-3, it is not this operation of
+#' removing boundaries. Just set the label of the second interval to the
+#' empty string "".
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param index index of the interval
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' tg <- tg.sample()
+#' tg.plot(tg)
+#' tg2 <- tg.removeIntervalBothBoundaries(tg, "word", 3)
+#' tg.plot(tg2)
+#' }
 tg.removeIntervalBothBoundaries <- function(tg, tierInd, index) {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1633,41 +2068,61 @@ tg.removeIntervalBothBoundaries <- function(tg, tierInd, index) {
 }
 
 
-#################
 
-## Vlozi novou hranici do IntervalTier, cimz vzdy vznikne novy interval,
-## kteremu je prirazen label (nepovinny parametr) ci zustane s prazdnym
-## labelem.
-## Mozne jsou ruzne situace umisteni nove hranice:
-## a) Do jiz existujiciho intervalu:
-##    Interval se novou hranici rozdeli na dve casti. Leva si zachova
-##    label puvodniho intervalu, prave je nastaven nepovinny novy label.
-##
-## b) Vlevo od existujicich intervalu:
-##    Novy interval zacina zadanou hranici a konci v miste zacatku prvniho
-##    jiz drive existujiciho intervalu. Noveme intervalu je nastaven
-##    nepovinny novy label.
-##
-## c) Vpravo od existujicich intervalu:
-##    Novy interval zacina v miste konce posledniho jiz existujiciho
-##    intervalu a konci zadanou novou hranici. Tomuto novem intervalu je
-##    nastaven nepovinny novy label. Situace je tak tedy ponekud odlisna od
-##    situaci a) a b), kde novy label byl nastavovan vzdy intervalu, ktery
-##    lezel napravo od nove hranice. V situaci c) lezi label naopak nalevo
-##    od hranice. Ale je to jedina logicka moznost ve smyslu pridavani
-##    novych intervalu za konec jiz existujicich.
-##
-## Situace, kdy by se vkladala hranice mezi existujici intervaly na pozici,
-## kde jeste zadny interval neni, neni z hlediska logiky Praatu mozna.
-## Neni totiz pripustne, aby existoval jeden interval, pak nic, a pak dalsi interval.
-## Nic mezi intervaly Praat dusledne znaci jako interval s prazdnym labelem.
-## Nova vrstva IntervalTier vzdy obsahuje prazdny interval
-## pres celou dobu trvani. Tento interval je mozne hranicemi delit na
-## podintervaly ci rozsirovat na obe strany. Mezery bez intervalu tak
-## nemohou vzniknout. Pokud by presto byly pritomne, je nutne nejdrive
-## tento problem napravit funkci tg.repairContinuity().
-##
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.insertBoundary
+#'
+#' Inserts new boundary into interval tier. This creates a new interval, to
+#' which we can set the label (optional argument).
+#'
+#' Notes
+#' =====
+#'
+#' There are more possible situations which influence where the new label
+#' will be set.
+#'
+#' a) New boundary into the existing interval (the most common situation):
+#'    The interval is splitted into two parts. The left preserves the label
+#'    of the original interval, the right is set to the new (optional) label.
+#'
+#' b) On the left of existing interval (i.e., enlarging the tier size):
+#'    The new interval starts with the new boundary and ends at the start
+#'    of originally first existing interval. The label is set to the new
+#'    interval.
+#'
+#' c) On the right of existing interval (i.e., enlarging the tier size):
+#'    The new interval starts at the end of originally last existing
+#'    interval and ends with the new boundary. The label is set to the new
+#'    interval.
+#'    This is somewhat different behaviour than in a) and b) where the new
+#'    label is set to the interval which is on the right of the new
+#'    boundary. In c), the new label is set on the left of the new boundary.
+#'    But this is the only logical possibility.
+#'
+#' It is a nonsense to insert a boundary between existing intervals to a
+#' position where there is no interval. This is against the basic logic of
+#' Praat interval tiers where, at the beginning, there is one large empty
+#' interval from beginning to the end. And then, it is divided to smaller
+#' intervals by adding new boundaries. Nevertheless, if the TextGrid is
+#' created by external programmes, you may rarely find such discontinuities.
+#' In such a case, at first, use the tgRepairContinuity() function.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param time time of the new boundary
+#' @param label [optional] label of the new interval
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg2 <- tg.insertNewIntervalTier(tg, 1, 'INTERVALS')
+#' tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.8)
+#' tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.1, "Interval A")
+#' tg2 <- tg.insertInterval(tg2, "INTERVALS", 1.2, 2.5, "Interval B")
+#' \dontrun{
+#' tg.plot(tg2)
+#' }
 tg.insertBoundary <- function(tg, tierInd, time, label="") {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1739,62 +2194,82 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
 }
 
 
-#################
 
-## Vlozi novy interval do prazdneho mista v IntervalTier, tedy
-## a) Do jiz existujiciho intervalu (musi mit prazdny label):
-##    Nejcastejsi pripad, protoze samotna nova vrstva IntervalTier je cela
-##    jeden prazdny interval od zacatku do konce.
-## b) Mimo existujici intervaly nalevo ci napravo, vznikla mezera bude
-##    zaplnena prazdnym intervalem.
-## Intervalu tStart az tEnd je prirazen label (nepovinny parametr) ci zustane
-## s prazdnym labelem.
-##
-## Tato funkce je ve vetsine pripadu totez, jako 1. tgInsertBoundary(tEnd)
-## a 2. tgInsertBoundary(tStart, novy label). Ale navic je provadena kontrola,
-## a) zda tStart a tEnd nalezeji do stejneho puvodniho prazdneho intervalu,
-## b) nebo jsou oba mimo existujici intervaly nalevo ci napravo.
-##
-## Pruniky noveho intervalu s vice jiz existujicimi i prazdnymi intervaly
-## nedavaji smysl a jsou zakazany.
-##
-## Je treba si uvedomit, ze ve skutecnosti tato funkce casto
-## vytvari vice intervalu. Napr. mame zcela novou IntervalTier s jednim prazdnym
-## intervalem 0 az 5 sec. Vlozime interval 1 az 2 sec s labelem 'rekl'.
-## Vysledkem jsou tri intervaly: 0-1 '', 1-2 'rekl', 2-5 ''.
-## Pak znovu vlozime touto funkci interval 7 az 8 sec s labelem 'ji',
-## vysledkem bude pet intervalu: 0-1 '', 1-2 'rekl', 2-5 '', 5-7 '' (vklada se
-## jako vypln, protoze jsme mimo rozsah puvodni vrstvy), 7-8 'ji'.
-## Pokud vsak nyni vlozime interval presne 2 az 3 'to', prida se ve
-## skutecnosti jen jeden interval, kde se vytvori prava hranice intervalu a
-## leva se jen napoji na jiz existujici, vysledkem bude sest intervalu:
-## 0-1 '', 1-2 'rekl', 2-3 'to', 3-5 '', 5-7 '', 7-8 'ji'.
-## Muze take nastat situace, kdy nevytvori zadny novy interval, napr. kdyz
-## do predchoziho vlozime interval 3 az 5 'asi'. Tim se pouze puvodne prazdnemu
-## intervalu 3-5 nastavi label na 'asi', vysledkem bude opet jen sest intervalu:
-## 0-1 '', 1-2 'rekl', 2-3 'to', 3-5 'asi', 5-7 '', 7-8 'ji'.
-##
-## Tato funkce v Praatu neni, zde je navic a je vhodna pro situace,
-## kdy chceme napr. do prazdne IntervalTier pridat nekolik oddelenych intervalu
-## (napr. intervaly detekovane recove aktivity).
-## Naopak neni zcela vhodna pro pridavani na sebe primo napojenych
-## intervalu (napr. postupne segmentujeme slovo na jednotlive navazujici
-## hlasky), protoze kdyz napr. vlozime intervaly 1 az 2.1 a 2.1 az 3,
-## kde obe hodnoty 2.1 byly vypocteny samostatne a diky zaokrouhlovacim chybam
-## se zcela presne nerovnaji, ve skutecnosti tim vznikne bud jeste prazdny
-## interval 'priblizne' 2.1 az 2.1, coz nechceme, a nebo naopak funkce skonci
-## s chybou, ze tStart je vetsi nez tEnd, pokud zaokrouhleni dopadlo opacne.
-## Pokud vsak hranice byla spoctena jen jednou a ulozena do promenne, ktera
-## byla pouzita jako konecna hranice predchazejiciho intervalu, a zaroven jako
-## pocatecni hranice noveho intervalu, nemel by byt problem a novy interval
-## se vytvori jako napojeni bez vlozeneho 'mikrointervalu'.
-## Kazdopadne, bezpecnejsi pro takove ucely je zpusob, jak se postupuje
-## v Praatu, tedy vlozit hranici se  zacatkem prvni hlasky pomoci
-## tgInsertBoundary(cas, labelHlasky), pak stejne casy zacatku a labely vsech
-## nasledujicich hlasek, a nakonec vlozit jeste konecnou hranici posledni hlasky
-## (tedy jiz bez labelu) pomoci tgInsertBoundary(cas).
-##
-## v1.0, Tomas Boril, borilt@gmail.com
+#' tg.insertInterval
+#'
+#' Inserts new interval into an empty space in interval tier:
+#' a) Into an already existing interval with empty label (most common
+#' situation because, e.g., a new interval tier has one empty interval from
+#' beginning to the end.
+#' b) Outside og existing intervals (left or right), this may create another
+#' empty interval between.
+#'
+#' Notes
+#' =====
+#' In most cases, this function is the same as 1.) tgInsertBoundary(tEnd)
+#' and 2.) tgInsertBoundary(tStart, 'new label'). But, additional checks are
+#' performed: a) tStart and tEnd belongs to the same empty interval, or
+#' b) both times are outside of existings intervals (both left or both right).
+#'
+#' Intersection of the new interval with more already existing (even empty)
+#' does not make a sense and is forbidden.
+#'
+#' In many situations, in fact, this function creates more than one interval.
+#' E.g., let's assume an empty interval tier with one empty interval from 0 to 5 sec.
+#' 1.) We insert a new interval from 1 to 2 with label "he".
+#'     Result: three intervals, 0-1 "", 1-2 "he", 2-5 "".
+#' 2.) Then, we insert an interval from 7 to 8 with label "lot".
+#'     Result: five intervals, 0-1 "", 1-2 "he", 2-5 "", 5-7 "", 7-8 "lot"
+#'     Note: the empty 5-7 "" interval is inserted because we are going
+#'     outside of the existing tier.
+#' 3.) Now, we insert a new interval exactly between 2 and 3 with label "said".
+#'     Result: really only one interval is created (and only the right
+#'     boundary is added because the left one already exists):
+#'     0-1 "", 1-2 "he", 2-3 "said", 3-5 "", 5-7 "", 7-8 "lot".
+#' 4.) After this, we want to insert another interval, 3 to 5: label "a".
+#'     In fact, this does not create any new interval at all. Instead of
+#'     that, it only sets the label to the already existing interval 3-5.
+#'     Result: 0-1 "", 1-2 "he", 2-3 "said", 3-5 "a", 5-7 "", 7-8 "lot".
+#'
+#' This function is not implemented in Praat (6.0.14). And it is very useful
+#' for adding separate intervals to an empty area in interval tier, e.g.,
+#' result of voice activity detection algorithm.
+#' On the other hand, if we want continuously add new consequential
+#' intervals, tgInsertBoundary() may be more useful. Because, in the
+#' tgInsertInterval() function, if we calculate both boundaries separately
+#' for each interval, strange situations may happen due to numeric round-up
+#' errors, like 3.14*5 != 15.7. In such cases, it may be hard to obtain
+#' precisely consequential time instances. As 3.14*5 is slightly larger than
+#' 15.7 (let's try to calculate 15.7 - 3.14*5), if you calculate tEnd of the
+#' first interval as 3.14*5 and tStart of the second interval as 15.7, this
+#' function refuse to create the second interval because it would be an
+#' intersection. In the opposite case (tEnd of the 1st: 15.7, tStart of the
+#' 2nd: 3.14*5), it would create another "micro" interval between these two
+#' slightly different time instances. Instead of that, if you insert only
+#' one boundary using the tgInsertBoundary() function, you are safe that
+#' only one new interval is created. But, if you calculate the "15.7" (no
+#' matter how) and store in the variable and then, use this variable in
+#' the tgInsertInterval() function both for the tEnd of the 1st interval and
+#' tStart of the 2nd interval, you are safe, it works fine.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param tStart start time of the new interval
+#' @param tEnd end time of the new interval
+#' @param label [optional] label of the new interval
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg2 <- tg.insertNewIntervalTier(tg, 1, 'INTERVALS')
+#' tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.8)
+#' tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.1, "Interval A")
+#' tg2 <- tg.insertInterval(tg2, "INTERVALS", 1.2, 2.5, "Interval B")
+#' \dontrun{
+#' tg.plot(tg2)
+#' }
 tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
     tierInd <- tgCheckTierInd(tg, tierInd)
     ntiers <- length(tg)
@@ -1944,12 +2419,29 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
 
 
 
-#################
 
 ## Nacte PitchTier z Praat ve formatu spreadSheet,
 ##
 ## v0.1, Tomas Boril, borilt@gmail.com
 ##     pt <- pt.read("demo/maminka_spreadSheet.PitchTier")
+
+
+#' pt.read
+#'
+#' Reads PitchTier from Praat. Supported formats: text file, short text file,
+#' spread sheet, headerless spread sheet (headerless not recommended,
+#' it does not contain tmin and tmax info).
+#'
+#' @param fileNamePitchTier file name of PitchTier
+#'
+#' @return PitchTier object
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' pt <- pt.read("demo/H.PitchTier")
+#' pt.plot(pt)
+#' }
 pt.read <- function(fileNamePitchTier) {
     if (!tbTools::isString(fileNamePitchTier)) {
         stop("Invalid 'fileNamePitchTier' parameter.")
@@ -2075,13 +2567,26 @@ pt.read <- function(fileNamePitchTier) {
 }
 
 
-#################
 
-## Ulozi PitchTier jako spreadSheet. PitchTier je list a musi obsahovat alespon t a f stejne delky.
-## Pokud nejsou v PitchTier specifikovany tmin a tmax, jsou brany jako min a max z t.
-## v0.1 Tomas Boril, borilt@gmail.com
-##     pt <- pt.read("demo/maminka_spreadSheet.PitchTier")
-##     pt.write(pt, "demo/vystup.PitchTier")
+#' pt.write
+#'
+#' Saves PitchTier to file (spread sheet file format).
+#' pt is list with at least $t and $f vectors (of the same length).
+#' If there are no $tmin and $tmax values, there are
+#' set as min and max of $t vector.
+#'
+#' @param pt PitchTier object
+#' @param fileNamePitchTier file name to be created
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' pt <- pt.sample()
+#' pt$f <- 12*log(pt$f/100) / log(2)  # conversion of Hz to Semitones, reference 0 ST = 100 Hz.
+#' pt.plot(pt)
+#' pt.write(pt, "demo/H_st.PitchTier")
+#' }
 pt.write <- function(pt, fileNamePitchTier) {
     if (!tbTools::isString(fileNamePitchTier)) {
         stop("Invalid 'fileNamePitchTier' parameter.")
@@ -2127,14 +2632,21 @@ pt.write <- function(pt, fileNamePitchTier) {
     close(fid)
 }
 
-#############
 
-## Zobrazi PitchTier ve schematicke a interaktivni podobe pomoci knihovny dygraphs.
-## Nepovinny parametr group (string character) slouzi k synchronizaci skupin pripadne
-## vice grafu dygraphs.
-## v1.00 Tomas Boril, borilt@gmail.com
-##     pt <- pt.read("demo/maminka_TextFile.PitchTier")
-##     pt.plot(pt)
+#' pt.plot
+#'
+#' Plots interactive PitchTier using dygraphs package.
+#'
+#' @param pt PitchTier object
+#' @param group [optional] character string, name of group for dygraphs synchronization
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' pt <- pt.sample()
+#' pt.plot(pt)
+#' }
 pt.plot <- function(pt, group = "") {
     data <- list(t = pt$t, f = pt$f)
 
@@ -2152,7 +2664,7 @@ pt.plot <- function(pt, group = "") {
 }
 
 
-#################
+
 
 
 
@@ -2179,9 +2691,3 @@ pt.plot <- function(pt, group = "") {
 #     stop("newInd must be integer >= 1.")
 # }
 
-
-#################
-#################
-#################
-#################
-#################
