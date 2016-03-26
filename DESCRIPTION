@@ -16,7 +16,6 @@ Imports:
     dplyr (>= 0.4.3),
     tidyr (>= 0.4.1),
     stringr (>= 1.0.0),
-    dygraphs (>= 0.8),
-    tbTools (>= 1.0.0)
+    dygraphs (>= 0.8)
 RoxygenNote: 5.0.1
-Remotes: bbTomas/tbTools
+Remotes: bbTomas/tbTools (>= 1.0.0)
