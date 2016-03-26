@@ -2,7 +2,7 @@
 
 library(dplyr)   # we need this for pipeline operator %>%
 
-#' tgCheckTierInd
+#' tg.checkTierInd
 #'
 #' Returns tier index. Input can be either index (number) or tier name (character string).
 #' It performs checks whether the tier exists.
@@ -15,9 +15,9 @@ library(dplyr)   # we need this for pipeline operator %>%
 #' @export
 #' @examples
 #' tg <- tg.sample()
-#' tgCheckTierInd(tg, 4)
-#' tgCheckTierInd(tg, 'word')
-tgCheckTierInd <- function(tg, tierInd) {
+#' tg.checkTierInd(tg, 4)
+#' tg.checkTierInd(tg, 'word')
+tg.checkTierInd <- function(tg, tierInd) {
     ntiers <- length(tg)
 
     if (is.numeric(tierInd) | is.integer(tierInd)) {      # tier index
@@ -681,7 +681,7 @@ tg.createNewTextGrid <- function(tMin, tMax) {
 #' tg.isIntervalTier(tg, 1)
 #' tg.isIntervalTier(tg, 'word')
 tg.isIntervalTier <- function(tg, tierInd) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (tg[[tierInd]]$type == 'interval') {
@@ -710,7 +710,7 @@ tg.isIntervalTier <- function(tg, tierInd) {
 #' tg.isPointTier(tg, 1)
 #' tg.isPointTier(tg, 'word')
 tg.isPointTier <- function(tg, tierInd) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (tg[[tierInd]]$type == 'point') {
@@ -739,7 +739,7 @@ tg.isPointTier <- function(tg, tierInd) {
 #' tg <- tg.sample()
 #' tg.getTierName(tg, 2)
 tg.getTierName <- function(tg, tierInd) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     n <- tg[[tierInd]]$name
@@ -768,7 +768,7 @@ tg.getTierName <- function(tg, tierInd) {
 #' tg2 <- tg.setTierName(tg, "word", "WORDTIER")
 #' tg.getTierName(tg2, 4)
 tg.setTierName <- function(tg, tierInd, name) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tbTools::isString(name)) {
@@ -804,7 +804,7 @@ tg.setTierName <- function(tg, tierInd, name) {
 #' tg <- tg.sample()
 #' tg.countLabels(tg, "phone", "a")
 tg.countLabels <- function(tg, tierInd, label) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tbTools::isString(label)) {
@@ -847,7 +847,7 @@ tg.countLabels <- function(tg, tierInd, label) {
 #' tg2 <- tg.duplicateTier(tg, "word", 1, "NEW")
 #' tg.plot(tg2)
 tg.duplicateTier <- function(tg, originalInd, newInd, newTierName = "") {
-    originalInd <- tgCheckTierInd(tg, originalInd)
+    originalInd <- tg.checkTierInd(tg, originalInd)
     ntiers <- length(tg)
 
     if (!tbTools::isInt(newInd)) {
@@ -913,7 +913,7 @@ tg.getStartTime <- function(tg, tierInd = 0) {
         return(t)
     }
 
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (tg.isPointTier(tg, tierInd)) {
@@ -960,7 +960,7 @@ tg.getEndTime <- function(tg, tierInd = 0) {
         return(t)
     }
 
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (tg.isPointTier(tg, tierInd)) {
@@ -1008,7 +1008,7 @@ tg.getTotalDuration <- function(tg, tierInd = 0) {
         return(t)
     }
 
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     t <- tg.getEndTime(tg, tierInd) - tg.getStartTime(tg, tierInd)
@@ -1052,7 +1052,7 @@ tg.getNumberOfTiers <- function(tg) {
 #' tg <- tg.sample()
 #' tg.getNumberOfPoints(tg, "phoneme")
 tg.getNumberOfPoints <- function(tg, tierInd) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tg.isPointTier(tg, tierInd)) {
@@ -1081,7 +1081,7 @@ tg.getNumberOfPoints <- function(tg, tierInd) {
 #' tg <- tg.sample()
 #' tg.getNumberOfIntervals(tg, "phone")
 tg.getNumberOfIntervals <- function(tg, tierInd) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tg.isIntervalTier(tg, tierInd)) {
@@ -1110,7 +1110,7 @@ tg.getNumberOfIntervals <- function(tg, tierInd) {
 #' tg.getLabel(tg, "phoneme", 4)
 #' tg.getLabel(tg, "phone", 4)
 tg.getLabel <- function(tg, tierInd, index) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tbTools::isInt(index)) {
@@ -1156,7 +1156,7 @@ tg.getLabel <- function(tg, tierInd, index) {
 #' tg2 <- tg.setLabel(tg, "word", 3, "New Label")
 #' tg.getLabel(tg2, "word", 3)
 tg.setLabel <- function(tg, tierInd, index, newLabel) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tbTools::isInt(index)) {
@@ -1206,7 +1206,7 @@ tg.setLabel <- function(tg, tierInd, index, newLabel) {
 #' tg <- tg.sample()
 #' tg.getIntervalStartTime(tg, "phone", 5)
 tg.getIntervalStartTime <- function(tg, tierInd, index) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tbTools::isInt(index)) {
@@ -1247,7 +1247,7 @@ tg.getIntervalStartTime <- function(tg, tierInd, index) {
 #' tg <- tg.sample()
 #' tg.getIntervalEndTime(tg, "phone", 5)
 tg.getIntervalEndTime <- function(tg, tierInd, index) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tbTools::isInt(index)) {
@@ -1287,7 +1287,7 @@ tg.getIntervalEndTime <- function(tg, tierInd, index) {
 #' tg <- tg.sample()
 #' tg.getIntervalDuration(tg, "phone", 5)
 tg.getIntervalDuration <- function(tg, tierInd, index) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tbTools::isInt(index)) {
@@ -1327,7 +1327,7 @@ tg.getIntervalDuration <- function(tg, tierInd, index) {
 #' tg <- tg.sample()
 #' tg.getPointTime(tg, "phoneme", 4)
 tg.getPointTime <- function(tg, tierInd, index) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tbTools::isInt(index)) {
@@ -1369,7 +1369,7 @@ tg.getPointTime <- function(tg, tierInd, index) {
 #' tg.plot(tg2)
 #' }
 tg.removeTier <- function(tg, tierInd) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     tgNew <- tg
@@ -1567,7 +1567,7 @@ tg.insertNewIntervalTier <- function(tg, newInd, newTierName, tMin=NA, tMax=NA) 
 #' tg <- tg.sample()
 #' tg.getIntervalIndexAtTime(tg, "word", 0.5)
 tg.getIntervalIndexAtTime <- function(tg, tierInd, time) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tg.isIntervalTier(tg, tierInd)) {
@@ -1610,7 +1610,7 @@ tg.getIntervalIndexAtTime <- function(tg, tierInd, time) {
 #' tg <- tg.sample()
 #' tg.getPointIndexHigherThanTime(tg, "phoneme", 0.5)
 tg.getPointIndexHigherThanTime <- function(tg, tierInd, time) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tg.isPointTier(tg, tierInd)) {
@@ -1654,7 +1654,7 @@ tg.getPointIndexHigherThanTime <- function(tg, tierInd, time) {
 #' tg <- tg.sample()
 #' tg.getPointIndexLowerThanTime(tg, "phoneme", 0.5)
 tg.getPointIndexLowerThanTime <- function(tg, tierInd, time) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tg.isPointTier(tg, tierInd)) {
@@ -1698,7 +1698,7 @@ tg.getPointIndexLowerThanTime <- function(tg, tierInd, time) {
 #' tg <- tg.sample()
 #' tg.getPointIndexNearestTime(tg, "phoneme", 0.5)
 tg.getPointIndexNearestTime <- function(tg, tierInd, time) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tg.isPointTier(tg, tierInd)) {
@@ -1748,7 +1748,7 @@ tg.getPointIndexNearestTime <- function(tg, tierInd, time) {
 #' tg2 <- tg.removePoint(tg, "phoneme", 1)
 #' tg2$phoneme$label
 tg.removePoint <- function(tg, tierInd, index) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tg.isPointTier(tg, tierInd)) {
@@ -1800,7 +1800,7 @@ tg.removePoint <- function(tg, tierInd, index) {
 #' tg.plot(tg2)
 #' }
 tg.insertPoint <- function(tg, tierInd, time, label) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tg.isPointTier(tg, tierInd)) {
@@ -1869,7 +1869,7 @@ tg.insertPoint <- function(tg, tierInd, time, label) {
 #' tg.plot(tg2)
 #' }
 tg.removeIntervalLeftBoundary <- function(tg, tierInd, index) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tg.isIntervalTier(tg, tierInd)) {
@@ -1942,7 +1942,7 @@ tg.removeIntervalLeftBoundary <- function(tg, tierInd, index) {
 #' tg.plot(tg2)
 #' }
 tg.removeIntervalRightBoundary <- function(tg, tierInd, index) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tg.isIntervalTier(tg, tierInd)) {
@@ -2018,7 +2018,7 @@ tg.removeIntervalRightBoundary <- function(tg, tierInd, index) {
 #' tg.plot(tg2)
 #' }
 tg.removeIntervalBothBoundaries <- function(tg, tierInd, index) {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tg.isIntervalTier(tg, tierInd)) {
@@ -2124,7 +2124,7 @@ tg.removeIntervalBothBoundaries <- function(tg, tierInd, index) {
 #' tg.plot(tg2)
 #' }
 tg.insertBoundary <- function(tg, tierInd, time, label="") {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tg.isIntervalTier(tg, tierInd)) {
@@ -2271,7 +2271,7 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
 #' tg.plot(tg2)
 #' }
 tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
-    tierInd <- tgCheckTierInd(tg, tierInd)
+    tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
     if (!tg.isIntervalTier(tg, tierInd)) {
@@ -2674,7 +2674,7 @@ pt.plot <- function(pt, group = "") {
 
 
 
-# tierInd <- tgCheckTierInd(tg, tierInd)
+# tierInd <- tg.checkTierInd(tg, tierInd)
 #     ntiers <- length(tg)
 
 
