@@ -33,7 +33,7 @@ tg.sample() %>% tg.plot()  # demo test
 ```
 
 
-## How to cite this toolbox?
+## How to cite this package?
 We have invested a lot of time and effort in creating mPraat toolbox / rPraat package, please cite it when using it for data analysis.
 
 At this time, we have submitted a paper which is not published yet. Please, let us know (e-mail: <borilt@gmail.com>) if you use this toolbox and we will provide you the citation link as soon as possible. Thank you.
