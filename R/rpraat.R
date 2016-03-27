@@ -1,7 +1,3 @@
-# devtools::install_github("bbTomas/tbTools")
-
-library(dplyr)   # we need this for pipeline operator %>%
-
 #' tg.checkTierInd
 #'
 #' Returns tier index. Input can be either index (number) or tier name (character string).
