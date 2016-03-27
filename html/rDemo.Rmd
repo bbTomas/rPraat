@@ -1,0 +1,235 @@
+# rPraat: Praat in R
+
+## Installation and help
+
+rPraat and mPraat homepage: [http://fu.ff.cuni.cz/praat/](http://fu.ff.cuni.cz/praat/)
+
+Package rPraat at github: [https://github.com/bbTomas/rPraat/](https://github.com/bbTomas/rPraat/)
+
+```{r, eval=FALSE}
+install.packages("devtools")
+devtools::install_github("bbTomas/rPraat")
+```
+
+At each R session, you have to initialize the package.
+```{r, eval=FALSE}
+library(rPraat)
+library(dplyr)   # optional, if you want to use the pipeline operator `%>%`.
+```
+
+
+For help and examples, use command
+```{r, eval=FALSE}
+?nameOfFunction
+```
+or read .pdf documentation at [https://github.com/bbTomas/rPraat/blob/master/rPraat.pdf](https://github.com/bbTomas/rPraat/blob/master/rPraat.pdf)
+
+
+## Demo files
+To reproduce the following examples, you will need some sample files. Download and extract [rpraat_demo.zip](http://fu.ff.cuni.cz/praat/rpraat_demo.zip) to your Working Directory, it creates `demo` subdirectory.
+
+### Read and plot Sound, TextGrid, and PitchTier
+```{r, fig.height=2.5}
+library(tuneR)
+library(tbTools)
+library(dygraphs)
+
+sndWav <- readWave("demo/H.wav"); fs <- sndWav@samp.rate; snd <- sndWav@left / (2^(sndWav@bit-1))
+t <- seqM(0, (length(snd)-1)/fs, by = 1/fs)
+
+dygraph(data.frame(t, snd), xlab = "Time (sec)", group="group1") %>% dyRangeSelector() %>% dyAxis("y", label = "Amplitude")
+```
+
+```{r, fig.height=3}
+library(rPraat)
+tg <- tg.read("demo/H.TextGrid") %>%
+    tg.removeTier("phrase") %>% tg.removeTier("phoneme") %>% tg.removeTier("syllable")
+
+tg.plot(tg, group="group1")
+```
+
+```{r, fig.height=2.5}
+pt <- pt.read("demo/H.PitchTier")
+pt.plot(pt, group="group1") %>% dyAxis("y", label = "Frequency (Hz)")
+```
+
+#### Interactive plots using dygraphs (including tg.plot, pt.plot)
+
+Mouse drag: Zoom to selection
+
+Mouse Double-click: Default zoom
+
+Shift + mouse drag: plot scroll
+
+
+## TextGrid
+
+```{r}
+tg <- tg.read("demo/H.TextGrid")
+tg.getNumberOfTiers(tg)
+length(tg)   # number of tiers, "low-level access"
+tg.getTotalDuration(tg)
+tg.getTierName(tg, 1)
+```
+
+### Tier accessed both by index and name
+
+```{r}
+tg.isPointTier(tg, 1)
+tg.isPointTier(tg, "phoneme")
+
+tg.isIntervalTier(tg, 1)
+tg.isIntervalTier(tg, "phoneme")
+
+tg[[1]]$type
+tg$phoneme$type
+
+tg.checkTierInd(tg, "word")  # get index of a tier with specified name
+tg.checkTierInd(tg, 4)  # only checks whether TextGrid contains a tier with this index
+```
+
+### Point tier
+
+```{r}
+tg.getNumberOfPoints(tg, 1)
+tg.getNumberOfPoints(tg, "phoneme")
+tg.getPointTime(tg, "phoneme", 4)
+tg.getLabel(tg, "phoneme", 4)
+```
+
+#### Point tier "low-level access"
+
+```{r}
+length(tg[[1]]$t)   # number of points
+tg[[1]]$t[4]
+tg[[1]]$label[4]
+
+length(tg$phoneme$t)
+tg$phoneme$t[4]
+tg$phoneme$label[4]
+
+tg$phoneme$t[5:8]
+```
+
+### Interval tier
+
+```{r}
+tg.isPointTier(tg, "word")
+tg.isIntervalTier(tg, "word")
+tg[[4]]$type
+tg$word$type
+
+tg.getTotalDuration(tg, "word")
+tg.getStartTime(tg, "word")
+tg.getEndTime(tg, "word")
+
+tg.getNumberOfIntervals(tg, "word")
+tg.getIntervalStartTime(tg, "word", index = 4)
+tg.getIntervalEndTime(tg, "word", index = 4)
+tg.getIntervalDuration(tg, "word", index = 4)
+tg.getLabel(tg, "word", index = 4)
+```
+
+#### Interval tier "low-level access"
+
+```{r}
+length(tg[[4]]$t1)   # number of intervals
+tg[[4]]$t1[4]
+tg[[4]]$t2[4]
+tg[[4]]$label[4]
+
+length(tg$word$t1)
+tg$word$t1[4]
+tg$word$t2[4]
+tg$word$label[4]
+
+tg$word$label[5:8]
+```
+
+### Vectorized operations
+
+```{r, fig.height=3.5}
+labelsOfInterest <- c("i", "i:", "e", "e:", "a", "a:", "o", "o:", "u", "u:")
+condition <- tg$phone$label %in% labelsOfInterest
+
+sum(condition) # How many labels satisfy the condition?
+
+dur <- tg$phone$t2[condition] - tg$phone$t1[condition]
+mean(dur)
+hist(dur)
+```
+
+
+### Overview of some TextGrid operations
+
+For all functions, see help `?functionName` for its description and example of use.
+
+```{r, fig.height=3.5}
+tg <- tg.read("demo/H.TextGrid")
+tg.plot(tg)
+
+tg <- tg.removeTier(tg, "syllable")
+tg <- tg.removeTier(tg, "phrase")
+tg <- tg.removeTier(tg, "phone")
+
+ind <- tg.getPointIndexNearestTime(tg, "phoneme", time = 1.5)
+tg <- tg.setLabel(tg, "phoneme", ind, newLabel = "!Q!")
+
+tg <- tg.insertPoint(tg, "phoneme", time = 1.6, label = "NEW")
+tg$phoneme$t <- tg$phoneme$t[-(30:40)]   # remove points 30:40
+tg$phoneme$label <- tg$phoneme$label[-(30:40)]
+
+tg <- tg.duplicateTier(tg, "word", newInd = 2, newTierName = "WORD2")
+tg <- tg.removeIntervalBothBoundaries(tg, "WORD2", index = 6)
+tg <- tg.setLabel(tg, "WORD2", index = 5, newLabel = "")
+tg <- tg.insertInterval(tg, "WORD2", tStart = 0.9, tEnd = 1.7, label = "NEW LAB")
+ind <- tg.getIntervalIndexAtTime(tg, "WORD2", time = 2.3)
+tg <- tg.removeIntervalBothBoundaries(tg, "WORD2", ind)
+tg.plot(tg)
+
+tgNew <- tg.createNewTextGrid(tMin = 0, tMax = 5)
+tgNew <- tg.insertNewIntervalTier(tgNew, newInd = 1, "word")
+tgNew <- tg.insertInterval(tgNew, tierInd = 1, tStart = 2, tEnd = 3.5, "hello")
+tgNew <- tg.insertInterval(tgNew, tierInd = 1, 4, 4.8, "world")
+tgNew <- tg.insertNewPointTier(tgNew, newInd = 2, newTierName = "click")
+tgNew <- tg.insertPoint(tgNew, tierInd = 2, time = 2, label = "click")
+tgNew <- tg.insertPoint(tgNew, tierInd = 2, time = 4, label = "click")
+tg.plot(tgNew)
+tg.write(tgNew, "demo/ex_output.TextGrid")
+```
+
+### Repair continuity problem of TextGrid
+
+Repairs problem of continuity of T2 and T1 in interval tiers. This problem is very rare and it should not appear. However, e.g., automatic segmentation tool Prague Labeller produces random numeric round-up errors featuring, e.g., T2 of preceding interval is slightly higher than the T1 of the current interval. Because of that, the boundary cannot be manually moved in Praat edit window.
+
+```{r}
+tgProblem <- tg.read("demo/H_problem.TextGrid")
+tgNew <- tg.repairContinuity(tgProblem)
+tg.write(tgNew, "demo/H_problem_OK.TextGrid")
+
+tgNew2 <- tg.repairContinuity(tgNew) # no problem in repaired TextGrid
+```
+
+## PitchTier
+
+**Example.** Transform Hz to semitones (ST) and cut the pitchtier along the TextGrid.
+
+```{r, fig.height=3.5}
+pt <- pt.read("demo/H.PitchTier")
+pt$f <- 12*log(pt$f/100) / log(2)  # conversion of Hz to Semitones, reference 0 ST = 100 Hz.
+
+pt.plot(pt) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
+
+
+tg <- tg.read("demo/H.TextGrid")
+tg$word$label[1:6]
+
+condition <- pt$t >= 0  &  pt$t <= tg$word$t2[6]
+pt$t <- pt$t[condition]  # first six intervals in word tier
+pt$f <- pt$f[condition]
+pt$tmax <- tg$word$t2[6]
+
+pt.plot(pt) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
+pt.write(pt, "demo/H_cut.PitchTier")
+```
+

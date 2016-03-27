@@ -1,0 +1,63 @@
+# rPraat package for R
+
+rPraat package for R which constitutes an interface between the most popular software for phonetic analyses, Praat, and R.
+
+Version 1.0.0.
+
+See also: [mPraat toolbox](https://github.com/bbTomas/mPraat) for Matlab.
+
+## Installation and demonstration
+
+You can install it from `github` using the `devtools` package. You will also need `tbTools` package which should install automatically with `rPraat`.
+
+### Install
+
+One-time installation (internet connection needed).
+
+```{r, eval=FALSE}
+install.packages("devtools")
+devtools::install_github("bbTomas/rPraat")
+```
+
+### Initialize
+
+At each R session, you have to initialize the package (no internet needed).
+
+```{r, eval=FALSE}
+library(rPraat)
+library(dplyr)   # optional, if you want to use the pipeline operator `%>%`.
+```
+
+### Test
+Let' try simple demo to check everything works.
+
+```{r, eval=FALSE}
+library(rPraat)
+library(dplyr)
+tg.sample() %>% tg.plot()
+```
+
+
+
+
+### Demonstration
+
+For demonstration, see [html/rDemo.html](http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html)
+
+## How to cite this toolbox?
+We have invested a lot of time and effort in creating mPraat toolbox / rPraat package, please cite it when using it for data analysis.
+
+At this time, we have submitted a paper which is not published yet. Please, let us know (e-mail: <borilt@gmail.com>) if you use this toolbox and we will provide you the citation link as soon as possible. Thank you.
+
+## Lincese
+
+License: MIT
+
+Copyright (c) 2016 Tomáš Bořil, borilt@gmail.com
+
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
