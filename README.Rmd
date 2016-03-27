@@ -6,39 +6,27 @@ Version 1.0.0.
 
 See also: [mPraat toolbox](https://github.com/bbTomas/mPraat) for Matlab.
 
+rPraat and mPraat homepage: [http://fu.ff.cuni.cz/praat/](http://fu.ff.cuni.cz/praat/)
+
 ## Installation and demonstration
 
-You can install it from `github` using the `devtools` package. You will also need `tbTools` package which should install automatically with `rPraat`.
-
-### Install
-
-One-time installation (internet connection needed).
+One-time installation (internet connection needed). 
 
 ```{r, eval=FALSE}
 install.packages("devtools")
 devtools::install_github("bbTomas/rPraat")
 ```
 
-### Initialize
+### Initialize and Test
 
 At each R session, you have to initialize the package (no internet needed).
 
 ```{r, eval=FALSE}
 library(rPraat)
 library(dplyr)   # optional, if you want to use the pipeline operator `%>%`.
+
+tg.sample() %>% tg.plot()  # demo test
 ```
-
-### Test
-Let' try simple demo to check everything works.
-
-```{r, eval=FALSE}
-library(rPraat)
-library(dplyr)
-tg.sample() %>% tg.plot()
-```
-
-
-
 
 ### Demonstration
 

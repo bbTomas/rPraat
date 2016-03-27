@@ -116,27 +116,19 @@ $(document).ready(function () {
 <p>rPraat package for R which constitutes an interface between the most popular software for phonetic analyses, Praat, and R.</p>
 <p>Version 1.0.0.</p>
 <p>See also: <a href="https://github.com/bbTomas/mPraat">mPraat toolbox</a> for Matlab.</p>
+<p>rPraat and mPraat homepage: <a href="http://fu.ff.cuni.cz/praat/" class="uri">http://fu.ff.cuni.cz/praat/</a></p>
 <div id="installation-and-demonstration" class="section level2">
 <h2>Installation and demonstration</h2>
-<p>You can install it from <code>github</code> using the <code>devtools</code> package. You will also need <code>tbTools</code> package which should install automatically with <code>rPraat</code>.</p>
-<div id="install" class="section level3">
-<h3>Install</h3>
 <p>One-time installation (internet connection needed).</p>
 <pre class="r"><code>install.packages(&quot;devtools&quot;)
 devtools::install_github(&quot;bbTomas/rPraat&quot;)</code></pre>
-</div>
-<div id="initialize" class="section level3">
-<h3>Initialize</h3>
+<div id="initialize-and-test" class="section level3">
+<h3>Initialize and Test</h3>
 <p>At each R session, you have to initialize the package (no internet needed).</p>
 <pre class="r"><code>library(rPraat)
-library(dplyr)   # optional, if you want to use the pipeline operator `%&gt;%`.</code></pre>
-</div>
-<div id="test" class="section level3">
-<h3>Test</h3>
-<p>Let’ try simple demo to check everything works.</p>
-<pre class="r"><code>library(rPraat)
-library(dplyr)
-tg.sample() %&gt;% tg.plot()</code></pre>
+library(dplyr)   # optional, if you want to use the pipeline operator `%&gt;%`.
+
+tg.sample() %&gt;% tg.plot()  # demo test</code></pre>
 </div>
 <div id="demonstration" class="section level3">
 <h3>Demonstration</h3>
