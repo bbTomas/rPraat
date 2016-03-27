@@ -24,7 +24,6 @@ which we can set the label (optional argument).
 }
 \details{
 Notes
-=====
 
 There are more possible situations which influence where the new label
 will be set.

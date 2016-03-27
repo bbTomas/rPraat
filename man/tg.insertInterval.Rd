@@ -30,7 +30,7 @@ empty interval between.
 }
 \details{
 Notes
-=====
+
 In most cases, this function is the same as 1.) tgInsertBoundary(tEnd)
 and 2.) tgInsertBoundary(tStart, 'new label'). But, additional checks are
 performed: a) tStart and tEnd belongs to the same empty interval, or
