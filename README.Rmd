@@ -25,7 +25,7 @@ At each R session, you have to initialize the package (no internet needed).
 
 ```{r, eval=FALSE}
 library(rPraat)
-library(dplyr)   # optional, if you want to use the pipeline operator `%>%`.
+library(dplyr)   # optional, if you want to use the pipeline operator %>%
 
 tg.sample() %>% tg.plot()  # demo test
 ```
