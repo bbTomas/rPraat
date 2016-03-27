@@ -4,11 +4,13 @@ rPraat package for R which constitutes an interface between the most popular sof
 
 Version 1.0.0.
 
+For demonstration, see [html/rDemo.html](http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html)
+
 See also: [mPraat toolbox](https://github.com/bbTomas/mPraat) for Matlab.
 
 rPraat and mPraat homepage: [http://fu.ff.cuni.cz/praat/](http://fu.ff.cuni.cz/praat/)
 
-## Installation and demonstration
+## Installation
 
 One-time installation (internet connection needed). 
 
@@ -28,9 +30,6 @@ library(dplyr)   # optional, if you want to use the pipeline operator `%>%`.
 tg.sample() %>% tg.plot()  # demo test
 ```
 
-### Demonstration
-
-For demonstration, see [html/rDemo.html](http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html)
 
 ## How to cite this toolbox?
 We have invested a lot of time and effort in creating mPraat toolbox / rPraat package, please cite it when using it for data analysis.
