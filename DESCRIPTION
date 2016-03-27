@@ -4,7 +4,7 @@ Title: Read, write and manipulate Praat TextGrid and PitchTier
 Version: 1.0.0
 Authors@R: person("Tomas", "Boril", email = "borilt@gmail.com", role = c("aut", "cre"))
 Maintainer: Tomas Boril <borilt@gmail.com>
-Description: rPraat package for R which constitutes an interface between the
+Description: rPraat package for R constitutes an interface between the
     most popular software for phonetic analyses, Praat, and R.
 URL: https://github.com/bbTomas/rPraat/
 BugReports: https://github.com/bbTomas/rPraat/issues
