@@ -6,6 +6,8 @@ Version 1.0.0.
 
 For demonstration, see [html/rDemo.html](http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html)
 
+Package documentation [https://github.com/bbTomas/rPraat/blob/master/rPraat.pdf](https://github.com/bbTomas/rPraat/blob/master/rPraat.pdf)
+
 See also: [mPraat toolbox](https://github.com/bbTomas/mPraat) for Matlab.
 
 rPraat and mPraat homepage: [http://fu.ff.cuni.cz/praat/](http://fu.ff.cuni.cz/praat/)
