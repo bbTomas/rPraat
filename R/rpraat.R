@@ -103,14 +103,14 @@ tg.read <- function(fileNameTextGrid) {
     }
 
     if (shortFormat) {
-        pocetTiers <- as.numeric(flines[find])
+        nTiers <- as.numeric(flines[find])
         find <- find + 1
     } else {
-        pocetTiers <- tidyr::extract_numeric(flines[find])
+        nTiers <- tidyr::extract_numeric(flines[find])
         find <- find + 1
     }
 
-    for (tier in tbTools::seqM(1, pocetTiers)) {
+    for (tier in tbTools::seqM(1, nTiers)) {
 
         if (shortFormat) {
             typ <- flines[find]; find <- find + 1
@@ -128,7 +128,7 @@ tg.read <- function(fileNameTextGrid) {
         }
 
         if (typ == '"IntervalTier"') {  # IntervalTier
-            r <- flines[find]; find <- find + 1  # jmeno
+            r <- flines[find]; find <- find + 1  # names
             if (shortFormat) {
                 tierName <- substr(r, 2, nchar(r)-1)
             } else {
@@ -137,22 +137,22 @@ tg.read <- function(fileNameTextGrid) {
             }
             tierType <- 'interval'
 
-            find <- find + 2; # ignorujeme xmin a xmax
+            find <- find + 2; # ignore xmin and xmax
 
             if (shortFormat) {
-                pocetIntervalu <- as.numeric(flines[find]); find <- find + 1
+                nIntervals <- as.numeric(flines[find]); find <- find + 1
             } else {
                 r <- tbTools::strTrim(flines[find]); find <- find + 1
-                pocetIntervalu <- tidyr::extract_numeric(r)
+                nIntervals <- tidyr::extract_numeric(r)
             }
 
             tierT1 <- numeric(0)
             tierT2 <- numeric(0)
             tierLabel <- character(0)
 
-            for (I in tbTools::seqM(1, pocetIntervalu)) {
+            for (I in tbTools::seqM(1, nIntervals)) {
                 if (!shortFormat) {
-                    r <- flines[find]; find <- find + 1 # ignorujeme radek intervals [..]:
+                    r <- flines[find]; find <- find + 1 # ignore line intervals [..]:
                 }
 
                 if (shortFormat) {
@@ -174,26 +174,26 @@ tg.read <- function(fileNameTextGrid) {
                         stop('Unknown textgrid format');
                     }
                     rind <- tbTools::str_find1(r, '"')
-                    pocetUvozovek <- length(tbTools::str_find(r, '"'))  # v Matlabu: sum(r == '"')
-                    if ((pocetUvozovek %% 2) != 1) { # odstranit mezeru na konci, ktera je pouze v pripade, ze je sudy pocet uvozovek
+                    nQuotationMarks <- length(tbTools::str_find(r, '"'))  # in Matlab: sum(r == '"')
+                    if ((nQuotationMarks %% 2) != 1) { # remove whitespace at the end of line, it is only in the case of even number of quotation marks
                         r <- substr(r, rind, nchar(r)-1)
                     } else {
                         r <- substr(r, rind, nchar(r))
                     }
                 }
-                pocetUvozovek <- length(tbTools::str_find(r, '"'))
+                nQuotationMarks <- length(tbTools::str_find(r, '"'))
                 label <- substr(r, 2, nchar(r))
-                if ((pocetUvozovek %% 2) == 1) {
+                if ((nQuotationMarks %% 2) == 1) {
                     label <- paste0(label, '\n')
 
                     repeat {
                         r <- flines[find]; find <- find + 1
-                        pocetUvozovek <- length(tbTools::str_find(r, '"'))
-                        if (!shortFormat & (pocetUvozovek %% 2 == 1)) {# odstranit mezeru na konci, ktera pouze v pripade, ze je lichy pocet uvozovek
+                        nQuotationMarks <- length(tbTools::str_find(r, '"'))
+                        if (!shortFormat & (nQuotationMarks %% 2 == 1)) { # remove whitespace at the end of line, it is only in the case of odd number of quotation marks
                             r <- substr(r, 1, nchar(r)-1)
                         }
 
-                        if (pocetUvozovek %% 2 == 1  &  stringr::str_sub(r, -1) == '"') {
+                        if (nQuotationMarks %% 2 == 1  &  stringr::str_sub(r, -1) == '"') {
                             label <- paste0(label, substr(r, 1, nchar(r)-1), '"')
                             break
                         } else {
@@ -226,7 +226,7 @@ tg.read <- function(fileNameTextGrid) {
 
 
         } else if (typ == '"TextTier"') {  # PointTier
-            r <- flines[find]; find <- find + 1  # jmeno
+            r <- flines[find]; find <- find + 1  # name
             if (shortFormat) {
                 tierName <- substr(r, 2, nchar(r)-1)
             } else {
@@ -235,21 +235,21 @@ tg.read <- function(fileNameTextGrid) {
             }
             tierType <- 'point'
 
-            find <- find + 2 # ignorujeme xmin a xmax
+            find <- find + 2 # ignore xmin and xmax
 
             if (shortFormat) {
-                pocetIntervalu <- as.numeric(flines[find]); find <- find + 1
+                nIntervals <- as.numeric(flines[find]); find <- find + 1
             } else {
                 r <- tbTools::strTrim(flines[find]); find <- find + 1
-                pocetIntervalu <- tidyr::extract_numeric(r)
+                nIntervals <- tidyr::extract_numeric(r)
             }
 
             tierT <- numeric(0)
             tierLabel <- character(0)
 
-            for (I in tbTools::seqM(1, pocetIntervalu)) {
+            for (I in tbTools::seqM(1, nIntervals)) {
                 if (!shortFormat) {
-                    r <- flines[find]; find <- find + 1 # ignorujeme radek points [..]:
+                    r <- flines[find]; find <- find + 1 # ignore line points [..]:
                 }
 
                 if (shortFormat) {
@@ -268,25 +268,25 @@ tg.read <- function(fileNameTextGrid) {
                         stop('Unknown textgrid format');
                     }
                     rind <- tbTools::str_find1(r, '"')
-                    pocetUvozovek <- length(tbTools::str_find(r, '"'))
-                    if (pocetUvozovek %% 2 != 1) { # odstranit mezeru na konci, ktera pouze v pripade, ze je sudy pocet uvozovek
+                    nQuotationMarks <- length(tbTools::str_find(r, '"'))
+                    if (nQuotationMarks %% 2 != 1) { # remove whitespace at the end of line, it is only in the case of even number of quotation marks
                         r <- substr(r, rind, nchar(r)-1)
                     } else {
                         r <- substr(r, rind, nchar(r))
                     }
                 }
-                pocetUvozovek <- length(tbTools::str_find(r, '"'))
+                nQuotationMarks <- length(tbTools::str_find(r, '"'))
                 label <- substr(r, 2, nchar(r))
-                if (pocetUvozovek %% 2 == 1) {
+                if (nQuotationMarks %% 2 == 1) {
                     label <- paste0(label, '\n')
                     repeat {
                         r <- flines[find]; find <- find + 1
-                        pocetUvozovek <- length(tbTools::str_find(r, '"'))
-                        if (!shortFormat & (pocetUvozovek %% 2 == 1)) { # odstranit mezeru na konci, ktera pouze v pripade, ze je lichy pocet uvozovek
+                        nQuotationMarks <- length(tbTools::str_find(r, '"'))
+                        if (!shortFormat & (nQuotationMarks %% 2 == 1)) { # remove whitespace at the end of line, it is only in the case of odd number of quotation marks
                             r <- substr(r, 1, nchar(r)-1)
                         }
 
-                        if ((pocetUvozovek %% 2 == 1) & (stringr::str_sub(r, -1) == '"')) {
+                        if ((nQuotationMarks %% 2 == 1) & (stringr::str_sub(r, -1) == '"')) {
                             label <- paste0(label, substr(r, 1, nchar(r)-1), '"')
                             break
                         } else {
@@ -355,13 +355,13 @@ tg.write <- function(tg, fileNameTextGrid) {
         stop("Invalid 'fileNameTextGrid' parameter.")
     }
 
-    nTiers <- length(tg)  # pocet Tiers
+    nTiers <- length(tg)  # number of Tiers
 
-    minCasTotal <-  NaN
-    maxCasTotal <-  NaN
+    minTimeTotal <-  NaN
+    maxTimeTotal <-  NaN
     if ("tmin" %in% names(class(tg))  &  "tmax" %in% names(class(tg))) {
-        minCasTotal <- as.numeric(class(tg)["tmin"])
-        maxCasTotal <- as.numeric(class(tg)["tmax"])
+        minTimeTotal <- as.numeric(class(tg)["tmin"])
+        maxTimeTotal <- as.numeric(class(tg)["tmax"])
     }
 
     for (I in tbTools::seqM(1, nTiers)) {
@@ -380,16 +380,16 @@ tg.write <- function(tg, fileNameTextGrid) {
         tg[[I]]$typInt <- typInt
 
         if (typInt == TRUE) {
-            nInt <- length(tg[[I]]$t1) # pocet intervalu
+            nInt <- length(tg[[I]]$t1) # number of intervals
             if (nInt > 0) {
-                minCasTotal <- min(tg[[I]]$t1[1], minCasTotal)
-                maxCasTotal <- max(tg[[I]]$t2[length(tg[[I]]$t2)], maxCasTotal)
+                minTimeTotal <- min(tg[[I]]$t1[1], minTimeTotal)
+                maxTimeTotal <- max(tg[[I]]$t2[length(tg[[I]]$t2)], maxTimeTotal)
             }
         } else {
-            nInt <- length(tg[[I]]$t) # pocet intervalu
+            nInt <- length(tg[[I]]$t) # number of points
             if (nInt > 0) {
-                minCasTotal <- min(tg[[I]]$t[1], minCasTotal)
-                maxCasTotal <- max(tg[[I]]$t[length(tg[[I]]$t)], maxCasTotal)
+                minTimeTotal <- min(tg[[I]]$t[1], minTimeTotal)
+                maxTimeTotal <- max(tg[[I]]$t[length(tg[[I]]$t)], maxTimeTotal)
             }
         }
     }
@@ -402,20 +402,20 @@ tg.write <- function(tg, fileNameTextGrid) {
     writeLines('File type = "ooTextFile"', fid)
     writeLines('Object class = "TextGrid"', fid)
     writeLines('', fid)
-    writeLines(as.character(tbTools::round2(minCasTotal, -10)), fid)  # nejmensi cas ze vsech vrstev
-    writeLines(as.character(tbTools::round2(maxCasTotal, -10)), fid)  # nejvetsi cas ze vsech vrstev
+    writeLines(as.character(tbTools::round2(minTimeTotal, -10)), fid)  # min time from all tiers
+    writeLines(as.character(tbTools::round2(maxTimeTotal, -10)), fid)  # max time from all tiers
     writeLines('<exists>', fid)
     writeLines(as.character(nTiers), fid)
 
     for (N in tbTools::seqM(1, nTiers)) {
-        if (tg[[N]]$typInt == TRUE) {
+        if (tg[[N]]$typInt == TRUE) {  # interval tier
             writeLines('"IntervalTier"', fid)
             writeLines(paste0('"', tg[[N]]$name, '"'), fid)
 
-            nInt <- length(tg[[N]]$t1)  # pocet intervalu
+            nInt <- length(tg[[N]]$t1)  # number of intervals
             if (nInt > 0) {
-                writeLines(as.character(tbTools::round2(tg[[N]]$t1[1], -10)), fid)  # pocatecni cas tier
-                writeLines(as.character(tbTools::round2(tg[[N]]$t2[length(tg[[N]]$t2)], -10)), fid)  # finalni cas tier
+                writeLines(as.character(tbTools::round2(tg[[N]]$t1[1], -10)), fid)  # start time of the tier
+                writeLines(as.character(tbTools::round2(tg[[N]]$t2[length(tg[[N]]$t2)], -10)), fid)  # end time of the tier
                 writeLines(as.character(nInt), fid)  # pocet intervalu textgrid
 
                 for (I in tbTools::seqM(1, nInt)) {
@@ -423,32 +423,32 @@ tg.write <- function(tg, fileNameTextGrid) {
                     writeLines(as.character(tbTools::round2(tg[[N]]$t2[I], -10)), fid)
                     writeLines(paste0('"', tg[[N]]$label[I], '"'), fid)
                 }
-            } else {   # vytvoreni jednoho prazdneho intervalu
-                writeLines(as.character(tbTools::round2(minCasTotal, -10)), fid)  # pocatecni cas tier
-                writeLines(as.character(tbTools::round2(maxCasTotal, -10)), fid)  # finalni cas tier
-                writeLines("1", fid)  # pocet intervalu textgrid
-                writeLines(as.character(tbTools::round2(minCasTotal, -10)), fid)
-                writeLines(as.character(tbTools::round2(maxCasTotal, -10)), fid)
+            } else {   # create one empty interval
+                writeLines(as.character(tbTools::round2(minTimeTotal, -10)), fid)  # start time of the tier
+                writeLines(as.character(tbTools::round2(maxTimeTotal, -10)), fid)  # end time of the tier
+                writeLines("1", fid)  # number of intervals
+                writeLines(as.character(tbTools::round2(minTimeTotal, -10)), fid)
+                writeLines(as.character(tbTools::round2(maxTimeTotal, -10)), fid)
                 writeLines('""', fid)
             }
-        } else { # je to pointTier
+        } else { # pointTier
             writeLines('"TextTier"', fid)
             writeLines(paste0('"', tg[[N]]$name, '"'), fid)
 
-            nInt <- length(tg[[N]]$t)  # pocet intervalu
+            nInt <- length(tg[[N]]$t)  # number of intervals
             if (nInt > 0) {
-                writeLines(as.character(tbTools::round2(tg[[N]]$t[1], -10)), fid)  # pocatecni cas tier
-                writeLines(as.character(tbTools::round2(tg[[N]]$t[length(tg[[N]]$t)], -10)), fid)  # finalni cas tier
-                writeLines(as.character(nInt), fid)  # pocet intervalu textgrid
+                writeLines(as.character(tbTools::round2(tg[[N]]$t[1], -10)), fid)  # start time of the tier
+                writeLines(as.character(tbTools::round2(tg[[N]]$t[length(tg[[N]]$t)], -10)), fid)  # end time of the tier
+                writeLines(as.character(nInt), fid)  # number of points
 
                 for (I in tbTools::seqM(1, nInt)) {
                     writeLines(as.character(tbTools::round2(tg[[N]]$t[I], -10)), fid)
                     writeLines(paste0('"', tg[[N]]$label[I], '"'), fid)
                 }
             } else { # prazdny pointtier
-                writeLines(as.character(tbTools::round2(minCasTotal, -10)), fid)  # pocatecni cas tier
-                writeLines(as.character(tbTools::round2(maxCasTotal, -10)), fid)  # finalni cas tier
-                writeLines('0', fid)  # pocet intervalu textgrid
+                writeLines(as.character(tbTools::round2(minTimeTotal, -10)), fid)  # start time of the tier
+                writeLines(as.character(tbTools::round2(maxTimeTotal, -10)), fid)  # end time of the tier
+                writeLines('0', fid)  # number of points
             }
         }
 
@@ -489,7 +489,7 @@ tg.plot <- function(tg, group = "") {
 
     tAll <- as.numeric(c(class(tg)["tmin"], class(tg)["tmax"]))
 
-    # Nalezeni vsech casovych okamziku
+    # find all time instances
     for (I in tbTools::seqM(1, ntiers)) {
 
         if (tg[[I]]$type == "point") {
@@ -507,20 +507,20 @@ tg.plot <- function(tg, group = "") {
 
     data <- list(t = tAll)
 
-    # Vytvoreni jednotlivych rad
+    # create tiers
     for (I in tbTools::seqM(1, ntiers)) {
 
         if (tg[[I]]$type == "point") {
             y <- rep(as.numeric(NA), length(tAll))
 
-            y[tAll %in% tg[[I]]$t] <- ntiers + 1 - I  # Vyska grafickeho bodu dle indexu tier
+            y[tAll %in% tg[[I]]$t] <- ntiers + 1 - I  # y-value of graphic point according to tier index
             data[[length(data)+1]] <- y
             names(data)[length(data)] <- tg[[I]]$name
 
         } else if (tg[[I]]$type == "interval") {
             y <- rep(as.numeric(NA), length(tAll))
 
-            # y[tAll %in% unique(c(tg[[I]]$t1, tg[[I]]$t2))] <- ntiers + 1 - I  # Vyska grafickeho bodu dle indexu tier
+            # y[tAll %in% unique(c(tg[[I]]$t1, tg[[I]]$t2))] <- ntiers + 1 - I  # y-value of graphic point according to tier index
             y <- rep(ntiers + 1 - I, length(tAll))
             data[[length(data)+1]] <- y
             names(data)[length(data)] <- tg[[I]]$name
@@ -531,7 +531,7 @@ tg.plot <- function(tg, group = "") {
 
     }
 
-    if (group != "") {  # pro synchronizaci s jinymi grafy dygraph, ktere maji nastavenu group na stejny nazev
+    if (group != "") {  # dygraphs plot-synchronization group
         g <- dygraphs::dygraph(data, group = group, xlab = "Time (sec)")
         g <- dygraphs::dyRangeSelector(g)
     } else {
@@ -558,7 +558,7 @@ tg.plot <- function(tg, group = "") {
 
     }
 
-    # Styly jednotlivych tiers
+    # style of tiers
     for (I in tbTools::seqM(1, ntiers)) {
         if (tg[[I]]$type == "point") {
             g <- dygraphs::dySeries(g, tg[[I]]$name, pointSize = 2, strokeWidth = 0)
@@ -745,9 +745,6 @@ tg.getTierName <- function(tg, tierInd) {
 
 
 
-## Nastavi (zmeni) jmeno vrstvy (tier) s danym indexem.
-## v1.0, Tomas Boril, borilt@gmail.com
-
 
 #' tg.setTierName
 #'
@@ -807,7 +804,7 @@ tg.countLabels <- function(tg, tierInd, label) {
         stop("label must be a character string")
     }
 
-    c <- 0  # nalezeny pocet
+    c <- 0  # count
 
     for (I in tbTools::seqM(1, length(tg[[tierInd]]$label))) {
         if (tg[[tierInd]]$label[I] == label) {
@@ -2144,12 +2141,12 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
     }
 
     if (is.na(index)) {
-        if (time > tg[[tierInd]]$t2[length(tg[[tierInd]]$t2)]) {  # pripad c) vpravo od existujicich intervalu
+        if (time > tg[[tierInd]]$t2[length(tg[[tierInd]]$t2)]) {  # situation c) On the right of existing interval
             tgNew[[tierInd]]$t1[nint+1] <- tg[[tierInd]]$t2[nint]
             tgNew[[tierInd]]$t2[nint+1] <- time
             tgNew[[tierInd]]$label[nint+1] <- label
             class(tgNew)["tmax"] <- max(c(as.numeric(class(tg)["tmax"]), time), na.rm = TRUE)
-        } else if (time < tg[[tierInd]]$t1[1]) { # pripad b) vlevo od existujicich intervalu
+        } else if (time < tg[[tierInd]]$t1[1]) { # situation b) On the left of existing interval
             for (I in tbTools::seqM(nint, 1, by = -1)) {
                 tgNew[[tierInd]]$t1[I+1] <- tgNew[[tierInd]]$t1[I]
                 tgNew[[tierInd]]$t2[I+1] <- tgNew[[tierInd]]$t2[I]
@@ -2159,12 +2156,12 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
             tgNew[[tierInd]]$t2[1] <- tgNew[[tierInd]]$t1[2]
             tgNew[[tierInd]]$label[1] <- label
             class(tgNew)["tmin"] <- min(c(as.numeric(class(tg)["tmin"]), time), na.rm = TRUE)
-        } else if (time == tg[[tierInd]]$t2[length(tg[[tierInd]]$t2)]) {  # pokus o nesmyslne vlozeni hranice presne na konec tier
+        } else if (time == tg[[tierInd]]$t2[length(tg[[tierInd]]$t2)]) {  # attempt to insert boundary exactly to the end of tier (nonsense)
             stop(paste0('Cannot insert boundary because one already exists at the same position [tierInd = ', tierInd, ', time = ', time, '].'))
         } else {
             stop('Nonsense: missing interval, even though time is between intervals. Please check continuity using tg.repairContinuity().')
         }
-    } else { # pripad a) do jiz existujiciho intervalu
+    } else { # situation a) New boundary into the existing interval
         for (I in tbTools::seqM(1, nint)) {
             if ((time %in% tgNew[[tierInd]]$t1) | (time %in% tgNew[[tierInd]]$t2)) {
                 stop(paste0('Cannot insert boundary because one already exists at the same position [tierInd = ', tierInd, ', time = ', time, '].'))
@@ -2282,19 +2279,19 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
     if (tStart >= tEnd) {
         stop(paste0('tStart [', as.character(tStart), '] must be lower than tEnd [', as.character(tEnd), '].'))
     }
-    # pozn. diky teto podmince nemohou nastat nektere situace podchycene nize
-    # (tStart == tEnd), leccos se tim zjednodusuje a Praat stejne nedovoluje
-    # mit dve hranice ve stejnem case, takze je to alespon kompatibilni.
+    # Note: thanks to this condition, some situations (which were solved below) cannot happen
+    # (tStart == tEnd), thus it is easier. By the way, Praat does not allow to have 2 boundaries
+    # in the same time instance, do it is fully compatible.
 
     if (!tbTools::isString(label)) {
         stop("label must be a character string.")
     }
 
-    # tgNew <- tg   # zakomentovano i v originale v Matlabu
+    # tgNew <- tg
 
     nint <- length(tg[[tierInd]]$t1)
     if (nint == 0) {
-        # Zvlastni situace, tier nema ani jeden interval.
+        # Strange situation, tier does not have any single interval.
         tgNew <- tg
         tgNew[[tierInd]]$t1 <- tStart
         tgNew[[tierInd]]$t2 <- tEnd
@@ -2304,34 +2301,35 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
         return(tgNew)
     }
 
-    tgNalevo <- tg[[tierInd]]$t1[1]
-    tgNapravo <- tg[[tierInd]]$t2[length(tg[[tierInd]]$t2)]
+    tgLeft <- tg[[tierInd]]$t1[1]
+    tgRight <- tg[[tierInd]]$t2[length(tg[[tierInd]]$t2)]
 
-    if (tStart < tgNalevo & tEnd < tgNalevo) {
-        # cat('vkladam uplne nalevo + prazdny interval jako vypln\n')
+    if (tStart < tgLeft & tEnd < tgLeft) {
+        # cat('insert totally left + empty filling interval\n')
         tgNew <- tg.insertBoundary(tg, tierInd, tEnd)
         tgNew <- tg.insertBoundary(tgNew, tierInd, tStart, label)
         return(tgNew)
-    } else if (tStart <= tgNalevo & tEnd == tgNalevo) {
-        # cat('vkladam uplne nalevo, plynule navazuji\n')
+    } else if (tStart <= tgLeft & tEnd == tgLeft) {
+        # cat('insert totally left, fluently connecting\n')
         tgNew <- tg.insertBoundary(tg, tierInd, tStart, label)
         return(tgNew)
-    } else if (tStart < tgNalevo & tEnd > tgNalevo) {
+    } else if (tStart < tgLeft & tEnd > tgLeft) {
         stop(paste0('Intersection of new interval (', as.character(tStart), ' to ', as.character(tEnd), ' sec, "', label, '") and already existing intervals (region before "beginning" and also the first interval) is forbidden.'))
-    } else if (tStart > tgNapravo & tEnd > tgNapravo) {
-        # cat('vkladam uplne napravo + prazdny interval jako vypln\n')
+    } else if (tStart > tgRight & tEnd > tgRight) {
+        # cat('insert totally right + empty filling interval\n')
         tgNew <- tg.insertBoundary(tg, tierInd, tEnd)
         tgNew <- tg.insertBoundary(tgNew, tierInd, tStart, label)
         return(tgNew)
-    } else if (tStart == tgNapravo & tEnd >= tgNapravo) {
-        # cat('vkladam uplne napravo, plynule navazuji\n')
+    } else if (tStart == tgRight & tEnd >= tgRight) {
+        # cat('insert totally right, fluently connecting\n')
         tgNew <- tg.insertBoundary(tg, tierInd, tEnd, label)
         return(tgNew)
-    } else if (tStart < tgNapravo & tEnd > tgNapravo) {
+    } else if (tStart < tgRight & tEnd > tgRight) {
         stop(paste0('Intersection of new interval (', as.character(tStart), ' to ', as.character(tEnd), ' sec, "', label, '") and already existing intervals (the last interval and also the region after "end") is forbidden.'))
-    } else if (tStart >= tgNalevo & tEnd <= tgNapravo) {
-        # cat('vkladani nekam do jiz existujici oblasti, nutna kontrola stejneho a prazdneho intervalu\n')
-        # nalezeni vsech intervalu, kam casy spadaji - pokud se trefime na hranici, muze totiz cas nalezet dvema intervalum
+    } else if (tStart >= tgLeft & tEnd <= tgRight) {
+        # cat('insert into an already existing area, we need a check: a) the same and b) empty interval\n')
+        # Find all intervals, in which our times belongs - if we hit a boundary,
+        # the time can belong to two intervals
         iStart <- integer(0)
         iEnd <- integer(0)
         for (I in tbTools::seqM(1, nint)) {
@@ -2344,19 +2342,19 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
         }
 
         if (!(length(iStart) == 1 & length(iEnd) == 1)) {
-            prunik <- intersect(iStart, iEnd) # nalezeni spolecneho intervalu z vice moznych variant
-            if (length(prunik) == 0) {
-                # je to chyba, ale ta bude zachycena dale podminkou 'if (iStart == iEnd)'
+            inters <- intersect(iStart, iEnd) # nalezeni spolecneho intervalu z vice moznych variant
+            if (length(inters) == 0) {
+                # this is error but it is solved by the condition 'if (iStart == iEnd)' above
                 iStart <- iStart[length(iStart)]
                 iEnd <- iEnd[1]
             } else {
-                iStart <- prunik[1]
-                iEnd <- prunik[1]
-                if (length(prunik) > 1) { # pokus o nalezeni prvniho vhodneho kandidata
-                    for (I in tbTools::seqM(1, length(prunik))) {
-                        if (tg[[tierInd]]$label[prunik[I]] == "") {
-                            iStart <- prunik[I]
-                            iEnd <- prunik[I]
+                iStart <- inters[1]
+                iEnd <- inters[1]
+                if (length(inters) > 1) { # attempt to find the first suitable candidate
+                    for (I in tbTools::seqM(1, length(inters))) {
+                        if (tg[[tierInd]]$label[inters[I]] == "") {
+                            iStart <- inters[I]
+                            iEnd <- inters[I]
                             break
                         }
                     }
@@ -2366,30 +2364,30 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
 
         if (iStart == iEnd) {
             if (tg[[tierInd]]$label[iStart] == "") {
-                # cat('vkladam dovnitr intervalu, otazka, zda napojit ci ne\n')
+                # cat('insert into an existing interval, the question is, concatenate or not?\n')
                 t1 <- tg[[tierInd]]$t1[iStart]
                 t2 <- tg[[tierInd]]$t2[iStart]
                 if (tStart == t1 & tEnd == t2) {
-                    # cat('jenom nastavim jiz existujicimu prazdnemu intervalu label\n');
+                    # cat('only this: set label to existing empty interval\n');
                     tgNew <- tg
                     tgNew[[tierInd]]$label[iStart] <- label
                     return(tgNew)
-                # } else if (tStart == t1 & tEnd == t1) {
-                #    cat('puvodnimu intervalu nastavim label a vlozim jednu hranici do t1, tim vznikne novy nulovy interval na zacatku s novym labelem a cely puvodni interval bude stale prazdny\n')
-                # } else if (tStart == t2 & tEnd == t2) {
-                #    cat('vlozim jednu hranici do t2 s novym labelem, tim zustane puvodni cely prazdny interval a vznikne novy nulovy interval na konci s novym labelem\n')
+                # } else if (tStart == t1 & tEnd == t1) {   # this cannot happen because of the condition 'if (iStart == iEnd)' above
+                #    cat('set label to original interval and insert one boundary to t1, this creates a new zero-length interval at the start with a new label and the whole original interval will stay empty\n')
+                # } else if (tStart == t2 & tEnd == t2) {   # this cannot happen because of the condition 'if (iStart == iEnd)' above
+                #    cat('insert one boundary to t2 with new label, this ensures that the original empty interval stays as it is and it creates a new zero-length interval at the end with a new label\n')
                 } else if (tStart == t1 & tEnd < t2) {
-                    # cat('puvodnimu intervalu nastavim label a vlozim jednu hranici do tEnd, tim se puvodni interval rozdeli na dve casti, prvni bude mit novy label, druha zustane prazdna\n')
+                    # cat('set a new label to the original interval and insert one new boundary to tEnd, it splits the original interval into two parts, the first will have new label, the second stays empty\n')
                     tgNew <- tg
                     tgNew[[tierInd]]$label[iStart] <- label
                     tgNew <- tg.insertBoundary(tgNew, tierInd, tEnd)
                     return(tgNew)
                 } else if (tStart > t1 & tEnd == t2) {
-                    # cat('vlozim jednu hranici do tStart s novym labelem, tim se puvodni interval rozdeli na dve casti, prvni zustane prazdna a druha bude mit novy label\n')
+                    # cat('insert one new boundary to tStart with a new label, it splits the original interval into two parts, the first stays empty and the second will have new label\n')
                     tgNew <- tg.insertBoundary(tg, tierInd, tStart, label)
                     return(tgNew)
                 } else if (tStart > t1 & tEnd < t2) {
-                    # cat('vlozim hranici do tEnd s prazdnym labelem, a pak vlozim hranici do tStart s novym labelem, tim se puvodni interval rozdeli na tri casti, prvni a posledni budou prazdne, prostredni bude mit novy label\n')
+                    # cat('insert one boundary to tEnd with empty label and then insert another boundary to tStart with new label, it splits the original interval into three parts, the first and the third will be empty, the second will have new label\n')
                     tgNew <- tg.insertBoundary(tg, tierInd, tEnd)
                     tgNew <- tg.insertBoundary(tgNew, tierInd, tStart, label)
                 } else {
@@ -2414,11 +2412,6 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
 
 
 
-
-## Nacte PitchTier z Praat ve formatu spreadSheet,
-##
-## v0.1, Tomas Boril, borilt@gmail.com
-##     pt <- pt.read("demo/maminka_spreadSheet.PitchTier")
 
 
 #' pt.read
@@ -2645,7 +2638,7 @@ pt.write <- function(pt, fileNamePitchTier) {
 pt.plot <- function(pt, group = "") {
     data <- list(t = pt$t, f = pt$f)
 
-    if (group != "") {  # pro synchronizaci s jinymi grafy dygraph, ktere maji nastavenu group na stejny nazev
+    if (group != "") {  # dygraphs plot-synchronization group
         g <- dygraphs::dygraph(data, group = group, xlab = "Time (sec)")
     } else {
         g <- dygraphs::dygraph(data, xlab = "Time (sec)")
