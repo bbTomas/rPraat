@@ -24,7 +24,7 @@ of the tier.
 E.g., we have interval 1-2-3, we remove the right boundary of the 2nd
 interval, the result is two intervals 1-23.
 If we do not want to concatenate labels, we have to set the label
-to the empty string '' before this operation.
+to the empty string "" before this operation.
 }
 \examples{
 \dontrun{

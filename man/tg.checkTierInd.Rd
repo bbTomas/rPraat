@@ -21,7 +21,7 @@ It performs checks whether the tier exists.
 \examples{
 tg <- tg.sample()
 tg.checkTierInd(tg, 4)
-tg.checkTierInd(tg, 'word')
+tg.checkTierInd(tg, "word")
 }
 \seealso{
 \code{\link{tg.getTierName}}, \code{\link{tg.isIntervalTier}}, \code{\link{tg.isPointTier}}, \code{\link{tg.plot}}, \code{\link{tg.getNumberOfTiers}}

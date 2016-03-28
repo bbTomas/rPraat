@@ -20,7 +20,7 @@ Returns TRUE if the tier is PointTier, FALSE otherwise.
 \examples{
 tg <- tg.sample()
 tg.isPointTier(tg, 1)
-tg.isPointTier(tg, 'word')
+tg.isPointTier(tg, "word")
 }
 \seealso{
 \code{\link{tg.isIntervalTier}}, \code{\link{tg.getTierName}}

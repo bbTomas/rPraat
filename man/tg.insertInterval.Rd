@@ -30,7 +30,7 @@ empty interval between.
 }
 \details{
 In most cases, this function is the same as 1.) tgInsertBoundary(tEnd)
-and 2.) tgInsertBoundary(tStart, 'new label'). But, additional checks are
+and 2.) tgInsertBoundary(tStart, "new label"). But, additional checks are
 performed: a) tStart and tEnd belongs to the same empty interval, or
 b) both times are outside of existings intervals (both left or both right).
 
@@ -77,7 +77,7 @@ tStart of the 2nd interval, you are safe, it works fine.
 }
 \examples{
 tg <- tg.sample()
-tg2 <- tg.insertNewIntervalTier(tg, 1, 'INTERVALS')
+tg2 <- tg.insertNewIntervalTier(tg, 1, "INTERVALS")
 tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.8)
 tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.1, "Interval A")
 tg2 <- tg.insertInterval(tg2, "INTERVALS", 1.2, 2.5, "Interval B")

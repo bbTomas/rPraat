@@ -11,7 +11,7 @@ tg.setTierName(tg, tierInd, name)
 
 \item{tierInd}{tier index or "name"}
 
-\item{name}{new 'name' of the tier}
+\item{name}{new "name" of the tier}
 }
 \description{
 Sets (changes) name of tier of the given index.
