@@ -13,25 +13,25 @@
 #' @examples
 #' tg <- tg.sample()
 #' tg.checkTierInd(tg, 4)
-#' tg.checkTierInd(tg, 'word')
+#' tg.checkTierInd(tg, "word")
 tg.checkTierInd <- function(tg, tierInd) {
     ntiers <- length(tg)
 
     if (is.numeric(tierInd) | is.integer(tierInd)) {      # tier index
         if ((length(tierInd) != 1)) {
-            stop(paste0('tierInd must be one integer number [length(tierInd) = ', length(tierInd), ']'))
+            stop(paste0("tierInd must be one integer number [length(tierInd) = ", length(tierInd), "]"))
         }
 
         if (!tbTools::isInt(tierInd)) {
-            stop(paste0('tierInd must be integer >= 1 [',  as.character(tierInd), ']'))
+            stop(paste0("tierInd must be integer >= 1 [",  as.character(tierInd), "]"))
         }
 
         if (tierInd < 1 | tierInd > ntiers) {
-            stop(paste0('tierInd out of range, tierInd = ', tierInd, ', ntiers = ', ntiers))
+            stop(paste0("tierInd out of range, tierInd = ", tierInd, ", ntiers = ", ntiers))
         }
     } else if (is.character(tierInd)) {       # tier name
         if ((length(tierInd) != 1)) {
-            stop(paste0('tierInd must be one character string (tier name) [length(tierInd) = ', length(tierInd), ']'))
+            stop(paste0("tierInd must be one character string (tier name) [length(tierInd) = ", length(tierInd), "]"))
         }
 
         actNames <- names(tg)
@@ -86,14 +86,14 @@ tg.read <- function(fileNameTextGrid) {
     xminStr <- flines[find]; find <- find + 1 # xmin
     xmaxStr <- flines[find]; find <- find + 1; # xmax
 
-    r <- flines[find]; find <- find + 1; # either '<exists>' -> shorttext or 'tiers? <exists> ' -> full text format
+    r <- flines[find]; find <- find + 1; # either "<exists>" -> shorttext or "tiers? <exists> " -> full text format
 
-    if (r == '<exists>') {
+    if (r == "<exists>") {
         shortFormat <- TRUE
-    } else if (substr(r, 1, 6) == 'tiers?') {
+    } else if (substr(r, 1, 6) == "tiers?") {
         shortFormat <- FALSE
     } else {
-        stop('Unknown textgrid format.')
+        stop("Unknown textgrid format.")
     }
 
     if (shortFormat) {
@@ -119,12 +119,12 @@ tg.read <- function(fileNameTextGrid) {
         } else {
             r <- tbTools::strTrim(flines[find]); find <- find + 1
 
-            while (substr(r, 1, 4) == 'item') {
+            while (substr(r, 1, 4) == "item") {
                 r <- tbTools::strTrim(flines[find]); find <- find + 1
             }
 
             if (substr(r, 1, 9) != 'class = "') {
-                stop('Unknown textgrid format')
+                stop("Unknown textgrid format")
             }
             typ <- substr(r, 9, nchar(r))
         }
@@ -137,7 +137,7 @@ tg.read <- function(fileNameTextGrid) {
                 r <- tbTools::strTrim(r);
                 tierName <- substr(r, 9, nchar(r)-1)
             }
-            tierType <- 'interval'
+            tierType <- "interval"
 
             find <- find + 2; # ignore xmin and xmax
 
@@ -163,8 +163,8 @@ tg.read <- function(fileNameTextGrid) {
                 } else {
                     r1 <- tbTools::strTrim(flines[find]); find <- find + 1
                     r2 <- tbTools::strTrim(flines[find]); find <- find + 1
-                    if ( (substr(r1, 1, 7) != 'xmin = ')  ||  (substr(r2, 1, 7) != 'xmax = ') ) {
-                        stop('Unknown textgrid format');
+                    if ( (substr(r1, 1, 7) != "xmin = ")  ||  (substr(r2, 1, 7) != "xmax = ") ) {
+                        stop("Unknown textgrid format");
                     }
                     t <- tidyr::extract_numeric(r1)
                     t2 <- tidyr::extract_numeric(r2)
@@ -173,7 +173,7 @@ tg.read <- function(fileNameTextGrid) {
                 r <- flines[find]; find <- find + 1;
                 if (!shortFormat) {
                     if (!tbTools::str_contains(r, 'text = "')) {
-                        stop('Unknown textgrid format');
+                        stop("Unknown textgrid format");
                     }
                     rind <- tbTools::str_find1(r, '"')
                     nQuotationMarks <- length(tbTools::str_find(r, '"'))  # in Matlab: sum(r == '"')
@@ -186,7 +186,7 @@ tg.read <- function(fileNameTextGrid) {
                 nQuotationMarks <- length(tbTools::str_find(r, '"'))
                 label <- substr(r, 2, nchar(r))
                 if ((nQuotationMarks %% 2) == 1) {
-                    label <- paste0(label, '\n')
+                    label <- paste0(label, "\n")
 
                     repeat {
                         r <- flines[find]; find <- find + 1
@@ -199,7 +199,7 @@ tg.read <- function(fileNameTextGrid) {
                             label <- paste0(label, substr(r, 1, nchar(r)-1), '"')
                             break
                         } else {
-                            label <- paste0(label, r, '\n')
+                            label <- paste0(label, r, "\n")
                         }
                     }
                 }
@@ -235,7 +235,7 @@ tg.read <- function(fileNameTextGrid) {
                 r <- tbTools::strTrim(r)
                 tierName <- substr(r, 9, nchar(r)-1)
             }
-            tierType <- 'point'
+            tierType <- "point"
 
             find <- find + 2 # ignore xmin and xmax
 
@@ -258,8 +258,8 @@ tg.read <- function(fileNameTextGrid) {
                     t <- as.numeric(flines[find]); find <- find + 1
                 } else {
                     r <- tbTools::strTrim(flines[find]); find <- find + 1
-                    if (substr(r, 1, 9) != 'number = ') {
-                        stop('Unknown textgrid format');
+                    if (substr(r, 1, 9) != "number = ") {
+                        stop("Unknown textgrid format");
                     }
                     t <- tidyr::extract_numeric(r)
                 }
@@ -267,7 +267,7 @@ tg.read <- function(fileNameTextGrid) {
                 r <- flines[find]; find <- find + 1
                 if (!shortFormat) {
                     if (!tbTools::str_contains(r, 'mark = "')) {
-                        stop('Unknown textgrid format');
+                        stop("Unknown textgrid format");
                     }
                     rind <- tbTools::str_find1(r, '"')
                     nQuotationMarks <- length(tbTools::str_find(r, '"'))
@@ -280,7 +280,7 @@ tg.read <- function(fileNameTextGrid) {
                 nQuotationMarks <- length(tbTools::str_find(r, '"'))
                 label <- substr(r, 2, nchar(r))
                 if (nQuotationMarks %% 2 == 1) {
-                    label <- paste0(label, '\n')
+                    label <- paste0(label, "\n")
                     repeat {
                         r <- flines[find]; find <- find + 1
                         nQuotationMarks <- length(tbTools::str_find(r, '"'))
@@ -292,7 +292,7 @@ tg.read <- function(fileNameTextGrid) {
                             label <- paste0(label, substr(r, 1, nchar(r)-1), '"')
                             break
                         } else {
-                            label <- paste0(label, r, '\n')
+                            label <- paste0(label, r, "\n")
                         }
 
                     }
@@ -319,7 +319,7 @@ tg.read <- function(fileNameTextGrid) {
             names(tg)[length(tg)] <- proposedName
 
         } else {  # neznamy typ tier
-            stop(paste0('Unsupported tier type [tierInd = ', length(tg)+1, ']'))
+            stop(paste0("Unsupported tier type [tierInd = ", length(tg)+1, "]"))
         }
 
     }
@@ -375,7 +375,7 @@ tg.write <- function(tg, fileNameTextGrid) {
             } else if (tg[[I]]$type == "point") {
                 typInt <- FALSE
             } else {
-                stop(paste0('Unknown tier type [', tg[[I]]$type, ']'))
+                stop(paste0("Unknown tier type [", tg[[I]]$type, "]"))
             }
         } else {
             typInt <- TRUE
@@ -399,15 +399,15 @@ tg.write <- function(tg, fileNameTextGrid) {
 
     fid <- file(fileNameTextGrid, open = "w", encoding = "UTF-8")
     if (!isOpen(fid)) {
-        stop(paste0('cannot open file [', fileNameTextGrid, ']'))
+        stop(paste0("cannot open file [", fileNameTextGrid, "]"))
     }
 
     writeLines('File type = "ooTextFile"', fid)
     writeLines('Object class = "TextGrid"', fid)
-    writeLines('', fid)
+    writeLines("", fid)
     writeLines(as.character(tbTools::round2(minTimeTotal, -10)), fid)  # min time from all tiers
     writeLines(as.character(tbTools::round2(maxTimeTotal, -10)), fid)  # max time from all tiers
-    writeLines('<exists>', fid)
+    writeLines("<exists>", fid)
     writeLines(as.character(nTiers), fid)
 
     for (N in tbTools::seqM(1, nTiers)) {
@@ -451,7 +451,7 @@ tg.write <- function(tg, fileNameTextGrid) {
             } else { # prazdny pointtier
                 writeLines(as.character(tbTools::round2(minTimeTotal, -10)), fid)  # start time of the tier
                 writeLines(as.character(tbTools::round2(maxTimeTotal, -10)), fid)  # end time of the tier
-                writeLines('0', fid)  # number of points
+                writeLines("0", fid)  # number of points
             }
         }
 
@@ -503,7 +503,7 @@ tg.plot <- function(tg, group = "") {
             tAll <- c(tAll, tg[[I]]$t1, tg[[I]]$t1)
 
         } else {
-            stop('Unknown tier type')
+            stop("Unknown tier type")
         }
 
     }
@@ -530,7 +530,7 @@ tg.plot <- function(tg, group = "") {
             names(data)[length(data)] <- tg[[I]]$name
 
         } else {
-            stop('Unknown tier type')
+            stop("Unknown tier type")
         }
 
     }
@@ -557,7 +557,7 @@ tg.plot <- function(tg, group = "") {
             }
 
         } else {
-            stop('Unknown tier type')
+            stop("Unknown tier type")
         }
 
     }
@@ -571,11 +571,11 @@ tg.plot <- function(tg, group = "") {
             g <- dygraphs::dySeries(g, tg[[I]]$name, pointSize = 2, strokeWidth = 1)
 
         } else {
-            stop('Unknown tier type')
+            stop("Unknown tier type")
         }
     }
     g <- dygraphs::dyAxis(g, "y", valueRange = c(0, length(tg)+2))
-    g <- dygraphs::dyAxis(g, "x", valueFormatter = 'function(d){return d.toFixed(3)}')
+    g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
     g
 }
 
@@ -682,12 +682,12 @@ tg.createNewTextGrid <- function(tMin, tMax) {
 #' @examples
 #' tg <- tg.sample()
 #' tg.isIntervalTier(tg, 1)
-#' tg.isIntervalTier(tg, 'word')
+#' tg.isIntervalTier(tg, "word")
 tg.isIntervalTier <- function(tg, tierInd) {
     tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
-    if (tg[[tierInd]]$type == 'interval') {
+    if (tg[[tierInd]]$type == "interval") {
         b <- TRUE
     } else {
         b <- FALSE
@@ -712,12 +712,12 @@ tg.isIntervalTier <- function(tg, tierInd) {
 #' @examples
 #' tg <- tg.sample()
 #' tg.isPointTier(tg, 1)
-#' tg.isPointTier(tg, 'word')
+#' tg.isPointTier(tg, "word")
 tg.isPointTier <- function(tg, tierInd) {
     tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
-    if (tg[[tierInd]]$type == 'point') {
+    if (tg[[tierInd]]$type == "point") {
         b <- TRUE
     } else {
         b <- FALSE
@@ -761,7 +761,7 @@ tg.getTierName <- function(tg, tierInd) {
 #'
 #' @param tg TextGrid object
 #' @param tierInd tier index or "name"
-#' @param name new 'name' of the tier
+#' @param name new "name" of the tier
 #'
 #' @export
 #' @seealso \code{\link{tg.getTierName}}
@@ -935,7 +935,7 @@ tg.getStartTime <- function(tg, tierInd = 0) {
             t <- tg[[tierInd]]$t1[1]
         }
     } else {
-        stop(paste0('Unknown tier type [tierInd = ', tierInd, ']'))
+        stop(paste0("Unknown tier type [tierInd = ", tierInd, "]"))
     }
 
     return(t)
@@ -983,7 +983,7 @@ tg.getEndTime <- function(tg, tierInd = 0) {
             t <- tg[[tierInd]]$t2[length(tg[[tierInd]]$t2)]
         }
     } else {
-        stop(paste0('Unknown tier type [tierInd = ', tierInd, ']'))
+        stop(paste0("Unknown tier type [tierInd = ", tierInd, "]"))
     }
 
     return(t)
@@ -1066,7 +1066,7 @@ tg.getNumberOfPoints <- function(tg, tierInd) {
     ntiers <- length(tg)
 
     if (!tg.isPointTier(tg, tierInd)) {
-        stop(paste0('tier ', tierInd, ' is not PointTier.'))
+        stop(paste0("tier ", tierInd, " is not PointTier."))
     }
 
     c <- length(tg[[tierInd]]$t)
@@ -1096,7 +1096,7 @@ tg.getNumberOfIntervals <- function(tg, tierInd) {
     ntiers <- length(tg)
 
     if (!tg.isIntervalTier(tg, tierInd)) {
-        stop(paste0('tier ', tierInd, ' is not IntervalTier.'))
+        stop(paste0("tier ", tierInd, " is not IntervalTier."))
     }
 
     c <- length(tg[[tierInd]]$t1)
@@ -1133,15 +1133,15 @@ tg.getLabel <- function(tg, tierInd, index) {
     if (tg.isIntervalTier(tg, tierInd)) {
         nint <- tg.getNumberOfIntervals(tg, tierInd)
         if (index < 1 | index > nint) {
-            stop(paste0('Index out of range [index = ', index, ', nint = ', nint))
+            stop(paste0("Index out of range [index = ", index, ", nint = ", nint))
         }
     } else if (tg.isPointTier(tg, tierInd)) {
         npoints <- tg.getNumberOfPoints(tg, tierInd)
         if (index < 1 | index > npoints) {
-            stop(paste0('Index out of range [index = ', index, ', npoints = ', npoints))
+            stop(paste0("Index out of range [index = ", index, ", npoints = ", npoints))
         }
     } else {
-        stop('Unknown tier type')
+        stop("Unknown tier type")
     }
 
     lab <- tg[[tierInd]]$label[index]
@@ -1183,15 +1183,15 @@ tg.setLabel <- function(tg, tierInd, index, newLabel) {
     if (tg.isIntervalTier(tg, tierInd)) {
         nint <- tg.getNumberOfIntervals(tg, tierInd)
         if (index < 1 | index > nint) {
-            stop(paste0('Index out of range [index = ', index, ', nint = ', nint))
+            stop(paste0("Index out of range [index = ", index, ", nint = ", nint))
         }
     } else if (tg.isPointTier(tg, tierInd)) {
         npoints <- tg.getNumberOfPoints(tg, tierInd)
         if (index < 1 | index > npoints) {
-            stop(paste0('Index out of range [index = ', index, ', npoints = ', npoints))
+            stop(paste0("Index out of range [index = ", index, ", npoints = ", npoints))
         }
     } else {
-        stop('Unknown tier type')
+        stop("Unknown tier type")
     }
 
     tgNew <- tg
@@ -1228,13 +1228,13 @@ tg.getIntervalStartTime <- function(tg, tierInd, index) {
     }
 
     if (!tg.isIntervalTier(tg, tierInd)) {
-        stop(paste0('Tier ', tierInd, ' is not IntervalTier.'))
+        stop(paste0("Tier ", tierInd, " is not IntervalTier."))
     }
 
 
     nint <- tg.getNumberOfIntervals(tg, tierInd)
     if (index < 1 | index > nint) {
-        stop(paste0('Index out of range [index = ', index, ', nint = ', nint, ']'))
+        stop(paste0("Index out of range [index = ", index, ", nint = ", nint, "]"))
     }
 
     t <- tg[[tierInd]]$t1[index]
@@ -1270,13 +1270,13 @@ tg.getIntervalEndTime <- function(tg, tierInd, index) {
     }
 
     if (!tg.isIntervalTier(tg, tierInd)) {
-        stop(paste0('Tier ', tierInd, ' is not IntervalTier.'))
+        stop(paste0("Tier ", tierInd, " is not IntervalTier."))
     }
 
 
     nint <- tg.getNumberOfIntervals(tg, tierInd)
     if (index < 1 | index > nint) {
-        stop(paste0('Index out of range [index = ', index, ', nint = ', nint, ']'))
+        stop(paste0("Index out of range [index = ", index, ", nint = ", nint, "]"))
     }
 
     t <- tg[[tierInd]]$t2[index]
@@ -1311,13 +1311,13 @@ tg.getIntervalDuration <- function(tg, tierInd, index) {
     }
 
     if (!tg.isIntervalTier(tg, tierInd)) {
-        stop(paste0('Tier ', tierInd, ' is not IntervalTier.'))
+        stop(paste0("Tier ", tierInd, " is not IntervalTier."))
     }
 
 
     nint <- tg.getNumberOfIntervals(tg, tierInd)
     if (index < 1 | index > nint) {
-        stop(paste0('Index out of range [index = ', index, ', nint = ', nint, ']'))
+        stop(paste0("Index out of range [index = ", index, ", nint = ", nint, "]"))
     }
 
     t <- tg[[tierInd]]$t2[index] - tg[[tierInd]]$t1[index]
@@ -1353,12 +1353,12 @@ tg.getPointTime <- function(tg, tierInd, index) {
     }
 
     if (!tg.isPointTier(tg, tierInd)) {
-        stop(paste0('Tier ', tierInd, ' is not PointTier.'))
+        stop(paste0("Tier ", tierInd, " is not PointTier."))
     }
 
     npoints <- tg.getNumberOfPoints(tg, tierInd)
     if (index < 1 | index > npoints) {
-        stop(paste0('Index out of range [index = ', index, ', npoints = ', npoints, ']'))
+        stop(paste0("Index out of range [index = ", index, ", npoints = ", npoints, "]"))
     }
 
     t <- tg[[tierInd]]$t[index]
@@ -1443,7 +1443,7 @@ tg.insertNewPointTier <- function(tg, newInd, newTierName) {
 
     tgNew <- tg
 
-    tNew <- list(name = newTierName, type = 'point', t = numeric(0), label = character(0))
+    tNew <- list(name = newTierName, type = "point", t = numeric(0), label = character(0))
 
     for (I in tbTools::seqM(ntiers+1, newInd+1, by = -1)) {
         tgNew[[I]] <- tgNew[[I-1]]
@@ -1484,7 +1484,7 @@ tg.insertNewPointTier <- function(tg, newInd, newTierName) {
 #' @examples
 #' \dontrun{
 #' tg <- tg.sample()
-#' tg2 <- tg.insertNewIntervalTier(tg, 1, 'INTERVALS')
+#' tg2 <- tg.insertNewIntervalTier(tg, 1, "INTERVALS")
 #' tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.8)
 #' tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.1, "Interval A")
 #' tg2 <- tg.insertInterval(tg2, "INTERVALS", 1.2, 2.5, "Interval B")
@@ -1551,7 +1551,7 @@ tg.insertNewIntervalTier <- function(tg, newInd, newTierName, tMin=NA, tMax=NA) 
 
 
 
-    tNew <- list(name = newTierName, type = 'interval', t1 = tMin, t2 = tMax, label = "")
+    tNew <- list(name = newTierName, type = "interval", t1 = tMin, t2 = tMax, label = "")
 
     for (I in tbTools::seqM(ntiers+1, newInd+1, by = -1)) {
         tgNew[[I]] <- tgNew[[I-1]]
@@ -1593,7 +1593,7 @@ tg.getIntervalIndexAtTime <- function(tg, tierInd, time) {
     ntiers <- length(tg)
 
     if (!tg.isIntervalTier(tg, tierInd)) {
-        stop(paste0('tier ', tierInd, ' is not IntervalTier.'))
+        stop(paste0("tier ", tierInd, " is not IntervalTier."))
     }
 
     if (!tbTools::isNum(time)) {
@@ -1637,7 +1637,7 @@ tg.getPointIndexHigherThanTime <- function(tg, tierInd, time) {
     ntiers <- length(tg)
 
     if (!tg.isPointTier(tg, tierInd)) {
-        stop(paste0('tier ', tierInd, ' is not PointTier.'))
+        stop(paste0("tier ", tierInd, " is not PointTier."))
     }
 
     if (!tbTools::isNum(time)) {
@@ -1682,7 +1682,7 @@ tg.getPointIndexLowerThanTime <- function(tg, tierInd, time) {
     ntiers <- length(tg)
 
     if (!tg.isPointTier(tg, tierInd)) {
-        stop(paste0('tier ', tierInd, ' is not PointTier.'))
+        stop(paste0("tier ", tierInd, " is not PointTier."))
     }
 
     if (!tbTools::isNum(time)) {
@@ -1727,7 +1727,7 @@ tg.getPointIndexNearestTime <- function(tg, tierInd, time) {
     ntiers <- length(tg)
 
     if (!tg.isPointTier(tg, tierInd)) {
-        stop(paste0('tier ', tierInd, ' is not PointTier.'))
+        stop(paste0("tier ", tierInd, " is not PointTier."))
     }
 
     if (!tbTools::isNum(time)) {
@@ -1778,7 +1778,7 @@ tg.removePoint <- function(tg, tierInd, index) {
     ntiers <- length(tg)
 
     if (!tg.isPointTier(tg, tierInd)) {
-        stop(paste0('tier ', tierInd, ' is not PointTier.'))
+        stop(paste0("tier ", tierInd, " is not PointTier."))
     }
 
     if (!tbTools::isInt(index)) {
@@ -1788,7 +1788,7 @@ tg.removePoint <- function(tg, tierInd, index) {
     npoints <- length(tg[[tierInd]]$t)
 
     if (index < 1 | index>npoints) {
-        stop(paste0('index out of range [index = ', index, ', npoints = ', npoints, '].'))
+        stop(paste0("index out of range [index = ", index, ", npoints = ", npoints, "]."))
     }
 
 
@@ -1831,7 +1831,7 @@ tg.insertPoint <- function(tg, tierInd, time, label) {
     ntiers <- length(tg)
 
     if (!tg.isPointTier(tg, tierInd)) {
-        stop(paste0('tier ', tierInd, ' is not PointTier.'))
+        stop(paste0("tier ", tierInd, " is not PointTier."))
     }
 
     if (!tbTools::isNum(time)) {
@@ -1879,7 +1879,7 @@ tg.insertPoint <- function(tg, tierInd, time, label) {
 #' E.g., we have interval 1-2-3, we remove the left boundary of the 2nd
 #' interval, the result is two intervals 12-3.
 #' If we do not want to concatenate labels, we have to set the label
-#' to the empty string '' before this operation.
+#' to the empty string "" before this operation.
 #'
 #' @param tg TextGrid object
 #' @param tierInd tier index or "name"
@@ -1901,7 +1901,7 @@ tg.removeIntervalLeftBoundary <- function(tg, tierInd, index) {
     ntiers <- length(tg)
 
     if (!tg.isIntervalTier(tg, tierInd)) {
-        stop(paste0('tier ', tierInd, ' is not IntervalTier.'))
+        stop(paste0("tier ", tierInd, " is not IntervalTier."))
     }
 
     if (!tbTools::isInt(index)) {
@@ -1910,11 +1910,11 @@ tg.removeIntervalLeftBoundary <- function(tg, tierInd, index) {
 
     nint <- tg.getNumberOfIntervals(tg, tierInd)
     if (index < 1 | index>nint) {
-        stop(paste0('index out of range [index = ', index, ', nint = ', nint, '].'))
+        stop(paste0("index out of range [index = ", index, ", nint = ", nint, "]."))
     }
 
     if (index == 1) {
-        stop('Cannot remove left boundary of the first interval.')
+        stop("Cannot remove left boundary of the first interval.")
     }
 
     t1 <- tg[[tierInd]]$t1[index-1]
@@ -1953,7 +1953,7 @@ tg.removeIntervalLeftBoundary <- function(tg, tierInd, index) {
 #' E.g., we have interval 1-2-3, we remove the right boundary of the 2nd
 #' interval, the result is two intervals 1-23.
 #' If we do not want to concatenate labels, we have to set the label
-#' to the empty string '' before this operation.
+#' to the empty string "" before this operation.
 #'
 #' @param tg TextGrid object
 #' @param tierInd tier index or "name"
@@ -1975,7 +1975,7 @@ tg.removeIntervalRightBoundary <- function(tg, tierInd, index) {
     ntiers <- length(tg)
 
     if (!tg.isIntervalTier(tg, tierInd)) {
-        stop(paste0('tier ', tierInd, ' is not IntervalTier.'))
+        stop(paste0("tier ", tierInd, " is not IntervalTier."))
     }
 
     if (!tbTools::isInt(index)) {
@@ -1984,11 +1984,11 @@ tg.removeIntervalRightBoundary <- function(tg, tierInd, index) {
 
     nint <- tg.getNumberOfIntervals(tg, tierInd)
     if (index < 1 | index>nint) {
-        stop(paste0('index out of range [index = ', index, ', nint = ', nint, '].'))
+        stop(paste0("index out of range [index = ", index, ", nint = ", nint, "]."))
     }
 
     if (index == nint) {
-        stop('Cannot remove right boundary of the last interval.')
+        stop("Cannot remove right boundary of the last interval.")
     }
 
     t1 <- tg[[tierInd]]$t1[index]
@@ -2052,7 +2052,7 @@ tg.removeIntervalBothBoundaries <- function(tg, tierInd, index) {
     ntiers <- length(tg)
 
     if (!tg.isIntervalTier(tg, tierInd)) {
-        stop(paste0('tier ', tierInd, ' is not IntervalTier.'))
+        stop(paste0("tier ", tierInd, " is not IntervalTier."))
     }
 
     if (!tbTools::isInt(index)) {
@@ -2061,15 +2061,15 @@ tg.removeIntervalBothBoundaries <- function(tg, tierInd, index) {
 
     nint <- tg.getNumberOfIntervals(tg, tierInd)
     if (index < 1 | index>nint) {
-        stop(paste0('index out of range [index = ', index, ', nint = ', nint, '].'))
+        stop(paste0("index out of range [index = ", index, ", nint = ", nint, "]."))
     }
 
 
     if (index == 1) {
-        stop('Cannot remove left boundary of the first interval.')
+        stop("Cannot remove left boundary of the first interval.")
     }
     if (index == nint) {
-        stop('Cannot remove right boundary of the last interval.')
+        stop("Cannot remove right boundary of the last interval.")
     }
 
     t1 <- tg[[tierInd]]$t1[index-1]
@@ -2144,7 +2144,7 @@ tg.removeIntervalBothBoundaries <- function(tg, tierInd, index) {
 #'
 #' @examples
 #' tg <- tg.sample()
-#' tg2 <- tg.insertNewIntervalTier(tg, 1, 'INTERVALS')
+#' tg2 <- tg.insertNewIntervalTier(tg, 1, "INTERVALS")
 #' tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.8)
 #' tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.1, "Interval A")
 #' tg2 <- tg.insertInterval(tg2, "INTERVALS", 1.2, 2.5, "Interval B")
@@ -2156,7 +2156,7 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
     ntiers <- length(tg)
 
     if (!tg.isIntervalTier(tg, tierInd)) {
-        stop(paste0('tier ', tierInd, ' is not IntervalTier.'))
+        stop(paste0("tier ", tierInd, " is not IntervalTier."))
     }
 
     if (!tbTools::isNum(time)) {
@@ -2173,7 +2173,7 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
     nint <- tg.getNumberOfIntervals(tg, tierInd);
 
     if (nint == 0) {
-        stop('Nonsense: tier [', tierInd, '] has 0 intervals.')
+        stop("Nonsense: tier [", tierInd, "] has 0 intervals.")
     }
 
     if (is.na(index)) {
@@ -2193,14 +2193,14 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
             tgNew[[tierInd]]$label[1] <- label
             class(tgNew)["tmin"] <- min(c(as.numeric(class(tg)["tmin"]), time), na.rm = TRUE)
         } else if (time == tg[[tierInd]]$t2[length(tg[[tierInd]]$t2)]) {  # attempt to insert boundary exactly to the end of tier (nonsense)
-            stop(paste0('Cannot insert boundary because one already exists at the same position [tierInd = ', tierInd, ', time = ', time, '].'))
+            stop(paste0("Cannot insert boundary because one already exists at the same position [tierInd = ", tierInd, ", time = ", time, "]."))
         } else {
-            stop('Nonsense: missing interval, even though time is between intervals. Please check continuity using tg.repairContinuity().')
+            stop("Nonsense: missing interval, even though time is between intervals. Please check continuity using tg.repairContinuity().")
         }
     } else { # situation a) New boundary into the existing interval
         for (I in tbTools::seqM(1, nint)) {
             if ((time %in% tgNew[[tierInd]]$t1) | (time %in% tgNew[[tierInd]]$t2)) {
-                stop(paste0('Cannot insert boundary because one already exists at the same position [tierInd = ', tierInd, ', time = ', time, '].'))
+                stop(paste0("Cannot insert boundary because one already exists at the same position [tierInd = ", tierInd, ", time = ", time, "]."))
             }
         }
 
@@ -2233,7 +2233,7 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
 #' empty interval between.
 #'
 #' In most cases, this function is the same as 1.) tgInsertBoundary(tEnd)
-#' and 2.) tgInsertBoundary(tStart, 'new label'). But, additional checks are
+#' and 2.) tgInsertBoundary(tStart, "new label"). But, additional checks are
 #' performed: a) tStart and tEnd belongs to the same empty interval, or
 #' b) both times are outside of existings intervals (both left or both right).
 #'
@@ -2290,7 +2290,7 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
 #'
 #' @examples
 #' tg <- tg.sample()
-#' tg2 <- tg.insertNewIntervalTier(tg, 1, 'INTERVALS')
+#' tg2 <- tg.insertNewIntervalTier(tg, 1, "INTERVALS")
 #' tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.8)
 #' tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.1, "Interval A")
 #' tg2 <- tg.insertInterval(tg2, "INTERVALS", 1.2, 2.5, "Interval B")
@@ -2302,7 +2302,7 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
     ntiers <- length(tg)
 
     if (!tg.isIntervalTier(tg, tierInd)) {
-        stop(paste0('tier ', tierInd, ' is not IntervalTier.'))
+        stop(paste0("tier ", tierInd, " is not IntervalTier."))
     }
 
     if (!tbTools::isNum(tStart)) {
@@ -2312,7 +2312,7 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
         stop("tEnd must be a number.")
     }
     if (tStart >= tEnd) {
-        stop(paste0('tStart [', as.character(tStart), '] must be lower than tEnd [', as.character(tEnd), '].'))
+        stop(paste0("tStart [", as.character(tStart), "] must be lower than tEnd [", as.character(tEnd), "]."))
     }
     # Note: thanks to this condition, some situations (which were solved below) cannot happen
     # (tStart == tEnd), thus it is easier. By the way, Praat does not allow to have 2 boundaries
@@ -2340,29 +2340,29 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
     tgRight <- tg[[tierInd]]$t2[length(tg[[tierInd]]$t2)]
 
     if (tStart < tgLeft & tEnd < tgLeft) {
-        # cat('insert totally left + empty filling interval\n')
+        # cat("insert totally left + empty filling interval\n")
         tgNew <- tg.insertBoundary(tg, tierInd, tEnd)
         tgNew <- tg.insertBoundary(tgNew, tierInd, tStart, label)
         return(tgNew)
     } else if (tStart <= tgLeft & tEnd == tgLeft) {
-        # cat('insert totally left, fluently connecting\n')
+        # cat("insert totally left, fluently connecting\n")
         tgNew <- tg.insertBoundary(tg, tierInd, tStart, label)
         return(tgNew)
     } else if (tStart < tgLeft & tEnd > tgLeft) {
-        stop(paste0('Intersection of new interval (', as.character(tStart), ' to ', as.character(tEnd), ' sec, "', label, '") and already existing intervals (region before "beginning" and also the first interval) is forbidden.'))
+        stop(paste0("Intersection of new interval (", as.character(tStart), " to ", as.character(tEnd), ' sec, "', label, '") and already existing intervals (region before "beginning" and also the first interval) is forbidden.'))
     } else if (tStart > tgRight & tEnd > tgRight) {
-        # cat('insert totally right + empty filling interval\n')
+        # cat("insert totally right + empty filling interval\n")
         tgNew <- tg.insertBoundary(tg, tierInd, tEnd)
         tgNew <- tg.insertBoundary(tgNew, tierInd, tStart, label)
         return(tgNew)
     } else if (tStart == tgRight & tEnd >= tgRight) {
-        # cat('insert totally right, fluently connecting\n')
+        # cat("insert totally right, fluently connecting\n")
         tgNew <- tg.insertBoundary(tg, tierInd, tEnd, label)
         return(tgNew)
     } else if (tStart < tgRight & tEnd > tgRight) {
-        stop(paste0('Intersection of new interval (', as.character(tStart), ' to ', as.character(tEnd), ' sec, "', label, '") and already existing intervals (the last interval and also the region after "end") is forbidden.'))
+        stop(paste0("Intersection of new interval (", as.character(tStart), " to ", as.character(tEnd), ' sec, "', label, '") and already existing intervals (the last interval and also the region after "end") is forbidden.'))
     } else if (tStart >= tgLeft & tEnd <= tgRight) {
-        # cat('insert into an already existing area, we need a check: a) the same and b) empty interval\n')
+        # cat("insert into an already existing area, we need a check: a) the same and b) empty interval\n")
         # Find all intervals, in which our times belongs - if we hit a boundary,
         # the time can belong to two intervals
         iStart <- integer(0)
@@ -2399,40 +2399,40 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
 
         if (iStart == iEnd) {
             if (tg[[tierInd]]$label[iStart] == "") {
-                # cat('insert into an existing interval, the question is, concatenate or not?\n')
+                # cat("insert into an existing interval, the question is, concatenate or not?\n")
                 t1 <- tg[[tierInd]]$t1[iStart]
                 t2 <- tg[[tierInd]]$t2[iStart]
                 if (tStart == t1 & tEnd == t2) {
-                    # cat('only this: set label to existing empty interval\n');
+                    # cat("only this: set label to existing empty interval\n");
                     tgNew <- tg
                     tgNew[[tierInd]]$label[iStart] <- label
                     return(tgNew)
                 # } else if (tStart == t1 & tEnd == t1) {   # this cannot happen because of the condition 'if (iStart == iEnd)' above
-                #    cat('set label to original interval and insert one boundary to t1, this creates a new zero-length interval at the start with a new label and the whole original interval will stay empty\n')
+                #    cat("set label to original interval and insert one boundary to t1, this creates a new zero-length interval at the start with a new label and the whole original interval will stay empty\n")
                 # } else if (tStart == t2 & tEnd == t2) {   # this cannot happen because of the condition 'if (iStart == iEnd)' above
-                #    cat('insert one boundary to t2 with new label, this ensures that the original empty interval stays as it is and it creates a new zero-length interval at the end with a new label\n')
+                #    cat("insert one boundary to t2 with new label, this ensures that the original empty interval stays as it is and it creates a new zero-length interval at the end with a new label\n")
                 } else if (tStart == t1 & tEnd < t2) {
-                    # cat('set a new label to the original interval and insert one new boundary to tEnd, it splits the original interval into two parts, the first will have new label, the second stays empty\n')
+                    # cat("set a new label to the original interval and insert one new boundary to tEnd, it splits the original interval into two parts, the first will have new label, the second stays empty\n")
                     tgNew <- tg
                     tgNew[[tierInd]]$label[iStart] <- label
                     tgNew <- tg.insertBoundary(tgNew, tierInd, tEnd)
                     return(tgNew)
                 } else if (tStart > t1 & tEnd == t2) {
-                    # cat('insert one new boundary to tStart with a new label, it splits the original interval into two parts, the first stays empty and the second will have new label\n')
+                    # cat("insert one new boundary to tStart with a new label, it splits the original interval into two parts, the first stays empty and the second will have new label\n")
                     tgNew <- tg.insertBoundary(tg, tierInd, tStart, label)
                     return(tgNew)
                 } else if (tStart > t1 & tEnd < t2) {
-                    # cat('insert one boundary to tEnd with empty label and then insert another boundary to tStart with new label, it splits the original interval into three parts, the first and the third will be empty, the second will have new label\n')
+                    # cat("insert one boundary to tEnd with empty label and then insert another boundary to tStart with new label, it splits the original interval into three parts, the first and the third will be empty, the second will have new label\n")
                     tgNew <- tg.insertBoundary(tg, tierInd, tEnd)
                     tgNew <- tg.insertBoundary(tgNew, tierInd, tStart, label)
                 } else {
                     stop("Error in author's logic. This cannot happen. Please, contact the author but be kind. He is really unhappy about this confusion.")
                 }
             } else {
-                stop(paste0('Insertion of new interval (', as.character(tStart), ' to ', as.character(tEnd), ' sec, "', label, '") into the interval with unempty label (', as.character(tg[[tierInd]]$t1[iStart]), ' to ', as.character(tg[[tierInd]]$t2[iStart]), ' sec, "', tg[[tierInd]]$label[iStart], '") is forbidden.'))
+                stop(paste0("Insertion of new interval (", as.character(tStart), " to ", as.character(tEnd), ' sec, "', label, '") into the interval with unempty label (', as.character(tg[[tierInd]]$t1[iStart]), " to ", as.character(tg[[tierInd]]$t2[iStart]), ' sec, "', tg[[tierInd]]$label[iStart], '") is forbidden.'))
             }
         } else {
-            stop(paste0('Intersection of new interval (', as.character(tStart), ' to ', as.character(tEnd), ' sec, "', label, '") and more already existing (indexes ', iStart, ' and ', iEnd, ') is forbidden.'))
+            stop(paste0("Intersection of new interval (", as.character(tStart), " to ", as.character(tEnd), ' sec, "', label, '") and more already existing (indexes ', iStart, " and ", iEnd, ") is forbidden."))
         }
 
 
@@ -2643,7 +2643,7 @@ pt.write <- function(pt, fileNamePitchTier) {
 
     fid <- file(fileNamePitchTier, open = "w", encoding = "UTF-8")
     if (!isOpen(fid)) {
-        stop(paste0('cannot open file [', fileNamePitchTier, ']'))
+        stop(paste0("cannot open file [", fileNamePitchTier, "]"))
     }
 
     writeLines('"ooTextFile"', fid)
@@ -2685,7 +2685,7 @@ pt.plot <- function(pt, group = "") {
     g <- dygraphs::dyOptions(g, drawPoints = TRUE, pointSize = 2, strokeWidth = 0)
     g <- dygraphs::dyRangeSelector(g, dateWindow = c(pt$tmin, pt$tmax))
 
-    g <- dygraphs::dyAxis(g, "x", valueFormatter = 'function(d){return d.toFixed(3)}')
+    g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
     g
 }
 
