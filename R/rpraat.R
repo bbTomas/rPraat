@@ -9,6 +9,7 @@
 #' @return Tier index
 #'
 #' @export
+#' @seealso \code{\link{tg.getTierName}}, \code{\link{tg.isIntervalTier}}, \code{\link{tg.isPointTier}}, \code{\link{tg.plot}}, \code{\link{tg.getNumberOfTiers}}
 #' @examples
 #' tg <- tg.sample()
 #' tg.checkTierInd(tg, 4)
@@ -63,6 +64,7 @@ tg.checkTierInd <- function(tg, tierInd) {
 #'
 #' @return TextGrid object
 #' @export
+#' @seealso \code{\link{tg.write}}, \code{\link{tg.plot}}, \code{\link{tg.repairContinuity}}, \code{\link{tg.createNewTextGrid}}, \code{\link{pt.read}}
 #'
 #' @examples
 #' \dontrun{
@@ -344,6 +346,7 @@ tg.read <- function(fileNameTextGrid) {
 #' @param fileNameTextGrid Output file name
 #'
 #' @export
+#' @seealso \code{\link{tg.read}}, \code{\link{pt.write}}
 #'
 #' @examples
 #' \dontrun{
@@ -466,6 +469,7 @@ tg.write <- function(tg, fileNameTextGrid) {
 #' @param group [optional] character string, name of group for dygraphs synchronization
 #'
 #' @export
+#' @seealso \code{\link{tg.read}}, \code{\link{pt.plot}}
 #'
 #' @examples
 #' \dontrun{
@@ -591,6 +595,7 @@ tg.plot <- function(tg, group = "") {
 #'
 #' @return TextGrid object
 #' @export
+#' @seealso \code{\link{tg.sampleProblem}}
 #'
 #' @examples
 #' \dontrun{
@@ -634,6 +639,7 @@ tg.repairContinuity <- function(tg, verbose = FALSE) {
 #'
 #' @return TextGrid object
 #' @export
+#' @seealso \code{\link{tg.insertNewIntervalTier}}, \code{\link{tg.insertNewPointTier}}
 #'
 #' @examples
 #' tg <- tg.createNewTextGrid(0, 5)
@@ -671,6 +677,7 @@ tg.createNewTextGrid <- function(tMin, tMax) {
 #'
 #' @return TRUE / FALSE
 #' @export
+#' @seealso \code{\link{tg.isPointTier}}, \code{\link{tg.getTierName}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -700,6 +707,7 @@ tg.isIntervalTier <- function(tg, tierInd) {
 #'
 #' @return TRUE / FALSE
 #' @export
+#' @seealso \code{\link{tg.isIntervalTier}}, \code{\link{tg.getTierName}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -730,6 +738,7 @@ tg.isPointTier <- function(tg, tierInd) {
 #'
 #' @return character string
 #' @export
+#' @seealso \code{\link{tg.setTierName}}, \code{\link{tg.isIntervalTier}}, \code{\link{tg.isPointTier}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -755,6 +764,7 @@ tg.getTierName <- function(tg, tierInd) {
 #' @param name new 'name' of the tier
 #'
 #' @export
+#' @seealso \code{\link{tg.getTierName}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -792,6 +802,7 @@ tg.setTierName <- function(tg, tierInd, name) {
 #'
 #' @return integer number
 #' @export
+#' @seealso \code{\link{tg.getLabel}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -834,6 +845,7 @@ tg.countLabels <- function(tg, tierInd, label) {
 #'
 #' @return TextGrid object
 #' @export
+#' @seealso \code{\link{tg.setTierName}}, \code{\link{tg.removeTier}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -895,6 +907,7 @@ tg.duplicateTier <- function(tg, originalInd, newInd, newTierName = "") {
 #'
 #' @return numeric
 #' @export
+#' @seealso \code{\link{tg.getEndTime}}, \code{\link{tg.getTotalDuration}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -942,6 +955,7 @@ tg.getStartTime <- function(tg, tierInd = 0) {
 #'
 #' @return numeric
 #' @export
+#' @seealso \code{\link{tg.getStartTime}}, \code{\link{tg.getTotalDuration}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -990,6 +1004,7 @@ tg.getEndTime <- function(tg, tierInd = 0) {
 #'
 #' @return numeric
 #' @export
+#' @seealso \code{\link{tg.getStartTime}}, \code{\link{tg.getEndTime}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1018,6 +1033,7 @@ tg.getTotalDuration <- function(tg, tierInd = 0) {
 #'
 #' @return integer
 #' @export
+#' @seealso \code{\link{tg.getTierName}}, \code{\link{tg.isIntervalTier}}, \code{\link{tg.isPointTier}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1040,6 +1056,7 @@ tg.getNumberOfTiers <- function(tg) {
 #'
 #' @return integer
 #' @export
+#' @seealso \code{\link{tg.getNumberOfIntervals}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1069,6 +1086,7 @@ tg.getNumberOfPoints <- function(tg, tierInd) {
 #'
 #' @return integer
 #' @export
+#' @seealso \code{\link{tg.getNumberOfPoints}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1098,6 +1116,7 @@ tg.getNumberOfIntervals <- function(tg, tierInd) {
 #'
 #' @return character string
 #' @export
+#' @seealso \code{\link{tg.setLabel}}, \code{\link{tg.countLabels}}
 #'
 #' @examples tg <- tg.sample()
 #' tg.getLabel(tg, "phoneme", 4)
@@ -1143,6 +1162,7 @@ tg.getLabel <- function(tg, tierInd, index) {
 #' @param newLabel new "label"
 #'
 #' @export
+#' @seealso \code{\link{tg.getLabel}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1194,6 +1214,7 @@ tg.setLabel <- function(tg, tierInd, index, newLabel) {
 #'
 #' @return numeric
 #' @export
+#' @seealso \code{\link{tg.getIntervalEndTime}}, \code{\link{tg.getIntervalDuration}}, \code{\link{tg.getIntervalIndexAtTime}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1235,6 +1256,7 @@ tg.getIntervalStartTime <- function(tg, tierInd, index) {
 #'
 #' @return numeric
 #' @export
+#' @seealso \code{\link{tg.getIntervalStartTime}}, \code{\link{tg.getIntervalDuration}}, \code{\link{tg.getIntervalIndexAtTime}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1275,6 +1297,7 @@ tg.getIntervalEndTime <- function(tg, tierInd, index) {
 #'
 #' @return numeric
 #' @export
+#' @seealso \code{\link{tg.getIntervalStartTime}}, \code{\link{tg.getIntervalEndTime}}, \code{\link{tg.getIntervalIndexAtTime}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1315,6 +1338,8 @@ tg.getIntervalDuration <- function(tg, tierInd, index) {
 #'
 #' @return numeric
 #' @export
+#' @seealso \code{\link{tg.getLabel}}, \code{\link{tg.getPointIndexNearestTime}}, \code{\link{tg.getPointIndexLowerThanTime}},
+#' @seealso \code{\link{tg.getPointIndexHigherThanTime}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1353,6 +1378,7 @@ tg.getPointTime <- function(tg, tierInd, index) {
 #'
 #' @return TextGrid object
 #' @export
+#' @seealso \code{\link{tg.insertNewIntervalTier}}, \code{\link{tg.insertNewPointTier}}, \code{\link{tg.duplicateTier}}
 #'
 #' @examples
 #' \dontrun{
@@ -1391,6 +1417,7 @@ tg.removeTier <- function(tg, tierInd) {
 #'
 #' @return TextGrid object
 #' @export
+#' @seealso \code{\link{tg.insertPoint}}, \code{\link{tg.insertNewIntervalTier}}, \code{\link{tg.duplicateTier}}, \code{\link{tg.removeTier}}
 #'
 #' @examples
 #' \dontrun{
@@ -1452,6 +1479,7 @@ tg.insertNewPointTier <- function(tg, newInd, newTierName) {
 #'
 #' @return TextGrid object
 #' @export
+#' @seealso \code{\link{tg.insertInterval}}, \code{\link{tg.insertNewPointTier}}, \code{\link{tg.duplicateTier}}, \code{\link{tg.removeTier}}
 #'
 #' @examples
 #' \dontrun{
@@ -1555,6 +1583,7 @@ tg.insertNewIntervalTier <- function(tg, newInd, newTierName, tMin=NA, tMax=NA) 
 #'
 #' @return integer
 #' @export
+#' @seealso \code{\link{tg.getIntervalStartTime}}, \code{\link{tg.getIntervalEndTime}}, \code{\link{tg.getLabel}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1598,6 +1627,7 @@ tg.getIntervalIndexAtTime <- function(tg, tierInd, time) {
 #'
 #' @return integer
 #' @export
+#' @seealso \code{\link{tg.getPointIndexNearestTime}}, \code{\link{tg.getPointIndexLowerThanTime}}, \code{\link{tg.getLabel}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1642,6 +1672,7 @@ tg.getPointIndexHigherThanTime <- function(tg, tierInd, time) {
 #'
 #' @return integer
 #' @export
+#' @seealso \code{\link{tg.getPointIndexNearestTime}}, \code{\link{tg.getPointIndexHigherThanTime}}, \code{\link{tg.getLabel}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1686,6 +1717,7 @@ tg.getPointIndexLowerThanTime <- function(tg, tierInd, time) {
 #'
 #' @return integer
 #' @export
+#' @seealso \code{\link{tg.getPointIndexLowerThanTime}}, \code{\link{tg.getPointIndexHigherThanTime}}, \code{\link{tg.getLabel}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1734,6 +1766,7 @@ tg.getPointIndexNearestTime <- function(tg, tierInd, time) {
 #'
 #' @return TextGrid object
 #' @export
+#' @seealso \code{\link{tg.insertPoint}}, \code{\link{tg.getNumberOfPoints}}, \code{\link{tg.removeIntervalBothBoundaries}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1785,6 +1818,7 @@ tg.removePoint <- function(tg, tierInd, index) {
 #'
 #' @return TextGrid object
 #' @export
+#' @seealso \code{\link{tg.removePoint}}, \code{\link{tg.insertInterval}}, \code{\link{tg.insertBoundary}}
 #'
 #' @examples
 #' \dontrun{
@@ -1853,6 +1887,7 @@ tg.insertPoint <- function(tg, tierInd, time, label) {
 #'
 #' @return TextGrid object
 #' @export
+#' @seealso \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}, \code{\link{tg.insertBoundary}}, \code{\link{tg.insertInterval}}
 #'
 #' @examples
 #' \dontrun{
@@ -1926,6 +1961,7 @@ tg.removeIntervalLeftBoundary <- function(tg, tierInd, index) {
 #'
 #' @return TextGrid object
 #' @export
+#' @seealso \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}, \code{\link{tg.insertBoundary}}, \code{\link{tg.insertInterval}}
 #'
 #' @examples
 #' \dontrun{
@@ -2002,6 +2038,7 @@ tg.removeIntervalRightBoundary <- function(tg, tierInd, index) {
 #'
 #' @return TextGrid object
 #' @export
+#' @seealso \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.insertBoundary}}, \code{\link{tg.insertInterval}}
 #'
 #' @examples
 #' \dontrun{
@@ -2067,8 +2104,6 @@ tg.removeIntervalBothBoundaries <- function(tg, tierInd, index) {
 #' Inserts new boundary into interval tier. This creates a new interval, to
 #' which we can set the label (optional argument).
 #'
-#' Notes
-#'
 #' There are more possible situations which influence where the new label
 #' will be set.
 #'
@@ -2105,6 +2140,7 @@ tg.removeIntervalBothBoundaries <- function(tg, tierInd, index) {
 #'
 #' @return TextGrid object
 #' @export
+#' @seealso \code{\link{tg.insertInterval}}, \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -2196,8 +2232,6 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
 #' b) Outside og existing intervals (left or right), this may create another
 #' empty interval between.
 #'
-#' Notes
-#'
 #' In most cases, this function is the same as 1.) tgInsertBoundary(tEnd)
 #' and 2.) tgInsertBoundary(tStart, 'new label'). But, additional checks are
 #' performed: a) tStart and tEnd belongs to the same empty interval, or
@@ -2252,6 +2286,7 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
 #'
 #' @return TextGrid object
 #' @export
+#' @seealso \code{\link{tg.insertBoundary}}, \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -2424,6 +2459,7 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
 #'
 #' @return PitchTier object
 #' @export
+#' @seealso \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{tg.read}}
 #'
 #' @examples
 #' \dontrun{
@@ -2567,6 +2603,7 @@ pt.read <- function(fileNamePitchTier) {
 #' @param fileNamePitchTier file name to be created
 #'
 #' @export
+#' @seealso \code{\link{pt.read}}, \code{\link{tg.write}}
 #'
 #' @examples
 #' \dontrun{
@@ -2629,6 +2666,7 @@ pt.write <- function(pt, fileNamePitchTier) {
 #' @param group [optional] character string, name of group for dygraphs synchronization
 #'
 #' @export
+#' @seealso \code{\link{pt.read}}, \code{\link{tg.plot}}
 #'
 #' @examples
 #' \dontrun{

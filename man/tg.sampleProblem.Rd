@@ -18,4 +18,7 @@ tg2 <- tg.repairContinuity(tg)
 tg2 <- tg.repairContinuity(tg2)
 tg.plot(tg2)
 }
+\seealso{
+\code{\link{tg.repairContinuity}}
+}
 

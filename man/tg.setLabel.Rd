@@ -24,4 +24,7 @@ tg <- tg.sample()
 tg2 <- tg.setLabel(tg, "word", 3, "New Label")
 tg.getLabel(tg2, "word", 3)
 }
+\seealso{
+\code{\link{tg.getLabel}}
+}
 

@@ -23,4 +23,9 @@ Return time of point at the specified index in point tier.
 tg <- tg.sample()
 tg.getPointTime(tg, "phoneme", 4)
 }
+\seealso{
+\code{\link{tg.getLabel}}, \code{\link{tg.getPointIndexNearestTime}}, \code{\link{tg.getPointIndexLowerThanTime}},
+
+\code{\link{tg.getPointIndexHigherThanTime}}
+}
 

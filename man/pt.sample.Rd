@@ -16,4 +16,7 @@ Returns sample PitchTier.
 pt <- pt.sample()
 pt.plot(pt)
 }
+\seealso{
+\code{\link{pt.plot}}
+}
 

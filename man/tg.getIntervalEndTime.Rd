@@ -23,4 +23,7 @@ Return end time of interval in interval tier.
 tg <- tg.sample()
 tg.getIntervalEndTime(tg, "phone", 5)
 }
+\seealso{
+\code{\link{tg.getIntervalStartTime}}, \code{\link{tg.getIntervalDuration}}, \code{\link{tg.getIntervalIndexAtTime}}
+}
 

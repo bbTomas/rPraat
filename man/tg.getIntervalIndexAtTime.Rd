@@ -24,4 +24,7 @@ tStart <= time < tEnd. Tier index must belong to interval tier.
 tg <- tg.sample()
 tg.getIntervalIndexAtTime(tg, "word", 0.5)
 }
+\seealso{
+\code{\link{tg.getIntervalStartTime}}, \code{\link{tg.getIntervalEndTime}}, \code{\link{tg.getLabel}}
+}
 

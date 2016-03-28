@@ -20,4 +20,7 @@ pt <- pt.sample()
 pt.plot(pt)
 }
 }
+\seealso{
+\code{\link{pt.read}}, \code{\link{tg.plot}}
+}
 

@@ -16,4 +16,7 @@ Returns sample TextGrid.
 tg <- tg.sample()
 tg.plot(tg)
 }
+\seealso{
+\code{\link{tg.plot}}
+}
 

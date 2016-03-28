@@ -24,4 +24,7 @@ tg <- tg.sample()
 tg.getTotalDuration(tg)
 tg.getTotalDuration(tg, "phone")
 }
+\seealso{
+\code{\link{tg.getStartTime}}, \code{\link{tg.getEndTime}}
+}
 

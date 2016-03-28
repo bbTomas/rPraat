@@ -21,4 +21,7 @@ Returns number of intervals in the given interval tier.
 tg <- tg.sample()
 tg.getNumberOfIntervals(tg, "phone")
 }
+\seealso{
+\code{\link{tg.getNumberOfPoints}}
+}
 

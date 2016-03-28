@@ -28,4 +28,7 @@ tg2 <- tg.insertPoint(tg, "phoneme", 1.4, "NEW POINT")
 tg.plot(tg2)
 }
 }
+\seealso{
+\code{\link{tg.removePoint}}, \code{\link{tg.insertInterval}}, \code{\link{tg.insertBoundary}}
+}
 

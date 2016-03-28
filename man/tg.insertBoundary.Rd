@@ -23,8 +23,6 @@ Inserts new boundary into interval tier. This creates a new interval, to
 which we can set the label (optional argument).
 }
 \details{
-Notes
-
 There are more possible situations which influence where the new label
 will be set.
 
@@ -63,5 +61,8 @@ tg2 <- tg.insertInterval(tg2, "INTERVALS", 1.2, 2.5, "Interval B")
 \dontrun{
 tg.plot(tg2)
 }
+}
+\seealso{
+\code{\link{tg.insertInterval}}, \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}
 }
 

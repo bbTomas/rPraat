@@ -19,4 +19,7 @@ Returns number of tiers.
 tg <- tg.sample()
 tg.getNumberOfTiers(tg)
 }
+\seealso{
+\code{\link{tg.getTierName}}, \code{\link{tg.isIntervalTier}}, \code{\link{tg.isPointTier}}
+}
 

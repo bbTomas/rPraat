@@ -23,4 +23,7 @@ pt <- pt.read("demo/H.PitchTier")
 pt.plot(pt)
 }
 }
+\seealso{
+\code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{tg.read}}
+}
 

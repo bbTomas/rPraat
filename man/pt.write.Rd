@@ -25,4 +25,7 @@ pt.plot(pt)
 pt.write(pt, "demo/H_st.PitchTier")
 }
 }
+\seealso{
+\code{\link{pt.read}}, \code{\link{tg.write}}
+}
 

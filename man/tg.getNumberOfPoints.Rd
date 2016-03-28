@@ -21,4 +21,7 @@ Returns number of points in the given point tier.
 tg <- tg.sample()
 tg.getNumberOfPoints(tg, "phoneme")
 }
+\seealso{
+\code{\link{tg.getNumberOfIntervals}}
+}
 

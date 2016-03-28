@@ -25,4 +25,7 @@ tg2 <- tg.removeTier(tg, "word")
 tg.plot(tg2)
 }
 }
+\seealso{
+\code{\link{tg.insertNewIntervalTier}}, \code{\link{tg.insertNewPointTier}}, \code{\link{tg.duplicateTier}}
+}
 

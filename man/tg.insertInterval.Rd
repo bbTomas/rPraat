@@ -29,8 +29,6 @@ b) Outside og existing intervals (left or right), this may create another
 empty interval between.
 }
 \details{
-Notes
-
 In most cases, this function is the same as 1.) tgInsertBoundary(tEnd)
 and 2.) tgInsertBoundary(tStart, 'new label'). But, additional checks are
 performed: a) tStart and tEnd belongs to the same empty interval, or
@@ -86,5 +84,8 @@ tg2 <- tg.insertInterval(tg2, "INTERVALS", 1.2, 2.5, "Interval B")
 \dontrun{
 tg.plot(tg2)
 }
+}
+\seealso{
+\code{\link{tg.insertBoundary}}, \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}
 }
 

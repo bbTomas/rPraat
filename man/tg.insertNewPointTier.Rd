@@ -28,4 +28,7 @@ tg2 <- tg.insertPoint(tg2, "POINTS", 3, "MY POINT")
 tg.plot(tg2)
 }
 }
+\seealso{
+\code{\link{tg.insertPoint}}, \code{\link{tg.insertNewIntervalTier}}, \code{\link{tg.duplicateTier}}, \code{\link{tg.removeTier}}
+}
 

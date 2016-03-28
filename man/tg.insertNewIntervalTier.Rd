@@ -36,4 +36,7 @@ tg2 <- tg.insertInterval(tg2, "INTERVALS", 1.2, 2.5, "Interval B")
 tg.plot(tg2)
 }
 }
+\seealso{
+\code{\link{tg.insertInterval}}, \code{\link{tg.insertNewPointTier}}, \code{\link{tg.duplicateTier}}, \code{\link{tg.removeTier}}
+}
 

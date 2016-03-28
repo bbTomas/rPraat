@@ -29,4 +29,7 @@ tg <- tg.insertNewIntervalTier(tg, 1, "word")
 tg <- tg.insertInterval(tg, "word", 1, 2, "hello")
 tg.plot(tg)
 }
+\seealso{
+\code{\link{tg.insertNewIntervalTier}}, \code{\link{tg.insertNewPointTier}}
+}
 

@@ -24,4 +24,7 @@ pointTime <= time. Tier index must belong to point tier.
 tg <- tg.sample()
 tg.getPointIndexLowerThanTime(tg, "phoneme", 0.5)
 }
+\seealso{
+\code{\link{tg.getPointIndexNearestTime}}, \code{\link{tg.getPointIndexHigherThanTime}}, \code{\link{tg.getLabel}}
+}
 

@@ -25,4 +25,7 @@ tg$phoneme$label
 tg2 <- tg.removePoint(tg, "phoneme", 1)
 tg2$phoneme$label
 }
+\seealso{
+\code{\link{tg.insertPoint}}, \code{\link{tg.getNumberOfPoints}}, \code{\link{tg.removeIntervalBothBoundaries}}
+}
 

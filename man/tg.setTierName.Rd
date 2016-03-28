@@ -21,4 +21,7 @@ tg <- tg.sample()
 tg2 <- tg.setTierName(tg, "word", "WORDTIER")
 tg.getTierName(tg2, 4)
 }
+\seealso{
+\code{\link{tg.getTierName}}
+}
 

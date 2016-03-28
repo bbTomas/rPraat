@@ -12,6 +12,7 @@
 #'
 #' @return TextGrid
 #' @export
+#' @seealso \code{\link{tg.plot}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -108,6 +109,7 @@ tg.sample <- function() {
 #'
 #' @return TextGrid
 #' @export
+#' @seealso \code{\link{tg.repairContinuity}}
 #'
 #' @examples
 #' tg <- tg.sampleProblem()
@@ -205,6 +207,7 @@ tg.sampleProblem <- function() {
 #'
 #' @return PitchTier
 #' @export
+#' @seealso \code{\link{pt.plot}}
 #'
 #' @examples
 #' pt <- pt.sample()

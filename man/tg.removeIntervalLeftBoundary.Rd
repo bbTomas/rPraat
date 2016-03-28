@@ -34,4 +34,7 @@ tg2 <- tg.removeIntervalLeftBoundary(tg, "word", 3)
 tg.plot(tg2)
 }
 }
+\seealso{
+\code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}, \code{\link{tg.insertBoundary}}, \code{\link{tg.insertInterval}}
+}
 

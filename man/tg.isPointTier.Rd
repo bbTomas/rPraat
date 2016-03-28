@@ -22,4 +22,7 @@ tg <- tg.sample()
 tg.isPointTier(tg, 1)
 tg.isPointTier(tg, 'word')
 }
+\seealso{
+\code{\link{tg.isIntervalTier}}, \code{\link{tg.getTierName}}
+}
 

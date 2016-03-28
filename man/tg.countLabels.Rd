@@ -23,4 +23,7 @@ Returns number of labels with the specified label.
 tg <- tg.sample()
 tg.countLabels(tg, "phone", "a")
 }
+\seealso{
+\code{\link{tg.getLabel}}
+}
 

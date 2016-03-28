@@ -29,4 +29,7 @@ tgNew <- tg.repairContinuity(tgProblem)
 tg.write(tgNew, "demo_problem_OK.TextGrid")
 }
 }
+\seealso{
+\code{\link{tg.sampleProblem}}
+}
 
