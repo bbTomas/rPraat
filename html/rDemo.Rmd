@@ -242,9 +242,9 @@ listFiles <- list.files(path = inputFolder, pattern = "\\.TextGrid$" , ignore.ca
 for (I in seq_along(listFiles)) {
     file <- listFiles[I]
     fileName <- substr(file, 1, nchar(file)-9)
-    fileTextGrid <- paste0(inputFolder, "/", paste0(fileName, ".TextGrid"))
-    filePitchTier <- paste0(inputFolder, "/", paste0(fileName, ".PitchTier"))
-    fileSound <- paste0(inputFolder, "/", paste0(fileName, ".wav"))
+    fileTextGrid <- paste0(inputFolder, "/", fileName, ".TextGrid")
+    filePitchTier <- paste0(inputFolder, "/", fileName, ".PitchTier")
+    fileSound <- paste0(inputFolder, "/", fileName, ".wav")
     
     tg <- tg.read(fileTextGrid)
     pt <- pt.read(filePitchTier)
