@@ -1,0 +1,104 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 1.7885625 
+tiers? <exists> 
+size = 2 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "phone" 
+        xmin = 0 
+        xmax = 1.7885625 
+        intervals: size = 13 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.1407611382467178 
+            text = "" 
+        intervals [2]:
+            xmin = 0.1407611382467178 
+            xmax = 0.24165250868220484 
+            text = "ʔ" 
+        intervals [3]:
+            xmin = 0.24165250868220484 
+            xmax = 0.3433962484613312 
+            text = "a" 
+        intervals [4]:
+            xmin = 0.3433962484613312 
+            xmax = 0.45802457792427254 
+            text = "n" 
+        intervals [5]:
+            xmin = 0.45802457792427254 
+            xmax = 0.5423253841224808 
+            text = "a" 
+        intervals [6]:
+            xmin = 0.5423253841224808 
+            xmax = 0.8401882326894831 
+            text = "" 
+        intervals [7]:
+            xmin = 0.8401882326894831 
+            xmax = 0.9298883724009658 
+            text = "w" 
+        intervals [8]:
+            xmin = 0.9298883724009658 
+            xmax = 1.1633413231159477 
+            text = "a" 
+        intervals [9]:
+            xmin = 1.1633413231159477 
+            xmax = 1.319297814582633 
+            text = "" 
+        intervals [10]:
+            xmin = 1.319297814582633 
+            xmax = 1.3986615608084938 
+            text = "h" 
+        intervals [11]:
+            xmin = 1.3986615608084938 
+            xmax = 1.506986933211399 
+            text = "a" 
+        intervals [12]:
+            xmin = 1.506986933211399 
+            xmax = 1.5890603944168995 
+            text = "m" 
+        intervals [13]:
+            xmin = 1.5890603944168995 
+            xmax = 1.7885625 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "syllable" 
+        xmin = 0 
+        xmax = 1.7885625 
+        intervals: size = 8 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.1407611382467178 
+            text = "" 
+        intervals [2]:
+            xmin = 0.1407611382467178 
+            xmax = 0.3433962484613312 
+            text = "a" 
+        intervals [3]:
+            xmin = 0.3433962484613312 
+            xmax = 0.5423253841224808 
+            text = "na" 
+        intervals [4]:
+            xmin = 0.5423253841224808 
+            xmax = 0.8401882326894831 
+            text = "{pause}" 
+        intervals [5]:
+            xmin = 0.8401882326894831 
+            xmax = 1.1633413231159477 
+            text = "wa" 
+        intervals [6]:
+            xmin = 1.1633413231159477 
+            xmax = 1.319297814582633 
+            text = "{pause}" 
+        intervals [7]:
+            xmin = 1.319297814582633 
+            xmax = 1.5890603944168995 
+            text = "ham" 
+        intervals [8]:
+            xmin = 1.5890603944168995 
+            xmax = 1.7885625 
+            text = "" 

@@ -78,9 +78,10 @@ tg.read <- function(fileNameTextGrid) {
 
     tg <- list()  # new textgrid
 
-    fid <- file(fileNameTextGrid, open = "r", encoding = "UTF-8")
-    flines <- readLines(fid)
-    close(fid)
+    # fid <- file(fileNameTextGrid, open = "r", encoding = "UTF-8")
+    # flines <- readLines(fid)
+    flines <- readr::read_lines(fileNameTextGrid, locale = readr::locale(encoding = "UTF-8"))
+    # close(fid)
     find <- 4   # index of line to read, we ignore the first three
 
     xminStr <- flines[find]; find <- find + 1 # xmin
@@ -2471,9 +2472,10 @@ pt.read <- function(fileNamePitchTier) {
         stop("Invalid 'fileNamePitchTier' parameter.")
     }
 
-    fid <- file(fileNamePitchTier, open = "r", encoding = "UTF-8")
-    flines <- readLines(fid)
-    close(fid)
+    # fid <- file(fileNamePitchTier, open = "r", encoding = "UTF-8")
+    # flines <- readLines(fid)
+    flines <- readr::read_lines(fileNamePitchTier, locale = readr::locale(encoding = "UTF-8"))
+    # close(fid)
 
     if (length(flines) < 1) {
         stop("Empty file.")

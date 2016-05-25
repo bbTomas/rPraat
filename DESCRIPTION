@@ -1,7 +1,7 @@
 Package: rPraat
 Type: Package
 Title: Read, write and manipulate Praat TextGrid and PitchTier
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: person("Tomas", "Boril", email = "borilt@gmail.com", role = c("aut", "cre"))
 Maintainer: Tomas Boril <borilt@gmail.com>
 Description: rPraat package for R constitutes an interface between the
@@ -16,6 +16,7 @@ Imports:
     dplyr (>= 0.4.3),
     tidyr (>= 0.4.1),
     stringr (>= 1.0.0),
+    readr(>= 0.2.2),
     dygraphs (>= 0.8),
     tbTools (>= 1.0.0)
 RoxygenNote: 5.0.1

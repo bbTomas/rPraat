@@ -51,6 +51,10 @@ test_that("tg.read", {
         tg <- tg.read("H_short.TextGrid")
         c(length(tg), length(unique(tg$word$t2)), tg[[1]]$label[[7]], tg[[2]]$type)
         }, c("5", "13", "k", "interval"))
+    expect_equal({
+        tg <- tg.read("utf8.TextGrid")
+        tg$phone$label[2]
+    }, "\u0294")
 })
 
 
