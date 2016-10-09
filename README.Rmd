@@ -36,7 +36,14 @@ tg.sample() %>% tg.plot()  # demo test
 ## How to cite this package?
 We have invested a lot of time and effort in creating mPraat toolbox / rPraat package, please cite it when using it for data analysis.
 
-At this time, we have submitted a paper which is not published yet. Please, let us know (e-mail: <borilt@gmail.com>) if you use this toolbox and we will provide you the citation link as soon as possible. Thank you.
+> Bořil, T., & Skarnitzl, R. (2016). Tools rPraat and mPraat. In P. Sojka, A. Horák, I. Kopeček, & K. Pala (Eds.), Text, Speech, and Dialogue (pp. 367–374). Springer International Publishing.
+
+[Download Tools rPraat and mPraat manuscript .pdf](http://fu.ff.cuni.cz/praat/boril_skarnitzl_2016_Tools_rPraat_and_mPraat_[manuscript].pdf)
+
+The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-5_42](http://dx.doi.org/10.1007/978-3-319-45510-5_42)
+
+
+[Download BibTeX reference mpraatrpraat2016.bib](http://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
 
 ## License
 

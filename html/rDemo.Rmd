@@ -1,5 +1,18 @@
 # rPraat: Praat in R
 
+## How to cite this package / toolbox?
+We have invested a lot of time and effort in creating mPraat toolbox / rPraat package, please cite it when using it for data analysis.
+
+> Bořil, T., & Skarnitzl, R. (2016). Tools rPraat and mPraat. In P. Sojka, A. Horák, I. Kopeček, & K. Pala (Eds.), Text, Speech, and Dialogue (pp. 367–374). Springer International Publishing.
+
+[Download Tools rPraat and mPraat manuscript .pdf](boril_skarnitzl_2016_Tools_rPraat_and_mPraat_[manuscript].pdf)
+
+The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-5_42](http://dx.doi.org/10.1007/978-3-319-45510-5_42)
+
+
+[Download BibTeX reference mpraatrpraat2016.bib](mpraatrpraat2016.bib)
+
+
 ## Installation and help
 
 rPraat and mPraat homepage: [http://fu.ff.cuni.cz/praat/](http://fu.ff.cuni.cz/praat/)

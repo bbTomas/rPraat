@@ -1,18 +1,21 @@
 citHeader("To cite rPraat in publications use:")
 
 citEntry(entry = "InProceedings",
-  author       = personList(as.person("Tomas Boril"), as.person("Radek Skarnitzl")),
-  booktitle      = "-",
+  author       = personList(as.person("Tomáš Bořil"),
+                   as.person("Radek Skarnitzl")),
+  editor = personList(as.person("Petr Sojka"),
+                   as.person("Aleš Horák"),
+                   as.person("Ivan Kopeček"),
+                   as.person("Karel Pala")),
+  booktitle      = "Text, Speech, and Dialogue: 19th International Conference, TSD 2016, Brno, Czech Republic, September 12-16, 2016, Proceedings",
+  publisher="Springer International Publishing",
+  address="Cham",
   year         = "2016",
-  title        =
-  paste("We have invested a lot of time and effort in creating rPraat package, please cite it when using it for data analysis.",
-  "At this time, we have submitted a paper which is not published yet.",
-  "Please, let us know (e-mail: <borilt@gmail.com>) if you use this toolbox and we will provide you the citation link",
-  "as soon as possible. Thank you."),
-
+  title        = "Tools rPraat and mPraat",
+  pages        = "367--374",
+  isbn="978-3-319-45510-5",
+  doi="10.1007/978-3-319-45510-5_42",
+  url="http://dx.doi.org/10.1007/978-3-319-45510-5_42",
   textVersion  =
-  paste("We have invested a lot of time and effort in creating rPraat package, please cite it when using it for data analysis.",
-  "At this time, we have submitted a paper which is not published yet.",
-  "Please, let us know (e-mail: <borilt@gmail.com>) if you use this toolbox and we will provide you the citation link",
-  "as soon as possible. Thank you.")
+  paste("Bořil, T., & Skarnitzl, R. (2016). Tools rPraat and mPraat. In P. Sojka, A. Horák, I. Kopeček, & K. Pala (Eds.), Text, Speech, and Dialogue (pp. 367-374). Springer International Publishing.")
 )
