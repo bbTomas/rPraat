@@ -101,15 +101,15 @@ tg.read <- function(fileNameTextGrid) {
         xmin <- as.numeric(xminStr) # xmin
         xmax <- as.numeric(xmaxStr) # xmax
     } else {
-        xmin <- tidyr::extract_numeric(xminStr) # xmin
-        xmax <- tidyr::extract_numeric(xmaxStr) # xmax
+        xmin <- readr::parse_number(xminStr) # xmin
+        xmax <- readr::parse_number(xmaxStr) # xmax
     }
 
     if (shortFormat) {
         nTiers <- as.numeric(flines[find])
         find <- find + 1
     } else {
-        nTiers <- tidyr::extract_numeric(flines[find])
+        nTiers <- readr::parse_number(flines[find])
         find <- find + 1
     }
 
@@ -146,7 +146,7 @@ tg.read <- function(fileNameTextGrid) {
                 nIntervals <- as.numeric(flines[find]); find <- find + 1
             } else {
                 r <- tbTools::strTrim(flines[find]); find <- find + 1
-                nIntervals <- tidyr::extract_numeric(r)
+                nIntervals <- readr::parse_number(r)
             }
 
             tierT1 <- numeric(0)
@@ -167,8 +167,8 @@ tg.read <- function(fileNameTextGrid) {
                     if ( (substr(r1, 1, 7) != "xmin = ")  ||  (substr(r2, 1, 7) != "xmax = ") ) {
                         stop("Unknown textgrid format");
                     }
-                    t <- tidyr::extract_numeric(r1)
-                    t2 <- tidyr::extract_numeric(r2)
+                    t <- readr::parse_number(r1)
+                    t2 <- readr::parse_number(r2)
                 }
 
                 r <- flines[find]; find <- find + 1;
@@ -244,7 +244,7 @@ tg.read <- function(fileNameTextGrid) {
                 nIntervals <- as.numeric(flines[find]); find <- find + 1
             } else {
                 r <- tbTools::strTrim(flines[find]); find <- find + 1
-                nIntervals <- tidyr::extract_numeric(r)
+                nIntervals <- readr::parse_number(r)
             }
 
             tierT <- numeric(0)
@@ -262,7 +262,7 @@ tg.read <- function(fileNameTextGrid) {
                     if (substr(r, 1, 9) != "number = ") {
                         stop("Unknown textgrid format");
                     }
-                    t <- tidyr::extract_numeric(r)
+                    t <- readr::parse_number(r)
                 }
 
                 r <- flines[find]; find <- find + 1
@@ -2532,9 +2532,9 @@ pt.read <- function(fileNamePitchTier) {
         }
 
         if (stringr::str_sub(flines[4], 1, 1) == "x") {  # TextFile
-            xmin <- tidyr::extract_numeric(flines[4])
-            xmax <- tidyr::extract_numeric(flines[5])
-            N <- tidyr::extract_numeric(flines[6])
+            xmin <- readr::parse_number(flines[4])
+            xmax <- readr::parse_number(flines[5])
+            N <- readr::parse_number(flines[6])
 
             if (N != (length(flines)-6)/3) {
                 stop("Wrong number of points in PitchTier format.")
@@ -2543,8 +2543,8 @@ pt.read <- function(fileNamePitchTier) {
             f <- numeric(N)
 
             for (I in tbTools::seqM(1, N, by = 1)) {
-                t[I] <- tidyr::extract_numeric(flines[8 + (I-1)*3])
-                f[I] <- tidyr::extract_numeric(flines[9 + (I-1)*3])
+                t[I] <- readr::parse_number(flines[8 + (I-1)*3])
+                f[I] <- readr::parse_number(flines[9 + (I-1)*3])
             }
 
         } else {   # shortTextFile
