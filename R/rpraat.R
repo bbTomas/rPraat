@@ -109,7 +109,13 @@ tg.read <- function(fileNameTextGrid) {
         nTiers <- as.numeric(flines[find])
         find <- find + 1
     } else {
-        nTiers <- readr::parse_number(flines[find])
+        r <- flines[find]
+        if (substr(r, nchar(r), nchar(r)) != " ") {
+            sppasFormat <- TRUE;
+        } else {
+            sppasFormat <- FALSE;
+        }
+        nTiers <- readr::parse_number(r)
         find <- find + 1
     }
 
@@ -179,7 +185,11 @@ tg.read <- function(fileNameTextGrid) {
                     rind <- tbTools::str_find1(r, '"')
                     nQuotationMarks <- length(tbTools::str_find(r, '"'))  # in Matlab: sum(r == '"')
                     if ((nQuotationMarks %% 2) != 1) { # remove whitespace at the end of line, it is only in the case of even number of quotation marks
-                        r <- substr(r, rind, nchar(r)-1)
+                        if (sppasFormat != TRUE) {
+                            r <- substr(r, rind, nchar(r)-1)
+                        } else {
+                            r <- substr(r, rind, nchar(r))
+                        }
                     } else {
                         r <- substr(r, rind, nchar(r))
                     }
@@ -192,7 +202,7 @@ tg.read <- function(fileNameTextGrid) {
                     repeat {
                         r <- flines[find]; find <- find + 1
                         nQuotationMarks <- length(tbTools::str_find(r, '"'))
-                        if (!shortFormat & (nQuotationMarks %% 2 == 1)) { # remove whitespace at the end of line, it is only in the case of odd number of quotation marks
+                        if (!shortFormat & (nQuotationMarks %% 2 == 1) & !sppasFormat) { # remove whitespace at the end of line, it is only in the case of odd number of quotation marks
                             r <- substr(r, 1, nchar(r)-1)
                         }
 
@@ -273,7 +283,11 @@ tg.read <- function(fileNameTextGrid) {
                     rind <- tbTools::str_find1(r, '"')
                     nQuotationMarks <- length(tbTools::str_find(r, '"'))
                     if (nQuotationMarks %% 2 != 1) { # remove whitespace at the end of line, it is only in the case of even number of quotation marks
-                        r <- substr(r, rind, nchar(r)-1)
+                        if (!sppasFormat) {
+                            r <- substr(r, rind, nchar(r)-1)
+                        } else {
+                            r <- substr(r, rind, nchar(r))
+                        }
                     } else {
                         r <- substr(r, rind, nchar(r))
                     }
@@ -285,7 +299,7 @@ tg.read <- function(fileNameTextGrid) {
                     repeat {
                         r <- flines[find]; find <- find + 1
                         nQuotationMarks <- length(tbTools::str_find(r, '"'))
-                        if (!shortFormat & (nQuotationMarks %% 2 == 1)) { # remove whitespace at the end of line, it is only in the case of odd number of quotation marks
+                        if (!shortFormat & (nQuotationMarks %% 2 == 1) & !sppasFormat) { # remove whitespace at the end of line, it is only in the case of odd number of quotation marks
                             r <- substr(r, 1, nchar(r)-1)
                         }
 

@@ -2,7 +2,7 @@
 
 rPraat package for R constitutes an interface between the most popular software for phonetic analyses, Praat, and R.
 
-Version 1.0.2.
+Version 1.0.3.
 
 For demonstration, see [html/rDemo.html](http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html)
 

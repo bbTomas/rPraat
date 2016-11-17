@@ -54,7 +54,15 @@ test_that("tg.read", {
     expect_equal({
         tg <- tg.read("utf8.TextGrid")
         tg$phone$label[2]
-    }, "\u0294")
+        }, "\u0294")
+    expect_equal({
+        tg <- tg.read("2pr.TextGrid")
+        tg$ORT$label[4:6]
+    }, c("wracal\npokus", "siebie\"\"\nah\"\"\na", "siebie\"\"\na\"\"h\"\"\na"))
+    expect_equal({
+        tg <- tg.read("sppas.TextGrid")
+        tg$ORT$label[4:6]
+    }, c("wracal\npokus", "siebe\"\"\nah\"\"\na", "siebie\"\"\na\"\"h\"\"\na"))
 })
 
 
@@ -62,7 +70,7 @@ test_that("tg.repairContinuity", {
     expect_equal({
         tg <- tg.repairContinuity(tg.sampleProblem(), verbose = TRUE)
         tg[[2]]$t2[16] > tg[[2]]$t1[17]
-    }, FALSE)
+        }, FALSE)
     expect_error(tg.repairContinuity(pt.sample()))
 })
 
