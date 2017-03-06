@@ -39,4 +39,3 @@ tg.plot(tg2)
 \seealso{
 \code{\link{tg.insertInterval}}, \code{\link{tg.insertNewPointTier}}, \code{\link{tg.duplicateTier}}, \code{\link{tg.removeTier}}
 }
-

@@ -21,4 +21,3 @@ tg.plot(tg2)
 \seealso{
 \code{\link{tg.repairContinuity}}
 }
-

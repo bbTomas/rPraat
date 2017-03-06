@@ -24,4 +24,3 @@ tg.getTierName(tg2, 4)
 \seealso{
 \code{\link{tg.getTierName}}
 }
-

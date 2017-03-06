@@ -26,4 +26,3 @@ tg.checkTierInd(tg, "word")
 \seealso{
 \code{\link{tg.getTierName}}, \code{\link{tg.isIntervalTier}}, \code{\link{tg.isPointTier}}, \code{\link{tg.plot}}, \code{\link{tg.getNumberOfTiers}}
 }
-

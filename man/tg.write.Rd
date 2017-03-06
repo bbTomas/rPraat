@@ -27,4 +27,3 @@ tg.write(tg, "demo_output.TextGrid")
 \seealso{
 \code{\link{tg.read}}, \code{\link{pt.write}}
 }
-

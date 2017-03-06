@@ -24,4 +24,3 @@ tg.getNumberOfPoints(tg, "phoneme")
 \seealso{
 \code{\link{tg.getNumberOfIntervals}}
 }
-

@@ -20,12 +20,11 @@ set as min and max of $t vector.
 \examples{
 \dontrun{
 pt <- pt.sample()
-pt$f <- 12*log(pt$f/100) / log(2)  # conversion of Hz to Semitones, reference 0 ST = 100 Hz.
+pt <- pt.Hz2ST(pt)    #  conversion of Hz to Semitones, reference 0 ST = 100 Hz.
 pt.plot(pt)
 pt.write(pt, "demo/H_st.PitchTier")
 }
 }
 \seealso{
-\code{\link{pt.read}}, \code{\link{tg.write}}
+\code{\link{pt.read}}, \code{\link{tg.write}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}
 }
-

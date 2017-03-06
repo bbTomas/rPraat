@@ -37,4 +37,3 @@ tg.plot(tg2)
 \seealso{
 \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}, \code{\link{tg.insertBoundary}}, \code{\link{tg.insertInterval}}
 }
-

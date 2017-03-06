@@ -27,4 +27,3 @@ tg.getIntervalIndexAtTime(tg, "word", 0.5)
 \seealso{
 \code{\link{tg.getIntervalStartTime}}, \code{\link{tg.getIntervalEndTime}}, \code{\link{tg.getLabel}}
 }
-

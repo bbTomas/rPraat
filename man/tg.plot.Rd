@@ -23,4 +23,3 @@ tg.plot(tg)
 \seealso{
 \code{\link{tg.read}}, \code{\link{pt.plot}}
 }
-

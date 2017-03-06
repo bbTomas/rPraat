@@ -26,4 +26,3 @@ tg.plot(tg)
 \seealso{
 \code{\link{tg.write}}, \code{\link{tg.plot}}, \code{\link{tg.repairContinuity}}, \code{\link{tg.createNewTextGrid}}, \code{\link{pt.read}}
 }
-

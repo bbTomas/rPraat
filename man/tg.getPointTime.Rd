@@ -28,4 +28,3 @@ tg.getPointTime(tg, "phoneme", 4)
 
 \code{\link{tg.getPointIndexHigherThanTime}}
 }
-

@@ -36,6 +36,18 @@ test_that("pt.read", {
         pt <- pt.read("H_spreadSheet.PitchTier")
         c(length(unique(pt$t)), pt$tmax)
         }, c(209, 3.617125))
+    expect_equal({
+        pt <- pt.sample()
+        pt2 <- pt.Hz2ST(pt)
+        pt3 <- pt.Hz2ST(pt, ref = 200)
+        c(length(pt2$f), length(pt3$f), pt$f[1], pt$f[45], pt$f[209], pt2$f[1], pt2$f[45], pt2$f[209], pt3$f[1], pt3$f[45], pt3$f[209], var(pt2$f), var(pt3$f))
+    }, c(209, 209, 210.0627306, 196.4245331, 161.7025771, 12.8498427, 11.6877016, 8.3201121, 0.8498427, -0.3122984, -3.6798879, 11.2833270, 11.2833270))
+    expect_equal({
+        pt <- pt.sample()
+        t <- c(-1, 0, 0.1, pt$t[3], pt$t[length(pt$t)], pt$t[length(pt$t)]+1)
+        pt2 <- pt.interpolate(pt, t)
+        c(pt2$tmin, pt2$tmax, length(pt2$t), length(pt2$f), pt2$t, pt2$f)
+    }, c(pt$tmin, pt$tmax, length(t), length(t), t, 210.0627306, 210.0627306, 213.8849744, 219.4930673, 161.7025771, 161.7025771))
 })
 
 

@@ -26,4 +26,3 @@ tg.countLabels(tg, "phone", "a")
 \seealso{
 \code{\link{tg.getLabel}}
 }
-

@@ -27,4 +27,3 @@ tg.getLabel(tg2, "word", 3)
 \seealso{
 \code{\link{tg.getLabel}}
 }
-

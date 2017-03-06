@@ -25,4 +25,3 @@ tg.isIntervalTier(tg, "word")
 \seealso{
 \code{\link{tg.isPointTier}}, \code{\link{tg.getTierName}}
 }
-

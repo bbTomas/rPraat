@@ -35,4 +35,3 @@ tg.plot(tg2)
 \seealso{
 \code{\link{tg.setTierName}}, \code{\link{tg.removeTier}}
 }
-

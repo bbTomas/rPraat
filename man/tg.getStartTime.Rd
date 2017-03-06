@@ -27,4 +27,3 @@ tg.getStartTime(tg, "phone")
 \seealso{
 \code{\link{tg.getEndTime}}, \code{\link{tg.getTotalDuration}}
 }
-

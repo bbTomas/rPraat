@@ -225,13 +225,15 @@ tgNew2 <- tg.repairContinuity(tgNew) # no problem in repaired TextGrid
 
 ## PitchTier
 
-**Example.** Transform Hz to semitones (ST) and cut the pitchtier along the TextGrid.
+**Example.** Transform Hz to semitones (ST), make interpolated contour, cut the original pitchtier along the TextGrid.
 
 ```{r, fig.height=3.5}
 pt <- pt.read("demo/H.PitchTier")
-pt$f <- 12*log(pt$f/100) / log(2)  # conversion of Hz to Semitones, reference 0 ST = 100 Hz.
+pt <- pt.Hz2ST(pt, ref = 100)  # conversion of Hz to Semitones, reference 0 ST = 100 Hz.
 
 pt.plot(pt) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
+pt2 <- pt.interpolate(pt, seq(pt$t[1], pt$t[length(pt$t)], by = 0.001))
+pt.plot(pt2) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
 
 
 tg <- tg.read("demo/H.TextGrid")

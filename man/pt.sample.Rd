@@ -19,4 +19,3 @@ pt.plot(pt)
 \seealso{
 \code{\link{pt.plot}}
 }
-

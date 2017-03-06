@@ -32,4 +32,3 @@ tg.plot(tg)
 \seealso{
 \code{\link{tg.insertNewIntervalTier}}, \code{\link{tg.insertNewPointTier}}
 }
-

@@ -26,4 +26,3 @@ tg.getIntervalStartTime(tg, "phone", 5)
 \seealso{
 \code{\link{tg.getIntervalEndTime}}, \code{\link{tg.getIntervalDuration}}, \code{\link{tg.getIntervalIndexAtTime}}
 }
-

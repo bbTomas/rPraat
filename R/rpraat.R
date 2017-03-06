@@ -2474,7 +2474,7 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
 #'
 #' @return PitchTier object
 #' @export
-#' @seealso \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{tg.read}}
+#' @seealso \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}, \code{\link{tg.read}}
 #'
 #' @examples
 #' \dontrun{
@@ -2619,12 +2619,12 @@ pt.read <- function(fileNamePitchTier) {
 #' @param fileNamePitchTier file name to be created
 #'
 #' @export
-#' @seealso \code{\link{pt.read}}, \code{\link{tg.write}}
+#' @seealso \code{\link{pt.read}}, \code{\link{tg.write}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}
 #'
 #' @examples
 #' \dontrun{
 #' pt <- pt.sample()
-#' pt$f <- 12*log(pt$f/100) / log(2)  # conversion of Hz to Semitones, reference 0 ST = 100 Hz.
+#' pt <- pt.Hz2ST(pt)    #  conversion of Hz to Semitones, reference 0 ST = 100 Hz.
 #' pt.plot(pt)
 #' pt.write(pt, "demo/H_st.PitchTier")
 #' }
@@ -2682,7 +2682,7 @@ pt.write <- function(pt, fileNamePitchTier) {
 #' @param group [optional] character string, name of group for dygraphs synchronization
 #'
 #' @export
-#' @seealso \code{\link{pt.read}}, \code{\link{tg.plot}}
+#' @seealso \code{\link{pt.read}}, \code{\link{tg.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}, \code{\link{pt.write}}
 #'
 #' @examples
 #' \dontrun{
@@ -2708,6 +2708,103 @@ pt.plot <- function(pt, group = "") {
 
 
 
+
+
+#' pt.interpolate
+#'
+#' Interpolates PitchTier contour in given time instances.
+#'
+#'  a) If t < min(pt$t) (or t > max(pt$t)), returns the first (or the last) value of pt$f.
+#'  b) If t is existing point in pt$t, returns the respective pt$f.
+#'  c) If t is Between two existing points, returns linear interpolation of these two points.
+#'
+#' @param pt PitchTier object
+#' @param t vector of time instances of interest
+#'
+#' @return PitchTier object
+#' @export
+#' @seealso \code{\link{pt.read}}, \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}
+#'
+#' @examples
+#' pt <- pt.sample()
+#' pt <- pt.Hz2ST(pt, ref = 100)  # conversion of Hz to Semitones, reference 0 ST = 100 Hz.
+#' pt2 <- pt.interpolate(pt, seq(pt$t[1], pt$t[length(pt$t)], by = 0.001))
+#' \dontrun{
+#' pt.plot(pt)
+#' pt.plot(pt2)
+#' }
+pt.interpolate <- function(pt, t) {
+    if (length(pt$t) != length(pt$f))
+        stop("PitchTier does not have equal length vectors $t and $f")
+
+    if (length(pt$t) < 1)
+        return(NA)
+
+    if (!identical(sort(pt$t), pt$t)) {
+        stop("time instances $t in PitchTier are not increasingly sorted")
+    }
+
+    if (!identical(unique(pt$t), pt$t)) {
+        stop("duplicated time instances in $t vector of the PitchTier")
+    }
+
+    pt2 <- pt
+    pt2$t <- t
+
+    f <- numeric(length(t))
+    for (I in seq_along(t)) {
+        if (length(pt$t) == 1) {
+            f[I] <- pt$f[1]
+        } else if (t[I] < pt$t[1]) {   # a)
+            f[I] <- pt$f[1]
+        } else if (t[I] > pt$t[length(pt$t)]) {   # a)
+            f[I] <- pt$f[length(pt$t)]
+        } else {
+            # b)
+            ind <- which(pt$t == t[I])
+            if (length(ind) == 1) {
+                f[I] <- pt$f[ind]
+            } else {
+                # c)
+                ind2 <- which(pt$t > t[I]); ind2 <- ind2[1]
+                ind1 <- ind2 - 1
+                # y = ax + b;  a = (y2-y1)/(x2-x1);  b = y1 - ax1
+                a <- (pt$f[ind2] - pt$f[ind1]) / (pt$t[ind2] - pt$t[ind1])
+                b <- pt$f[ind1] - a*pt$t[ind1]
+                f[I] <- a*t[I] + b
+            }
+        }
+    }
+
+    pt2$f <- f
+    return(pt2)
+}
+
+
+
+
+#' pt.Hz2ST
+#'
+#' Converts Hz to Semitones with given reference (default 0 ST = 100 Hz).
+#'
+#' @param pt PitchTier object
+#' @param ref reference value (in Hz) for 0 ST. Default: 100 Hz.
+#'
+#' @return PitchTier object
+#' @export
+#' @seealso \code{\link{pt.read}}, \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}
+#'
+#' @examples
+#' pt <- pt.sample()
+#' pt2 <- pt.Hz2ST(pt, ref = 200)
+#' \dontrun{
+#' pt.plot(pt)  %>% dygraphs::dyAxis("y", label = "Frequency (Hz)")
+#' pt.plot(pt2) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
+#' }
+pt.Hz2ST <- function(pt, ref=100) {
+    pt$f <- 12*log(pt$f/ref) / log(2)
+    return(pt)
+}
 
 
 

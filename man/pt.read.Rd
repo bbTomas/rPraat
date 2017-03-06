@@ -24,6 +24,5 @@ pt.plot(pt)
 }
 }
 \seealso{
-\code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{tg.read}}
+\code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}, \code{\link{tg.read}}
 }
-

@@ -24,4 +24,3 @@ tg.getNumberOfIntervals(tg, "phone")
 \seealso{
 \code{\link{tg.getNumberOfPoints}}
 }
-

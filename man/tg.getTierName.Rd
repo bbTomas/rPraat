@@ -24,4 +24,3 @@ tg.getTierName(tg, 2)
 \seealso{
 \code{\link{tg.setTierName}}, \code{\link{tg.isIntervalTier}}, \code{\link{tg.isPointTier}}
 }
-
