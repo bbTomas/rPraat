@@ -225,27 +225,55 @@ tgNew2 <- tg.repairContinuity(tgNew) # no problem in repaired TextGrid
 
 ## PitchTier
 
-**Example.** Transform Hz to semitones (ST), make interpolated contour, cut the original pitchtier along the TextGrid.
+**Example.** Transform Hz to semitones (ST), cut the original pitchtier along the TextGrid, make interpolated contour.
 
 ```{r, fig.height=3.5}
 pt <- pt.read("demo/H.PitchTier")
 pt <- pt.Hz2ST(pt, ref = 100)  # conversion of Hz to Semitones, reference 0 ST = 100 Hz.
 
 pt.plot(pt) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
-pt2 <- pt.interpolate(pt, seq(pt$t[1], pt$t[length(pt$t)], by = 0.001))
-pt.plot(pt2) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
-
 
 tg <- tg.read("demo/H.TextGrid")
-tg$word$label[1:6]
+tg$word$label[2:6]
 
-condition <- pt$t >= 0  &  pt$t <= tg$word$t2[6]
-pt$t <- pt$t[condition]  # first six intervals in word tier
-pt$f <- pt$f[condition]
-pt$tmax <- tg$word$t2[6]
+pt2 <- pt.cut0(pt, tStart = tg$word$t1[2], tEnd = tg$word$t2[6]) # the first five words
+pt.plot(pt2) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
 
-pt.plot(pt) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
-pt.write(pt, "demo/H_cut.PitchTier")
+pt2interp <- pt.interpolate(pt2, seq(pt2$t[1], pt2$t[length(pt2$t)], by = 0.001))
+pt.plot(pt2interp) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
+
+pt.write(pt2interp, "demo/H_cut_interp.PitchTier")
+```
+
+### Legendre polynomials modelling
+
+
+#### Orthogonal basis
+```{r}
+pt.legendreDemo()
+```
+
+#### Cut the PitchTier
+```{r}
+pt <- pt.sample()
+pt <- pt.Hz2ST(pt)
+pt <- pt.cut(pt, tStart = 3)  # cut PitchTier from t = 3 sec and preserve time
+```
+
+#### Model it using Legendre polynomials
+```{r}
+c <- pt.legendre(pt)
+print(c)
+```
+#### Reconstruct the contour from these 4 coefficients
+```{r, fig.height=5}
+leg <- pt.legendreSynth(c)
+ptLeg <- pt
+ptLeg$t <- seq(ptLeg$tmin, ptLeg$tmax, length.out = length(leg))
+ptLeg$f <- leg
+
+plot(pt$t, pt$f, xlab = "Time (sec)", ylab = "F0 (ST re 100 Hz)")
+lines(ptLeg$t, ptLeg$f, col = "blue")
 ```
 
 ## Process all files in folder

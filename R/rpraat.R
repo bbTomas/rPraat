@@ -2474,7 +2474,7 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
 #'
 #' @return PitchTier object
 #' @export
-#' @seealso \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}, \code{\link{tg.read}}
+#' @seealso \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.interpolate}}, \code{\link{tg.read}}
 #'
 #' @examples
 #' \dontrun{
@@ -2682,7 +2682,7 @@ pt.write <- function(pt, fileNamePitchTier) {
 #' @param group [optional] character string, name of group for dygraphs synchronization
 #'
 #' @export
-#' @seealso \code{\link{pt.read}}, \code{\link{tg.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}, \code{\link{pt.write}}
+#' @seealso \code{\link{pt.read}}, \code{\link{tg.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.interpolate}}, \code{\link{pt.write}}
 #'
 #' @examples
 #' \dontrun{
@@ -2723,7 +2723,7 @@ pt.plot <- function(pt, group = "") {
 #'
 #' @return PitchTier object
 #' @export
-#' @seealso \code{\link{pt.read}}, \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}
+#' @seealso \code{\link{pt.read}}, \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.legendre}}
 #'
 #' @examples
 #' pt <- pt.sample()
@@ -2734,6 +2734,10 @@ pt.plot <- function(pt, group = "") {
 #' pt.plot(pt2)
 #' }
 pt.interpolate <- function(pt, t) {
+    if (class(t) != "numeric"  &  class(t) != "integer") {
+        stop("t must be numeric vector")
+    }
+
     if (length(pt$t) != length(pt$f))
         stop("PitchTier does not have equal length vectors $t and $f")
 
@@ -2792,7 +2796,7 @@ pt.interpolate <- function(pt, t) {
 #'
 #' @return PitchTier object
 #' @export
-#' @seealso \code{\link{pt.read}}, \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}
+#' @seealso \code{\link{pt.read}}, \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.interpolate}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}
 #'
 #' @examples
 #' pt <- pt.sample()
@@ -2802,6 +2806,10 @@ pt.interpolate <- function(pt, t) {
 #' pt.plot(pt2) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
 #' }
 pt.Hz2ST <- function(pt, ref=100) {
+    if (!tbTools::isNum(ref) | ref <= 0) {
+        stop("ref must be a positive number.")
+    }
+
     pt$f <- 12*log(pt$f/ref) / log(2)
     return(pt)
 }
@@ -2813,44 +2821,60 @@ pt.Hz2ST <- function(pt, ref=100) {
 #'
 #' @param pt PitchTier object
 #' @param npoints Number of points of PitchTier interpolation
+#' @param npolynomials Number of polynomials to be used for Legendre modelling
 #'
 #' @return Vector of Legendre polynomials
 #' @export
-#' @seealso \code{\link{pt.legendreSynth}}, \code{\link{pt.legendreDemo}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}
+#' @seealso \code{\link{pt.legendreSynth}}, \code{\link{pt.legendreDemo}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}
 #'
 #' @examples
 #' pt <- pt.sample()
-#' pt$f <- pt$f[pt$t >= 3]  # Cut the PitchTier - from time 3 seconds to the end
-#' pt$t <- pt$t[pt$t >= 3] - 3
-#' pt$tmax <- pt$tmax - 3
+#' pt <- pt.Hz2ST(pt)
+#' pt <- pt.cut(pt, tStart = 3)  # cut PitchTier from t = 3 sec and preserve time
 #' c <- pt.legendre(pt)
 #' print(c)
 #' leg <- pt.legendreSynth(c)
+#' ptLeg <- pt
+#' ptLeg$t <- seq(ptLeg$tmin, ptLeg$tmax, length.out = length(leg))
+#' ptLeg$f <- leg
 #' \dontrun{
-#' pt.plot(pt)
-#' plot(leg)
+#' plot(pt$t, pt$f, xlab = "Time (sec)", ylab = "F0 (ST re 100 Hz)")
+#' lines(ptLeg$t, ptLeg$f, col = "blue")
 #' }
-pt.legendre <- function(pt, npoints = 1000) {
+pt.legendre <- function(pt, npoints = 1000, npolynomials = 4) {
+    if (!tbTools::isInt(npoints) | npoints < 0) {
+        stop("npoints must be integer >= 0.")
+    }
+
+    if (!tbTools::isInt(npolynomials) | npolynomials <= 0) {
+        stop("npolynomials must be integer > 0.")
+    }
+
     pt <- pt.interpolate(pt, seq(pt$tmin, pt$tmax, length.out = npoints))
 
     y <- pt$f
 
-    lP <- npoints  # počet vzorků polynomu
 
-    # příprava
+    lP <- npoints # počet vzorků polynomu
+    nP <- npolynomials
+
+    B <- matrix(nrow = nP, ncol = lP)  # báze
     x <- seq(-1, 1, length.out = lP)
 
-    P <- matrix(c(rep(1, lP),
-                  x,
-                  1/2*(3*x^2 - 1),
-                  1/2*(5*x^3 - 3*x)),
-                nrow = 4, ncol = lP, byrow = TRUE)
+    for (i in tbTools::seqM(1, nP)) {
+        n <- i - 1
+        p <- numeric(lP)
+        for (k in tbTools::seqM(0, n)) {
+            p <- p + x^k*choose(n, k)*choose((n+k-1)/2, n)
+        }
+        p <- p*2^n
 
-    nP <- nrow(P)
+        B[i, ] <- p
+    }
 
     c <- numeric(nP)
     for (I in 1: nP) {
-        c[I] <- t(matrix(y)) %*% matrix(P[I, ], nrow = lP, ncol = 1) / lP * ((I-1)*2+1)
+        c[I] <- t(matrix(y)) %*% matrix(B[I, ], nrow = lP, ncol = 1) / lP * ((I-1)*2+1)
         # koeficient ((I-1)*2+1) odpovídá výkonům komponent, které lze spočítat i takto: mean((P.^2).')
     }
 
@@ -2870,30 +2894,50 @@ pt.legendre <- function(pt, npoints = 1000) {
 #'
 #' @examples
 #' pt <- pt.sample()
-#' pt$f <- pt$f[pt$t >= 3]  # Cut the PitchTier - from time 3 seconds to the end
-#' pt$t <- pt$t[pt$t >= 3] - 3
-#' pt$tmax <- pt$tmax - 3
+#' pt <- pt.Hz2ST(pt)
+#' pt <- pt.cut(pt, tStart = 3)  # cut PitchTier from t = 3 sec and preserve time
 #' c <- pt.legendre(pt)
 #' print(c)
 #' leg <- pt.legendreSynth(c)
+#' ptLeg <- pt
+#' ptLeg$t <- seq(ptLeg$tmin, ptLeg$tmax, length.out = length(leg))
+#' ptLeg$f <- leg
 #' \dontrun{
-#' pt.plot(pt)
-#' plot(leg)
+#' plot(pt$t, pt$f, xlab = "Time (sec)", ylab = "F0 (ST re 100 Hz)")
+#' lines(ptLeg$t, ptLeg$f, col = "blue")
 #' }
 pt.legendreSynth <- function(c, npoints = 1000) {
-    lP <- npoints  # počet vzorků polynomu
+    if (class(c) != "numeric"  &  class(c) != "integer") {
+        stop("c must be numeric vector")
+    }
 
+    if (!tbTools::isInt(npoints) | npoints < 0) {
+        stop("npoints must be integer >= 0.")
+    }
+
+    lP <- npoints # počet vzorků polynomu
+    nP <- length(c)
+
+    B <- matrix(nrow = nP, ncol = lP)  # báze
     x <- seq(-1, 1, length.out = lP)
 
-    P <- matrix(c(rep(1, lP),   # báze
-                  x,
-                  1/2*(3*x^2 - 1),
-                  1/2*(5*x^3 - 3*x)),
-                nrow = 4, ncol = lP, byrow = TRUE)
+    for (i in tbTools::seqM(1, nP)) {
+        n <- i - 1
+        p <- numeric(lP)
+        for (k in tbTools::seqM(0, n)) {
+            p <- p + x^k*choose(n, k)*choose((n+k-1)/2, n)
+        }
+        p <- p*2^n
 
-    nP <- nrow(P)
+        B[i, ] <- p
+    }
 
-    yModelovane <- t(matrix(c)) %*% P
+    if (nP > 0) {
+        yModelovane <- t(matrix(c)) %*% B
+    }
+    else {
+        yModelovane <- rep(NA, npoints)
+    }
 
     return(as.numeric(yModelovane))
 }
@@ -2902,20 +2946,157 @@ pt.legendreSynth <- function(c, npoints = 1000) {
 #'
 #' Plots first four Legendre polynomials
 #'
-#' @return
 #' @export
 #' @seealso \code{\link{pt.legendre}}, \code{\link{pt.legendreSynth}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}
 #'
 #' @examples
+#' \dontrun{
 #' pt.legendreDemo()
-#'
+#' }
 pt.legendreDemo <- function() {
-    par(mfrow = c(2, 2))
-    plot(pt.legendreSynth(c(1, 0, 0, 0), 1024))
-    plot(pt.legendreSynth(c(0, 1, 0, 0), 1024))
-    plot(pt.legendreSynth(c(0, 0, 1, 0), 1024))
-    plot(pt.legendreSynth(c(0, 0, 0, 1), 1024))
-    par(mfrow = c(1, 1))
+    graphics::par(mfrow = c(2, 2))
+    graphics::plot(pt.legendreSynth(c(1, 0, 0, 0), 1024))
+    graphics::plot(pt.legendreSynth(c(0, 1, 0, 0), 1024))
+    graphics::plot(pt.legendreSynth(c(0, 0, 1, 0), 1024))
+    graphics::plot(pt.legendreSynth(c(0, 0, 0, 1), 1024))
+    graphics::par(mfrow = c(1, 1))
+}
+
+
+#' pt.cut
+#'
+#' Cut the specified interval from the PitchTier and preserve time
+#'
+#' @param pt PitchTier object
+#' @param tStart beginning time of interval to be cut (default -Inf = cut from the tMin of the PitchTier)
+#' @param tEnd final time of interval to be cut (default Inf = cut to the tMax of the PitchTier)
+#'
+#' @return PitchTier object
+#' @export
+#' @seealso \code{\link{pt.cut0}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}, \code{\link{pt.legendre}}, \code{\link{pt.legendreSynth}}, \code{\link{pt.legendreDemo}}
+#'
+#' @examples
+#' pt <- pt.sample()
+#' pt2 <-   pt.cut(pt,  tStart = 3)
+#' pt2_0 <- pt.cut0(pt, tStart = 3)
+#' pt3 <-   pt.cut(pt,  tStart = 2, tEnd = 3)
+#' pt3_0 <- pt.cut0(pt, tStart = 2, tEnd = 3)
+#' pt4 <-   pt.cut(pt,  tEnd = 1)
+#' pt4_0 <- pt.cut0(pt, tEnd = 1)
+#' pt5 <-   pt.cut(pt,  tStart = -1, tEnd = 1)
+#' pt5_0 <- pt.cut0(pt, tStart = -1, tEnd = 1)
+#' \dontrun{
+#' pt.plot(pt)
+#' pt.plot(pt2)
+#' pt.plot(pt2_0)
+#' pt.plot(pt3)
+#' pt.plot(pt3_0)
+#' pt.plot(pt4)
+#' pt.plot(pt4_0)
+#' pt.plot(pt5)
+#' pt.plot(pt5_0)
+#' }
+pt.cut <- function(pt, tStart = -Inf, tEnd = Inf) {
+    if (!tbTools::isNum(tStart)) {
+        stop("tStart must be a number.")
+    }
+    if (!tbTools::isNum(tEnd)) {
+        stop("tEnd must be a number.")
+    }
+    if (is.infinite(tStart) & tStart>0) {
+        stop("infinite tStart can be negative only")
+    }
+    if (is.infinite(tEnd) & tEnd<0) {
+        stop("infinite tEnd can be positive only")
+    }
+
+    pt2 <- pt
+    pt2$t <- pt$t[pt$t >= tStart  &  pt$t <= tEnd]
+    pt2$f <- pt$f[pt$t >= tStart  &  pt$t <= tEnd]
+
+    if (is.infinite(tStart)) {
+        pt2$tmin <- pt$tmin
+    } else {
+        pt2$tmin <- tStart
+    }
+
+    if (is.infinite(tEnd)) {
+        pt2$tmax <- pt$tmax
+    } else {
+        pt2$tmax <- tEnd
+    }
+
+    return(pt2)
+}
+
+#' pt.cut0
+#'
+#' Cut the specified interval from the PitchTier and shift time so that the new tmin = 0
+#'
+#' @param pt PitchTier object
+#' @param tStart beginning time of interval to be cut (default -Inf = cut from the tMin of the PitchTier)
+#' @param tEnd final time of interval to be cut (default Inf = cut to the tMax of the PitchTier)
+#'
+#' @return PitchTier object
+#' @export
+#' @seealso \code{\link{pt.cut}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}, \code{\link{pt.legendre}}, \code{\link{pt.legendreSynth}}, \code{\link{pt.legendreDemo}}
+#'
+#' @examples
+#' pt <- pt.sample()
+#' pt2 <-   pt.cut(pt,  tStart = 3)
+#' pt2_0 <- pt.cut0(pt, tStart = 3)
+#' pt3 <-   pt.cut(pt,  tStart = 2, tEnd = 3)
+#' pt3_0 <- pt.cut0(pt, tStart = 2, tEnd = 3)
+#' pt4 <-   pt.cut(pt,  tEnd = 1)
+#' pt4_0 <- pt.cut0(pt, tEnd = 1)
+#' pt5 <-   pt.cut(pt,  tStart = -1, tEnd = 1)
+#' pt5_0 <- pt.cut0(pt, tStart = -1, tEnd = 1)
+#' \dontrun{
+#' pt.plot(pt)
+#' pt.plot(pt2)
+#' pt.plot(pt2_0)
+#' pt.plot(pt3)
+#' pt.plot(pt3_0)
+#' pt.plot(pt4)
+#' pt.plot(pt4_0)
+#' pt.plot(pt5)
+#' pt.plot(pt5_0)
+#' }
+pt.cut0 <- function(pt, tStart = -Inf, tEnd = Inf) {
+    if (!tbTools::isNum(tStart)) {
+        stop("tStart must be a number.")
+    }
+    if (!tbTools::isNum(tEnd)) {
+        stop("tEnd must be a number.")
+    }
+    if (is.infinite(tStart) & tStart>0) {
+        stop("infinite tStart can be negative only")
+    }
+    if (is.infinite(tEnd) & tEnd<0) {
+        stop("infinite tEnd can be positive only")
+    }
+
+    pt2 <- pt
+    pt2$t <- pt$t[pt$t >= tStart  &  pt$t <= tEnd]
+    pt2$f <- pt$f[pt$t >= tStart  &  pt$t <= tEnd]
+
+    if (is.infinite(tStart)) {
+        pt2$tmin <- pt$tmin
+    } else {
+        pt2$tmin <- tStart
+    }
+
+    if (is.infinite(tEnd)) {
+        pt2$tmax <- pt$tmax
+    } else {
+        pt2$tmax <- tEnd
+    }
+
+    pt2$t <- pt2$t - pt2$tmin
+    pt2$tmax <- pt2$tmax - pt2$tmin
+    pt2$tmin <- 0
+
+    return(pt2)
 }
 
 

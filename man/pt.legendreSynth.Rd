@@ -19,15 +19,17 @@ Synthetize the contour from vector of Legendre polynomials 'c' in 'npoints' equi
 }
 \examples{
 pt <- pt.sample()
-pt$f <- pt$f[pt$t >= 3]  # Cut the PitchTier - from time 3 seconds to the end
-pt$t <- pt$t[pt$t >= 3] - 3
-pt$tmax <- pt$tmax - 3
+pt <- pt.Hz2ST(pt)
+pt <- pt.cut(pt, tStart = 3)  # cut PitchTier from t = 3 sec and preserve time
 c <- pt.legendre(pt)
 print(c)
 leg <- pt.legendreSynth(c)
+ptLeg <- pt
+ptLeg$t <- seq(ptLeg$tmin, ptLeg$tmax, length.out = length(leg))
+ptLeg$f <- leg
 \dontrun{
-pt.plot(pt)
-plot(leg)
+plot(pt$t, pt$f, xlab = "Time (sec)", ylab = "F0 (ST re 100 Hz)")
+lines(ptLeg$t, ptLeg$f, col = "blue")
 }
 }
 \seealso{

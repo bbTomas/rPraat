@@ -4,12 +4,14 @@
 \alias{pt.legendre}
 \title{pt.legendre}
 \usage{
-pt.legendre(pt, npoints = 1000)
+pt.legendre(pt, npoints = 1000, npolynomials = 4)
 }
 \arguments{
 \item{pt}{PitchTier object}
 
 \item{npoints}{Number of points of PitchTier interpolation}
+
+\item{npolynomials}{Number of polynomials to be used for Legendre modelling}
 }
 \value{
 Vector of Legendre polynomials
@@ -19,17 +21,19 @@ Interpolate the PitchTier in 'npoints' equidistant points and approximate it by 
 }
 \examples{
 pt <- pt.sample()
-pt$f <- pt$f[pt$t >= 3]  # Cut the PitchTier - from time 3 seconds to the end
-pt$t <- pt$t[pt$t >= 3] - 3
-pt$tmax <- pt$tmax - 3
+pt <- pt.Hz2ST(pt)
+pt <- pt.cut(pt, tStart = 3)  # cut PitchTier from t = 3 sec and preserve time
 c <- pt.legendre(pt)
 print(c)
 leg <- pt.legendreSynth(c)
+ptLeg <- pt
+ptLeg$t <- seq(ptLeg$tmin, ptLeg$tmax, length.out = length(leg))
+ptLeg$f <- leg
 \dontrun{
-pt.plot(pt)
-plot(leg)
+plot(pt$t, pt$f, xlab = "Time (sec)", ylab = "F0 (ST re 100 Hz)")
+lines(ptLeg$t, ptLeg$f, col = "blue")
 }
 }
 \seealso{
-\code{\link{pt.legendreSynth}}, \code{\link{pt.legendreDemo}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}
+\code{\link{pt.legendreSynth}}, \code{\link{pt.legendreDemo}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}
 }

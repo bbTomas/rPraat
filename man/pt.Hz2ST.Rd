@@ -26,5 +26,5 @@ pt.plot(pt2) \%>\% dygraphs::dyAxis("y", label = "Frequency (ST)")
 }
 }
 \seealso{
-\code{\link{pt.read}}, \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}
+\code{\link{pt.read}}, \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.interpolate}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}
 }

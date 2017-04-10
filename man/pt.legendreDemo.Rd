@@ -10,8 +10,9 @@ pt.legendreDemo()
 Plots first four Legendre polynomials
 }
 \examples{
+\dontrun{
 pt.legendreDemo()
-
+}
 }
 \seealso{
 \code{\link{pt.legendre}}, \code{\link{pt.legendreSynth}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}
