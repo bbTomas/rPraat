@@ -7,7 +7,7 @@
 pt.legendreSynth(c, npoints = 1000)
 }
 \arguments{
-\item{c}{Vector of Legendre polynomials}
+\item{c}{Vector of Legendre polynomials coefficients}
 
 \item{npoints}{Number of points of PitchTier interpolation}
 }

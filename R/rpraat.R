@@ -2823,7 +2823,7 @@ pt.Hz2ST <- function(pt, ref=100) {
 #' @param npoints Number of points of PitchTier interpolation
 #' @param npolynomials Number of polynomials to be used for Legendre modelling
 #'
-#' @return Vector of Legendre polynomials
+#' @return Vector of Legendre polynomials coefficients
 #' @export
 #' @seealso \code{\link{pt.legendreSynth}}, \code{\link{pt.legendreDemo}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}
 #'
@@ -2885,7 +2885,7 @@ pt.legendre <- function(pt, npoints = 1000, npolynomials = 4) {
 #'
 #' Synthetize the contour from vector of Legendre polynomials 'c' in 'npoints' equidistant points
 #'
-#' @param c Vector of Legendre polynomials
+#' @param c Vector of Legendre polynomials coefficients
 #' @param npoints Number of points of PitchTier interpolation
 #'
 #' @return Vector of values of synthetized contour

@@ -14,7 +14,7 @@ pt.legendre(pt, npoints = 1000, npolynomials = 4)
 \item{npolynomials}{Number of polynomials to be used for Legendre modelling}
 }
 \value{
-Vector of Legendre polynomials
+Vector of Legendre polynomials coefficients
 }
 \description{
 Interpolate the PitchTier in 'npoints' equidistant points and approximate it by Legendre polynomials
