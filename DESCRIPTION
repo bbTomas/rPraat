@@ -1,7 +1,7 @@
 Package: rPraat
 Type: Package
 Title: Read, write and manipulate Praat TextGrid and PitchTier
-Version: 1.0.4
+Version: 1.0.5
 Encoding: UTF-8
 Authors@R: person("Tomas", "Boril", email = "borilt@gmail.com", role = c("aut", "cre"))
 Maintainer: Tomas Boril <borilt@gmail.com>
@@ -12,11 +12,11 @@ BugReports: https://github.com/bbTomas/rPraat/issues
 License: MIT + file LICENSE
 LazyData: TRUE
 Depends:
-    R (>= 3.3.2)
+    R (>= 3.3.3)
 Imports:
     dplyr (>= 0.5.0),
     stringr (>= 1.2.0),
-    readr(>= 1.0.0),
+    readr(>= 1.1.0),
     dygraphs (>= 1.1.1.4),
     tbTools (>= 1.0.0)
 RoxygenNote: 6.0.1

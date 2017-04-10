@@ -2807,8 +2807,116 @@ pt.Hz2ST <- function(pt, ref=100) {
 }
 
 
+#' pt.legendre
+#'
+#' Interpolate the PitchTier in 'npoints' equidistant points and approximate it by Legendre polynomials
+#'
+#' @param pt PitchTier object
+#' @param npoints Number of points of PitchTier interpolation
+#'
+#' @return Vector of Legendre polynomials
+#' @export
+#' @seealso \code{\link{pt.legendreSynth}}, \code{\link{pt.legendreDemo}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}
+#'
+#' @examples
+#' pt <- pt.sample()
+#' pt$f <- pt$f[pt$t >= 3]  # Cut the PitchTier - from time 3 seconds to the end
+#' pt$t <- pt$t[pt$t >= 3] - 3
+#' pt$tmax <- pt$tmax - 3
+#' c <- pt.legendre(pt)
+#' print(c)
+#' leg <- pt.legendreSynth(c)
+#' \dontrun{
+#' pt.plot(pt)
+#' plot(leg)
+#' }
+pt.legendre <- function(pt, npoints = 1000) {
+    pt <- pt.interpolate(pt, seq(pt$tmin, pt$tmax, length.out = npoints))
 
+    y <- pt$f
 
+    lP <- npoints  # počet vzorků polynomu
+
+    # příprava
+    x <- seq(-1, 1, length.out = lP)
+
+    P <- matrix(c(rep(1, lP),
+                  x,
+                  1/2*(3*x^2 - 1),
+                  1/2*(5*x^3 - 3*x)),
+                nrow = 4, ncol = lP, byrow = TRUE)
+
+    nP <- nrow(P)
+
+    c <- numeric(nP)
+    for (I in 1: nP) {
+        c[I] <- t(matrix(y)) %*% matrix(P[I, ], nrow = lP, ncol = 1) / lP * ((I-1)*2+1)
+        # koeficient ((I-1)*2+1) odpovídá výkonům komponent, které lze spočítat i takto: mean((P.^2).')
+    }
+
+    return(c)
+}
+
+#' pt.legendreSynth
+#'
+#' Synthetize the contour from vector of Legendre polynomials 'c' in 'npoints' equidistant points
+#'
+#' @param c Vector of Legendre polynomials
+#' @param npoints Number of points of PitchTier interpolation
+#'
+#' @return Vector of values of synthetized contour
+#' @export
+#' @seealso \code{\link{pt.legendre}}, \code{\link{pt.legendreDemo}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}
+#'
+#' @examples
+#' pt <- pt.sample()
+#' pt$f <- pt$f[pt$t >= 3]  # Cut the PitchTier - from time 3 seconds to the end
+#' pt$t <- pt$t[pt$t >= 3] - 3
+#' pt$tmax <- pt$tmax - 3
+#' c <- pt.legendre(pt)
+#' print(c)
+#' leg <- pt.legendreSynth(c)
+#' \dontrun{
+#' pt.plot(pt)
+#' plot(leg)
+#' }
+pt.legendreSynth <- function(c, npoints = 1000) {
+    lP <- npoints  # počet vzorků polynomu
+
+    x <- seq(-1, 1, length.out = lP)
+
+    P <- matrix(c(rep(1, lP),   # báze
+                  x,
+                  1/2*(3*x^2 - 1),
+                  1/2*(5*x^3 - 3*x)),
+                nrow = 4, ncol = lP, byrow = TRUE)
+
+    nP <- nrow(P)
+
+    yModelovane <- t(matrix(c)) %*% P
+
+    return(as.numeric(yModelovane))
+}
+
+#' pt.legendreDemo
+#'
+#' Plots first four Legendre polynomials
+#'
+#' @return
+#' @export
+#' @seealso \code{\link{pt.legendre}}, \code{\link{pt.legendreSynth}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}
+#'
+#' @examples
+#' pt.legendreDemo()
+#'
+pt.legendreDemo <- function() {
+    par(mfrow = c(2, 2))
+    plot(pt.legendreSynth(c(1, 0, 0, 0), 1024))
+    plot(pt.legendreSynth(c(0, 1, 0, 0), 1024))
+    plot(pt.legendreSynth(c(0, 0, 1, 0), 1024))
+    plot(pt.legendreSynth(c(0, 0, 0, 1), 1024))
+    par(mfrow = c(1, 1))
+}
 
 
 
