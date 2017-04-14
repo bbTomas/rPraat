@@ -64,7 +64,7 @@ tg.checkTierInd <- function(tg, tierInd) {
 #'
 #' @return TextGrid object
 #' @export
-#' @seealso \code{\link{tg.write}}, \code{\link{tg.plot}}, \code{\link{tg.repairContinuity}}, \code{\link{tg.createNewTextGrid}}, \code{\link{pt.read}}
+#' @seealso \code{\link{tg.write}}, \code{\link{tg.plot}}, \code{\link{tg.repairContinuity}}, \code{\link{tg.createNewTextGrid}}, \code{\link{tg.findLabels}}, \code{\link{tg.duplicateTierMergeSegments}}, \code{\link{pt.read}}
 #'
 #' @examples
 #' \dontrun{
@@ -692,7 +692,7 @@ tg.createNewTextGrid <- function(tMin, tMax) {
 #'
 #' @return TRUE / FALSE
 #' @export
-#' @seealso \code{\link{tg.isPointTier}}, \code{\link{tg.getTierName}}
+#' @seealso \code{\link{tg.isPointTier}}, \code{\link{tg.getTierName}}, \code{\link{tg.findLabels}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -722,7 +722,7 @@ tg.isIntervalTier <- function(tg, tierInd) {
 #'
 #' @return TRUE / FALSE
 #' @export
-#' @seealso \code{\link{tg.isIntervalTier}}, \code{\link{tg.getTierName}}
+#' @seealso \code{\link{tg.isIntervalTier}}, \code{\link{tg.getTierName}}, \code{\link{tg.findLabels}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -817,7 +817,7 @@ tg.setTierName <- function(tg, tierInd, name) {
 #'
 #' @return integer number
 #' @export
-#' @seealso \code{\link{tg.getLabel}}
+#' @seealso \code{\link{tg.findLabels}}, \code{\link{tg.getLabel}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -855,23 +855,31 @@ tg.countLabels <- function(tg, tierInd, label) {
 #'
 #' @param tg TextGrid object
 #' @param originalInd tier index or "name"
-#' @param newInd new tier index (1 = the first)
+#' @param newInd new tier index (1 = the first, Inf = the last [default])
 #' @param newTierName [optional but recommended] name of the new tier
 #'
 #' @return TextGrid object
 #' @export
-#' @seealso \code{\link{tg.setTierName}}, \code{\link{tg.removeTier}}
+#' @seealso \code{\link{tg.duplicateTierMergeSegments}}, \code{\link{tg.setTierName}}, \code{\link{tg.removeTier}}
 #'
 #' @examples
 #' tg <- tg.sample()
 #' tg2 <- tg.duplicateTier(tg, "word", 1, "NEW")
 #' tg.plot(tg2)
-tg.duplicateTier <- function(tg, originalInd, newInd, newTierName = "") {
+tg.duplicateTier <- function(tg, originalInd, newInd = Inf, newTierName = "") {
     originalInd <- tg.checkTierInd(tg, originalInd)
     ntiers <- length(tg)
 
     if (!tbTools::isInt(newInd)) {
-        stop("newInd must be integer >= 1")
+        stop("newInd must be integer >= 1 or +Inf")
+    }
+
+    if (is.infinite(newInd)) {
+        if (newInd > 0) {
+            newInd <- ntiers+1
+        } else {
+            stop("newInd must be integer >= 1 or +Inf")
+        }
     }
 
     if (newInd < 1  |  newInd > ntiers+1) {
@@ -908,6 +916,168 @@ tg.duplicateTier <- function(tg, originalInd, newInd, newTierName = "") {
 
     return(tgNew)
 }
+
+
+#' tg.duplicateTierMergeSegments
+#'
+#' Duplicates tier originalInd and merge segments (according to the pattern) to the new tier with specified index newInd
+#' (existing tiers are shifted).
+#' Typical use: create new syllable tier from phone tier. It merges phones into syllables according to separators in pattern.
+#'
+#' Note 1: there can be segments with empty labels in the original tier (pause), do not specify them in the pattern
+#'
+#' Note 2: if there is an segment with empty label in the original tier in the place of separator in the pattern,
+#'         the empty segment is duplicated into the new tier, i.e. at the position of the separator, there may or may not be
+#'         an empty segment, if there is, it is duplicated. And they are not specified in the pattern.
+#'
+#' Note 3: if the segment with empty label is not at the position corresponding to separator, it leads to error
+#'         - the part specified in the pattern between separators cannot be split by empty segments
+#'
+#' Note 4: beware of labels that appear empty but they are not (space, new line character etc.) - these segments are handled
+#'         as classical non-empty labels. See example - one label is " ", therefore it must be specified in the pattern.
+#'
+#' @param tg TextGrid object
+#' @param originalInd tier index or "name"
+#' @param newInd new tier index (1 = the first, Inf = the last [default])
+#' @param newTierName name of the new tier
+#' @param pattern merge segments pattern for the new tier (e.g., "he-llo-world")
+#' @param sep separator in pattern (default: "-")
+#'
+#' @return TextGrid object
+#' @export
+#' @seealso \code{\link{tg.duplicateTier}}, \code{\link{tg.setTierName}}, \code{\link{tg.removeTier}}
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg <- tg.removeTier(tg, "syllable")
+#' collapsed <- paste0(tg$phone$label, collapse = "")  # get actual labels
+#' print(collapsed)  # all labels in collapsed form - copy the string, include separators -> pattern
+#' pattern <- "ja:-ci-P\\ek-nu-t_so-?u-J\\e-la:S- -nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"
+#' tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = "-")
+#' \dontrun{
+#' tg.plot(tg)
+#' tg.plot(tg2)
+#' }
+tg.duplicateTierMergeSegments <- function(tg, originalInd, newInd = Inf, newTierName, pattern, sep = "-") {
+    originalInd <- tg.checkTierInd(tg, originalInd)
+    if (!tg.isIntervalTier(tg, originalInd)) {
+        stop("originalInd must be interval tier")
+    }
+
+    ntiers <- length(tg)
+
+    if (!tbTools::isInt(newInd)) {
+        stop("newInd must be integer >= 1 or +Inf")
+    }
+
+    if (is.infinite(newInd)) {
+        if (newInd > 0) {
+            newInd <- ntiers+1
+        } else {
+            stop("newInd must be integer >= 1 or +Inf")
+        }
+    }
+
+    if (newInd < 1  |  newInd > ntiers+1) {
+        stop(paste0("newInd out of range <1; ntiers+1> [newInd = ", newInd, ", ntiers = ", ntiers, "]"))
+    }
+
+    if (!tbTools::isString(newTierName)) {
+        stop("newTierName must be a character string")
+    }
+
+    if (!tbTools::isString(pattern)) {
+        stop("pattern must be a character string")
+    }
+
+
+    tgNew <- tg
+
+    tOrig <- tg[[originalInd]]
+    ## process tOrig - point or interval?
+    collapsed <- paste0(tOrig$label, collapse = "")
+    patternCollapsed <- gsub(sep, "", pattern, fixed = TRUE)
+    if (collapsed != patternCollapsed) {
+        stop(paste0("pattern does not match actual labels in the tier\n", "pattern:       [", patternCollapsed, "]\n",
+                    "actual labels: [", collapsed, "]"))
+    }
+
+    parts <- unlist(strsplit(pattern, split = sep, fixed = TRUE))
+
+    t1 <- numeric(0)  #
+    t2 <- numeric(0)  #
+    label <- character(0)
+    indPart <- 1
+    labTemp <- ""
+
+    t1Last <- NA
+
+    # pozor, nějak se též vypořádat s prázdnými labely - ideálně je zachovat a brát je též jako oddělovač, tedy v rámci jedné "part" nemůže být uvnitř prázdný label
+
+    for (I in tbTools::seqM(1, length(tOrig$label))) {
+        if (labTemp == "") {
+            t1Last <- tOrig$t1[I]
+        }
+
+        if (tOrig$label[I] == "") {  # empty label
+            if (labTemp != "") {
+                stop(paste0("unmatched labels [", labTemp, "] with the part [", parts[indPart], "], prematurely terminated by new segment with empty label"))
+            }
+
+            t1 <- c(t1, tOrig$t1[I])
+            t2 <- c(t2, tOrig$t2[I])
+            label <- c(label, tOrig$label[I])
+        } else { # non-empty label
+            labTemp <- paste0(labTemp, tOrig$label[I])
+            if (indPart > length(parts)) {
+                stop("more labels than parts")
+            }
+            if (length(labTemp) > length(parts[indPart])) {
+                stop(paste0("unmatched label [", labTemp, "], the part should be [", parts[indPart], "]"))
+            }
+
+            if (labTemp == parts[indPart]) {  # match
+                t1 <- c(t1, t1Last)
+                t2 <- c(t2, tOrig$t2[I])
+                label <- c(label, labTemp)
+                labTemp <- ""
+                indPart <- indPart + 1
+            } else {  # not yet
+                # nothing to do
+            }
+        }
+    }
+
+    if (indPart <= length(parts)) {
+        stop("labels prematurely ended, not all parts found")
+    }
+
+    tOrig$t1 <- t1
+    tOrig$t2 <- t2
+    tOrig$label <- label
+
+    ##
+
+    for (I in tbTools::seqM(ntiers+1, newInd+1, by = -1)) {
+        tgNew[[I]] <- tgNew[[I-1]]
+        names(tgNew)[I] <- names(tgNew)[I-1]
+    }
+
+    tgNew[[newInd]] <- tOrig
+
+
+    actNames <- names(tgNew)
+    if (newTierName %in% actNames) {
+        warning(paste0("TextGrid has a duplicate tier name [", newTierName, "]. You should not use the name for indexing to avoid ambiguity."))
+    }
+    tgNew[[newInd]]$name <- newTierName
+    names(tgNew)[newInd] <- newTierName
+
+
+
+    return(tgNew)
+}
+
 
 
 
@@ -1131,7 +1301,7 @@ tg.getNumberOfIntervals <- function(tg, tierInd) {
 #'
 #' @return character string
 #' @export
-#' @seealso \code{\link{tg.setLabel}}, \code{\link{tg.countLabels}}
+#' @seealso \code{\link{tg.setLabel}}, \code{\link{tg.countLabels}}, \code{\link{tg.findLabels}}
 #'
 #' @examples tg <- tg.sample()
 #' tg.getLabel(tg, "phoneme", 4)
@@ -1229,7 +1399,7 @@ tg.setLabel <- function(tg, tierInd, index, newLabel) {
 #'
 #' @return numeric
 #' @export
-#' @seealso \code{\link{tg.getIntervalEndTime}}, \code{\link{tg.getIntervalDuration}}, \code{\link{tg.getIntervalIndexAtTime}}
+#' @seealso \code{\link{tg.getIntervalEndTime}}, \code{\link{tg.getIntervalDuration}}, \code{\link{tg.getIntervalIndexAtTime}}, \code{\link{tg.findLabels}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1271,7 +1441,7 @@ tg.getIntervalStartTime <- function(tg, tierInd, index) {
 #'
 #' @return numeric
 #' @export
-#' @seealso \code{\link{tg.getIntervalStartTime}}, \code{\link{tg.getIntervalDuration}}, \code{\link{tg.getIntervalIndexAtTime}}
+#' @seealso \code{\link{tg.getIntervalStartTime}}, \code{\link{tg.getIntervalDuration}}, \code{\link{tg.getIntervalIndexAtTime}}, \code{\link{tg.findLabels}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1312,7 +1482,7 @@ tg.getIntervalEndTime <- function(tg, tierInd, index) {
 #'
 #' @return numeric
 #' @export
-#' @seealso \code{\link{tg.getIntervalStartTime}}, \code{\link{tg.getIntervalEndTime}}, \code{\link{tg.getIntervalIndexAtTime}}
+#' @seealso \code{\link{tg.getIntervalStartTime}}, \code{\link{tg.getIntervalEndTime}}, \code{\link{tg.getIntervalIndexAtTime}}, \code{\link{tg.findLabels}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1354,7 +1524,7 @@ tg.getIntervalDuration <- function(tg, tierInd, index) {
 #' @return numeric
 #' @export
 #' @seealso \code{\link{tg.getLabel}}, \code{\link{tg.getPointIndexNearestTime}}, \code{\link{tg.getPointIndexLowerThanTime}},
-#' @seealso \code{\link{tg.getPointIndexHigherThanTime}}
+#' @seealso \code{\link{tg.getPointIndexHigherThanTime}}, \code{\link{tg.findLabels}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1427,7 +1597,7 @@ tg.removeTier <- function(tg, tierInd) {
 #' shifted).
 #'
 #' @param tg TextGrid object
-#' @param newInd new tier index (1 = the first)
+#' @param newInd new tier index (1 = the first, Inf = the last [default])
 #' @param newTierName new tier name
 #'
 #' @return TextGrid object
@@ -1439,13 +1609,23 @@ tg.removeTier <- function(tg, tierInd) {
 #' tg <- tg.sample()
 #' tg2 <- tg.insertNewPointTier(tg, 1, "POINTS")
 #' tg2 <- tg.insertPoint(tg2, "POINTS", 3, "MY POINT")
+#' tg2 <- tg.insertNewPointTier(tg2, Inf, "POINTS2")  # the last tier
+#' tg2 <- tg.insertPoint(tg2, "POINTS2", 2, "point in the last tier")
 #' tg.plot(tg2)
 #' }
-tg.insertNewPointTier <- function(tg, newInd, newTierName) {
+tg.insertNewPointTier <- function(tg, newInd = Inf, newTierName) {
     ntiers <- length(tg)
 
     if (!tbTools::isInt(newInd)) {
-        stop("newInd must be integer >= 1")
+        stop("newInd must be integer >= 1 or +Inf")
+    }
+
+    if (is.infinite(newInd)) {
+        if (newInd > 0) {
+            newInd <- ntiers+1
+        } else {
+            stop("newInd must be integer >= 1 or +Inf")
+        }
     }
 
     if (newInd < 1  |  newInd > ntiers+1) {
@@ -1487,14 +1667,14 @@ tg.insertNewPointTier <- function(tg, newInd, newTierName) {
 #' pieces.
 #'
 #' @param tg TextGrid object
-#' @param newInd new tier index (1 = the first)
+#' @param newInd new tier index (1 = the first, Inf = the last [default])
 #' @param newTierName new tier name
 #' @param tMin [optional] start time of the new tier
 #' @param tMax [optional] end time of the new tier
 #'
 #' @return TextGrid object
 #' @export
-#' @seealso \code{\link{tg.insertInterval}}, \code{\link{tg.insertNewPointTier}}, \code{\link{tg.duplicateTier}}, \code{\link{tg.removeTier}}
+#' @seealso \code{\link{tg.insertInterval}}, \code{\link{tg.insertNewPointTier}}, \code{\link{tg.duplicateTier}}, \code{\link{tg.duplicateTierMergeSegments}}, \code{\link{tg.removeTier}}
 #'
 #' @examples
 #' \dontrun{
@@ -1503,13 +1683,23 @@ tg.insertNewPointTier <- function(tg, newInd, newTierName) {
 #' tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.8)
 #' tg2 <- tg.insertBoundary(tg2, "INTERVALS", 0.1, "Interval A")
 #' tg2 <- tg.insertInterval(tg2, "INTERVALS", 1.2, 2.5, "Interval B")
+#' tg2 <- tg.insertNewIntervalTier(tg2, Inf, "LastTier")
+#' tg2 <- tg.insertInterval(tg2, "LastTier", 1, 3, "This is the last tier")
 #' tg.plot(tg2)
 #' }
-tg.insertNewIntervalTier <- function(tg, newInd, newTierName, tMin=NA, tMax=NA) {
+tg.insertNewIntervalTier <- function(tg, newInd = Inf, newTierName, tMin=NA, tMax=NA) {
     ntiers <- length(tg)
 
     if (!tbTools::isInt(newInd)) {
-        stop("newInd must be integer >= 1")
+        stop("newInd must be integer >= 1 or +Inf")
+    }
+
+    if (is.infinite(newInd)) {
+        if (newInd > 0) {
+            newInd <- ntiers+1
+        } else {
+            stop("newInd must be integer >= 1 or +Inf")
+        }
     }
 
     if (newInd < 1  |  newInd > ntiers+1) {
@@ -1598,7 +1788,7 @@ tg.insertNewIntervalTier <- function(tg, newInd, newTierName, tMin=NA, tMax=NA) 
 #'
 #' @return integer
 #' @export
-#' @seealso \code{\link{tg.getIntervalStartTime}}, \code{\link{tg.getIntervalEndTime}}, \code{\link{tg.getLabel}}
+#' @seealso \code{\link{tg.getIntervalStartTime}}, \code{\link{tg.getIntervalEndTime}}, \code{\link{tg.getLabel}}, \code{\link{tg.findLabels}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1642,7 +1832,7 @@ tg.getIntervalIndexAtTime <- function(tg, tierInd, time) {
 #'
 #' @return integer
 #' @export
-#' @seealso \code{\link{tg.getPointIndexNearestTime}}, \code{\link{tg.getPointIndexLowerThanTime}}, \code{\link{tg.getLabel}}
+#' @seealso \code{\link{tg.getPointIndexNearestTime}}, \code{\link{tg.getPointIndexLowerThanTime}}, \code{\link{tg.getLabel}}, \code{\link{tg.findLabels}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1687,7 +1877,7 @@ tg.getPointIndexHigherThanTime <- function(tg, tierInd, time) {
 #'
 #' @return integer
 #' @export
-#' @seealso \code{\link{tg.getPointIndexNearestTime}}, \code{\link{tg.getPointIndexHigherThanTime}}, \code{\link{tg.getLabel}}
+#' @seealso \code{\link{tg.getPointIndexNearestTime}}, \code{\link{tg.getPointIndexHigherThanTime}}, \code{\link{tg.getLabel}}, \code{\link{tg.findLabels}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -1732,7 +1922,7 @@ tg.getPointIndexLowerThanTime <- function(tg, tierInd, time) {
 #'
 #' @return integer
 #' @export
-#' @seealso \code{\link{tg.getPointIndexLowerThanTime}}, \code{\link{tg.getPointIndexHigherThanTime}}, \code{\link{tg.getLabel}}
+#' @seealso \code{\link{tg.getPointIndexLowerThanTime}}, \code{\link{tg.getPointIndexHigherThanTime}}, \code{\link{tg.getLabel}}, \code{\link{tg.findLabels}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -2155,7 +2345,7 @@ tg.removeIntervalBothBoundaries <- function(tg, tierInd, index) {
 #'
 #' @return TextGrid object
 #' @export
-#' @seealso \code{\link{tg.insertInterval}}, \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}
+#' @seealso \code{\link{tg.insertInterval}}, \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}, \code{\link{tg.duplicateTierMergeSegments}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -2244,7 +2434,7 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
 #' a) Into an already existing interval with empty label (most common
 #' situation because, e.g., a new interval tier has one empty interval from
 #' beginning to the end.
-#' b) Outside og existing intervals (left or right), this may create another
+#' b) Outside of existing intervals (left or right), this may create another
 #' empty interval between.
 #'
 #' In most cases, this function is the same as 1.) tgInsertBoundary(tEnd)
@@ -2301,7 +2491,7 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
 #'
 #' @return TextGrid object
 #' @export
-#' @seealso \code{\link{tg.insertBoundary}}, \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}
+#' @seealso \code{\link{tg.insertBoundary}}, \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}, \code{\link{tg.duplicateTierMergeSegments}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -2459,6 +2649,126 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
     return(tgNew)
 }
 
+
+#' tg.findLabels
+#'
+#' Find label or consecutive sequence of labels and returns their indices.
+#'
+#' @param tg TextGrid object
+#' @param tierInd tier index or "name"
+#' @param labelVector character string (one label) or vector of character strings (consecutive sequence of labels) to be found
+#' @param returnTime If TRUE, return vectors of begin (t1) and end time (t2) for each found group of sequence of labels instead of indices (when FALSE = default).
+#'
+#' @return If returnTime == FALSE, returns list of all occurrences, each member of the list is one occurence and contains vector of label indices, if returnTime == TRUE, returns list witch vectors t1 (begin) and t2 (end) for each found group of sequence of labels.
+#' @export
+#' @seealso \code{\link{tg.countLabels}}, \code{\link{tg.getLabel}}, \code{\link{tg.duplicateTierMergeSegments}}
+#'
+#' @examples
+#' tg <- tg.sample()
+#' i <- tg.findLabels(tg, "phoneme", "n")
+#' i
+#' length(i)
+#' i[[1]]
+#' i[[2]]
+#' tg$phoneme$label[unlist(i)]
+#'
+#' i <- tg.findLabels(tg, "phone", c("?", "a"))
+#' i
+#' length(i)
+#' tg$phone$label[i[[1]]]
+#' tg$phone$label[i[[2]]]
+#' tg$phone$label[unlist(i)]
+#'
+#' t <- tg.findLabels(tg, "phone", c("?", "a"), returnTime = TRUE)
+#' t
+#' t$t2[1] - t$t1[1]   # duration of the first result
+#' t$t2[2] - t$t1[2]   # duration of the second result
+#'
+#' i <- tg.findLabels(tg.sample(), "word", c("ti", "reknu", "co"))
+#' i
+#' length(i)
+#' length(i[[1]])
+#' i[[1]]
+#' i[[1]][3]
+#' tg$word$label[i[[1]]]
+#'
+#' t <- tg.findLabels(tg.sample(), "word", c("ti", "reknu", "co"), returnTime = TRUE)
+#' pt <- pt.sample()
+#' tStart <- t$t1[1]
+#' tEnd <- t$t2[1]
+#' \dontrun{
+#' pt.plot(pt.cut(pt, tStart, tEnd))
+#' }
+tg.findLabels <- function(tg, tierInd, labelVector, returnTime = FALSE) {
+    if (!tbTools::isLogical(returnTime)) {
+        stop("returnTime must be a logical value.")
+    }
+
+    tierInd <- tg.checkTierInd(tg, tierInd)
+    ntiers <- length(tg)
+
+    if (class(labelVector) != "character") {
+        stop("labelVector must be a character string or vector of character strings")
+    }
+
+    nlabs <- length(labelVector)
+
+    if (nlabs < 1)
+        return(integer(0))
+    else if (nlabs == 1) {
+        indLab <- which(tg[[tierInd]]$label == labelVector)
+        if (returnTime == FALSE) {
+            return(as.list(indLab))
+        } else {
+            if (tg.isIntervalTier(tg, tierInd)) {
+                return( list(t1 = tg[[tierInd]]$t1[indLab], t2 = tg[[tierInd]]$t2[indLab]) )
+            } else {  # PointTier
+                return( list(t1 = tg[[tierInd]]$t[indLab], t2 = tg[[tierInd]]$t[indLab]) )
+            }
+        }
+    }
+    else {
+        indStart <- which(tg[[tierInd]]$label == labelVector[1])
+        indStart <- indStart[indStart <= length(tg[[tierInd]]$label) - nlabs + 1]  # pokud zbývá do konce méně labelů, než hledáme, nemá smysl hledat
+
+        indLab <- list()
+
+        for (I in indStart) {
+            ok <- TRUE
+            for (J in tbTools::seqM(2, nlabs)) {
+                if (tg[[tierInd]]$label[I+J-1] != labelVector[J]) {
+                    ok <- FALSE
+                    break
+                }
+            }
+            if (ok) {
+                indLab <- c(indLab, list(tbTools::seqM(I, I+nlabs-1)))
+            }
+        }
+
+        if (returnTime == FALSE) {
+            return(indLab)
+        } else {
+            if (tg.isIntervalTier(tg, tierInd)) {
+                t1 <- numeric(length(indLab))
+                t2 <- numeric(length(indLab))
+                for (I in tbTools::seqM(1, length(indLab))) {
+                    t1[I] <- tg[[tierInd]]$t1[ indLab[[I]][1] ]
+                    t2[I] <- tg[[tierInd]]$t2[ indLab[[I]][ length(indLab[[I]]) ]   ]
+                }
+            } else { # PointTier
+                t1 <- numeric(length(indLab))
+                t2 <- numeric(length(indLab))
+                for (I in tbTools::seqM(1, length(indLab))) {
+                    t1[I] <- tg[[tierInd]]$t[ indLab[[I]][1] ]
+                    t2[I] <- tg[[tierInd]]$t[ indLab[[I]][ length(indLab[[I]]) ]   ]
+                }
+            }
+            return(list(t1 = t1, t2 = t2))
+        }
+
+    }
+}
 
 
 
@@ -2803,7 +3113,7 @@ pt.interpolate <- function(pt, t) {
 #' pt2 <- pt.Hz2ST(pt, ref = 200)
 #' \dontrun{
 #' pt.plot(pt)  %>% dygraphs::dyAxis("y", label = "Frequency (Hz)")
-#' pt.plot(pt2) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
+#' pt.plot(pt2) %>% dygraphs::dyAxis("y", label = "Frequency (ST re 200 Hz)")
 #' }
 pt.Hz2ST <- function(pt, ref=100) {
     if (!tbTools::isNum(ref) | ref <= 0) {
@@ -3109,6 +3419,10 @@ pt.cut0 <- function(pt, tStart = -Inf, tEnd = Inf) {
 
 # if (!tbTools::isString(name)) {
 #     stop("Name must be a character string.")
+# }
+
+# if (!tbTools::isLogical(name)) {
+#     stop("Name must be a logical value.")
 # }
 
 # if (!tbTools::isNum(tMin)) {

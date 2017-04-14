@@ -1,7 +1,7 @@
 Package: rPraat
 Type: Package
 Title: Read, write and manipulate Praat TextGrid and PitchTier
-Version: 1.0.6
+Version: 1.0.7
 Encoding: UTF-8
 Authors@R: person("Tomas", "Boril", email = "borilt@gmail.com", role = c("aut", "cre"))
 Maintainer: Tomas Boril <borilt@gmail.com>
@@ -19,7 +19,7 @@ Imports:
     stringr (>= 1.2.0),
     readr(>= 1.1.0),
     dygraphs (>= 1.1.1.4),
-    tbTools (>= 1.0.0)
+    tbTools (>= 1.0.1)
 RoxygenNote: 6.0.1
 Remotes: bbTomas/tbTools
 Suggests: testthat

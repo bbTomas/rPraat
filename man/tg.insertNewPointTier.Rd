@@ -4,12 +4,12 @@
 \alias{tg.insertNewPointTier}
 \title{tg.insertNewPointTier}
 \usage{
-tg.insertNewPointTier(tg, newInd, newTierName)
+tg.insertNewPointTier(tg, newInd = Inf, newTierName)
 }
 \arguments{
 \item{tg}{TextGrid object}
 
-\item{newInd}{new tier index (1 = the first)}
+\item{newInd}{new tier index (1 = the first, Inf = the last [default])}
 
 \item{newTierName}{new tier name}
 }
@@ -25,6 +25,8 @@ shifted).
 tg <- tg.sample()
 tg2 <- tg.insertNewPointTier(tg, 1, "POINTS")
 tg2 <- tg.insertPoint(tg2, "POINTS", 3, "MY POINT")
+tg2 <- tg.insertNewPointTier(tg2, Inf, "POINTS2")  # the last tier
+tg2 <- tg.insertPoint(tg2, "POINTS2", 2, "point in the last tier")
 tg.plot(tg2)
 }
 }

@@ -346,3 +346,164 @@ test_that("tg.createNewTextGrid", {
         c(length(tg), class(tg)["tmin"], class(tg)["tmax"])
         }, c("0", tmin="0", tmax="5"))
 })
+
+test_that("tg.findLabels", {
+    expect_error(tg.findLabels(tg.sample(), "word", "nic", "aha"))
+    expect_error(tg.findLabels(tg.sample(), "word"))
+    expect_error(tg.findLabels(tg.sample(), "word", "co", 0))
+    expect_error(tg.findLabels(tg.sample(), "word", 4))
+    expect_equal(length(tg.findLabels(tg.sample(), "word", character(0))), 0)
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "word", "")
+        c(class(q), length(q), q[[1]], q[[2]])},
+        c("list", 2, 1, 13))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "phoneme", "")
+        c(class(q), length(q))},
+        c("list", 0))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "word", "nic")
+        c(class(q), length(q))},
+        c("list", 0))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "word", "reknu")
+        c(class(q), length(q), q[[1]])},
+        c("list", 1, 4))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "phone", "a")
+        c(class(q), length(q), q[[1]], q[[2]], q[[3]], q[[4]], q[[5]])},
+        c("list", 5, 29, 40, 42, 44, 46))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "phoneme", c("n"))
+        c(class(q), length(q), q[[1]], q[[2]], q[[3]], q[[4]])},
+        c("list", 4, 8, 18, 25, 42))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "word", c("ti", "reknu", "co"))
+        c(class(q), length(q), q[[1]][1], q[[1]][2], q[[1]][3])},
+        c("list", 1, 3, 4, 5))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "phone", c("?", "a"))
+        c(class(q), length(q), q[[1]][1], q[[1]][2], q[[2]][1], q[[2]][2])},
+        c("list", 2, 39, 40, 41, 42))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "phoneme", c("n", "e"))
+        c(class(q), length(q), q[[1]][1], q[[1]][2])},
+        c("list", 1, 18, 19))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "phoneme", c("n", "a"))
+        c(class(q), length(q), q[[1]][1], q[[1]][2], q[[2]][1], q[[2]][2])},
+        c("list", 2, 25, 26, 42, 43))
+
+    expect_equal(length(tg.findLabels(tg.sample(), "word", character(0), TRUE)), 0)
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "word", "", TRUE)
+        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2])},
+        c("list", 2, 2, 2, 0.008, 0.0965724658757064, 3.495928125, 3.616))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "phoneme", "", TRUE)
+        c(class(q), length(q), length(q$t1), length(q$t2))},
+        c("list", 2, 0, 0))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "word", "nic", TRUE)
+        c(class(q), length(q), length(q$t1), length(q$t2))},
+        c("list", 2, 0, 0))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "word", "reknu", TRUE)
+        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1])},
+        c("list", 2, 1, 1, 0.352156565444145, 0.632200305451128))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "phone", "a", TRUE)
+        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2], q$t1[3], q$t2[3], q$t1[4], q$t2[4], q$t1[5], q$t2[5])},
+        c("list", 2, 5, 5, 2.24830876409774, 2.30352886461156, 2.96666963493613, 3.02360108418367, 3.07030520488411, 3.10631502016129, 3.18439423076923, 3.2390296474359, 3.3053099702381, 3.35952210541475))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "phoneme", c("n"), TRUE)
+        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2], q$t1[3], q$t2[3], q$t1[4], q$t2[4])},
+        c("list", 2, 4, 4, 0.562717206724197, 0.562717206724197, 1.88902324993668, 1.88902324993668, 2.22032423657473, 2.22032423657473, 3.38647934980882, 3.38647934980882))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "word", c("ti", "reknu", "co"), TRUE)
+        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1])},
+        c("list", 2, 1, 1, 0.215988182773109, 0.760009490030675))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "phone", c("?", "a"), TRUE)
+        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2])},
+        c("list", 2, 2, 2, 2.91140769675926, 3.02360108418367, 3.02360108418367, 3.10631502016129))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "phoneme", c("n", "e"), TRUE)
+        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1])},
+        c("list", 2, 1, 1, 1.88902324993668, 1.92282441350142))
+    expect_equal({
+        q <- tg.findLabels(tg.sample(), "phoneme", c("n", "a"), TRUE)
+        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2])},
+        c("list", 2, 2, 2, 2.22032423657473, 2.27591881435465, 3.38647934980882, 3.45468235960145))
+})
+
+test_that("tg.duplicateTierMergeSegments", {
+    expect_error({
+        tg <- tg.read("H3.TextGrid")   # prázdné segmenty uvnitř slabiky vadí
+        pattern <- "ja:-ci-P\\ek-nu-t_so-?u-J\\e-la:S- -nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"
+        tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = "-")
+    })
+    expect_error({
+        tg <- tg.read("H.TextGrid")
+        pattern <- "ja:-ci-P\\ek-nu-tso-?u-J\\e-la:S- -nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"
+        tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = "-")
+    })
+    expect_error({
+        tg <- tg.read("H.TextGrid")
+        pattern <- "ja:-ci-P\\ek-nu-t_soa-?u-J\\e-la:S- -nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"
+        tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = "-")
+    })
+    expect_error({
+        tg <- tg.read("H.TextGrid")
+        pattern <- "ja:-ci-P\\ek-nu-t_so-?u-J\\e-la:S--nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"
+        tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = "-")
+    })
+    expect_error({
+        tg <- tg.read("H.TextGrid")
+        pattern <- "ja:-ci-P\\ek-nu-t_so-?u-J\\e-la:S- -nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:-at"
+        tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = "-")
+    })
+    expect_error({
+        tg <- tg.read("H.TextGrid")
+        pattern <- "ja:-nu-ci-P\\ek-nu-t_so-?u-J\\e-la:S- -nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"
+        tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = "-")
+    })
+    expect_error({
+        tg <- tg.read("H.TextGrid")
+        pattern <- "a:-ci-P\\ek-nu-t_so-?u-J\\e-la:S- -nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"
+        tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = "-")
+    })
+    expect_error({
+        tg <- tg.read("H.TextGrid")
+        pattern <- "ja:-ci-P\\ek-nu-t_so-?u-J\\e-la:S- -nej-dP\\i:f--naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"
+        tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = "-")
+    })
+    expect_error({
+        tg <- tg.read("H.TextGrid")
+        pattern <- "ja:-ci-P\\ek-nu-t_so-?u-J\\e-la:S- -nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"
+        tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = "")
+    })
+    expect_error({
+        tg <- tg.read("H.TextGrid")
+        pattern <- "ja:-ci-P\\ek-nu-t_so-?u-J\\e-la:S- -nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"
+        tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = " ")
+    })
+    expect_error({
+        tg <- tg.read("H.TextGrid")  # should not duplicate point tier
+        pattern <- "ja:ciP\\eknut_souJ\\ela:SnejdP\\i:fnajdeZhut_Skuaatamana"
+        tg2 <- tg.duplicateTierMergeSegments(tg, "phoneme", 1, "syll", pattern, sep = "-")
+    })
+    expect_equal({
+        tg <- tg.read("H.TextGrid")
+        pattern <- "ja:-ci-P\\ek-nu-t_so-?u-J\\e-la:S- -nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"
+        tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = "-")
+        c(length(tg2), tg2[[1]]$name, length(tg2$syll$label) - length(tg2$syllable$label),
+          sum(tg2$syll$label == tg2$syllable$label), # one difference: pause " " != ""
+          identical(tg2$syll$t1[2:22], tg2$syllable$t1[2:22]),
+          tg2$syll$t1[1],
+          identical(tg2$syll$t2, tg2$syllable$t2),
+          tg2$syll$type
+          )
+        },
+        c(6, "syll", 0, 21, TRUE, 0.008, TRUE, "interval"))
+})

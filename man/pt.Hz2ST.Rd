@@ -22,7 +22,7 @@ pt <- pt.sample()
 pt2 <- pt.Hz2ST(pt, ref = 200)
 \dontrun{
 pt.plot(pt)  \%>\% dygraphs::dyAxis("y", label = "Frequency (Hz)")
-pt.plot(pt2) \%>\% dygraphs::dyAxis("y", label = "Frequency (ST)")
+pt.plot(pt2) \%>\% dygraphs::dyAxis("y", label = "Frequency (ST re 200 Hz)")
 }
 }
 \seealso{

@@ -24,5 +24,5 @@ tg <- tg.sample()
 tg.countLabels(tg, "phone", "a")
 }
 \seealso{
-\code{\link{tg.getLabel}}
+\code{\link{tg.findLabels}}, \code{\link{tg.getLabel}}
 }

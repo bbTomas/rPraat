@@ -25,7 +25,7 @@ Inserts new interval into an empty space in interval tier:
 a) Into an already existing interval with empty label (most common
 situation because, e.g., a new interval tier has one empty interval from
 beginning to the end.
-b) Outside og existing intervals (left or right), this may create another
+b) Outside of existing intervals (left or right), this may create another
 empty interval between.
 }
 \details{
@@ -86,5 +86,5 @@ tg.plot(tg2)
 }
 }
 \seealso{
-\code{\link{tg.insertBoundary}}, \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}
+\code{\link{tg.insertBoundary}}, \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}, \code{\link{tg.duplicateTierMergeSegments}}
 }

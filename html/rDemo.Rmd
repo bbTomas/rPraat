@@ -46,6 +46,7 @@ To reproduce the following examples, you will need some sample files. Download a
 library(tuneR)
 library(tbTools)
 library(dygraphs)
+library(dplyr)
 
 sndWav <- readWave("demo/H.wav"); fs <- sndWav@samp.rate; snd <- sndWav@left / (2^(sndWav@bit-1))
 t <- seqM(0, (length(snd)-1)/fs, by = 1/fs)
@@ -55,6 +56,7 @@ dygraph(data.frame(t, snd), xlab = "Time (sec)", group="group1") %>% dyRangeSele
 
 ```{r, fig.height=3}
 library(rPraat)
+library(dplyr)
 tg <- tg.read("demo/H.TextGrid") %>%
     tg.removeTier("phrase") %>% tg.removeTier("phoneme") %>% tg.removeTier("syllable")
 
@@ -172,6 +174,77 @@ mean(dur)
 hist(dur)
 ```
 
+### Find labels in TextGrid
+
+```{r}
+tg <- tg.read("demo/H.TextGrid")
+
+# find label "n" in phoneme tier (Point tier)
+i <- tg.findLabels(tg, "phoneme", "n")
+i # 4 results and their indices
+length(i) # 4 results
+i[[1]]  # index of the first result
+tg$phoneme$label[unlist(i)]
+
+# find fragments with successive labels "?" "a" in phone tear (Interval tier)
+i <- tg.findLabels(tg, "phone", c("?", "a"))
+i  
+length(i) # 2 results found
+i[[1]]  # indices of the first result
+i[[2]]  # indices of the second result
+tg$phone$label[i[[1]]]
+tg$phone$label[i[[2]]]
+tg$phone$label[unlist(i)]
+
+# find fragments with successive labels "?" "a" in phone tier
+# and return initial and final time of these fragments
+t <- tg.findLabels(tg, "phone", c("?", "a"), returnTime = TRUE)
+t # 2 results and their initial (t1) and final (t2) time
+length(t) # 2 results found
+t$t2[1] - t$t1[1]   # duration of the first fragment
+t$t2[2] - t$t1[2]   # duration of the second fragment
+
+# find fragments with successive labels "ti" "řeknu" "co" in word tier (Interval tier)
+i <- tg.findLabels(tg, "word", c("ti", "řeknu", "co"))
+i  
+length(i) # 1 result found
+i[[1]]           # indices of segments in the first result
+length(i[[1]])   # length of the first (and only) result (number of segments)
+i[[1]][3]        # index of the third segment in the first result
+tg$word$label[i[[1]]]  # all labels in the fragment
+# get initial and final time of the fragment
+t <- tg.findLabels(tg, "word", c("ti", "řeknu", "co"), returnTime = TRUE)
+t
+```
+
+### Create syllable tier from phone tier
+
+```{r}
+tg <- tg.read("demo/H.TextGrid")
+
+tg <- tg %>% tg.removeTier("phoneme") %>%  tg.removeTier("syllable") %>% tg.removeTier("word") %>%
+    tg.removeTier("phrase")
+```
+
+Get actual labels.
+
+```{r}
+collapsed <- paste0(tg$phone$label, collapse = "")
+collapsed
+```
+
+Edit the collapsed string with labels - insert separators to mark boundaries of syllables.
+
+* There can be segments with empty labels in the original tier (pauses), do not specify them in the pattern.
+* Beware of labels that appear empty but they are not (space, new line character etc.) - these segments are handled as classical non-empty labels. See example - one label is " ", therefore it must be specified in the pattern.
+
+```{r}
+pattern <- "ja:-ci-P\\ek-nu-t_so-?u-J\\e-la:S- -nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"
+tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = "-")
+tg.plot(tg2)
+```
+
+
 
 ### Overview of some TextGrid operations
 
@@ -201,15 +274,21 @@ tg <- tg.removeIntervalBothBoundaries(tg, "WORD2", ind)
 tg.plot(tg)
 
 tgNew <- tg.createNewTextGrid(tMin = 0, tMax = 5)
-tgNew <- tg.insertNewIntervalTier(tgNew, newInd = 1, "word")
+tgNew <- tg.insertNewIntervalTier(tgNew, newInd = 1, "word")   # the first tier
 tgNew <- tg.insertInterval(tgNew, tierInd = 1, tStart = 2, tEnd = 3.5, "hello")
 tgNew <- tg.insertInterval(tgNew, tierInd = 1, 4, 4.8, "world")
+tgNew <- tg.insertNewIntervalTier(tgNew, newInd = Inf, "word_last")  # the last tier (at this moment)
+tgNew <- tg.insertInterval(tgNew, tierInd = "word_last", 2, 3, "ABC")
 tgNew <- tg.insertNewPointTier(tgNew, newInd = 2, newTierName = "click")
 tgNew <- tg.insertPoint(tgNew, tierInd = 2, time = 2, label = "click")
 tgNew <- tg.insertPoint(tgNew, tierInd = 2, time = 4, label = "click")
+tgNew <- tg.insertNewPointTier(tgNew, newInd = Inf, newTierName = "pointTierLast")
+tgNew <- tg.insertPoint(tgNew, tierInd = "pointTierLast", time = 3, label = "point")
 tg.plot(tgNew)
 tg.write(tgNew, "demo/ex_output.TextGrid")
 ```
+
+
 
 ### Repair continuity problem of TextGrid
 
@@ -231,16 +310,17 @@ tgNew2 <- tg.repairContinuity(tgNew) # no problem in repaired TextGrid
 pt <- pt.read("demo/H.PitchTier")
 pt <- pt.Hz2ST(pt, ref = 100)  # conversion of Hz to Semitones, reference 0 ST = 100 Hz.
 
-pt.plot(pt) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
+pt.plot(pt) %>% dygraphs::dyAxis("y", label = "Frequency (ST re 100 Hz)")
 
 tg <- tg.read("demo/H.TextGrid")
-tg$word$label[2:6]
+t <- tg.findLabels(tg, "word", c("já", "ti", "řeknu"), returnTime = TRUE)
+print(t)
 
-pt2 <- pt.cut0(pt, tStart = tg$word$t1[2], tEnd = tg$word$t2[6]) # the first five words
-pt.plot(pt2) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
+pt2 <- pt.cut0(pt, tStart = t$t1[1], tEnd = t$t2[1]) # "já ti řeknu"
+pt.plot(pt2) %>% dygraphs::dyAxis("y", label = "Frequency (ST re 100 Hz)")
 
 pt2interp <- pt.interpolate(pt2, seq(pt2$t[1], pt2$t[length(pt2$t)], by = 0.001))
-pt.plot(pt2interp) %>% dygraphs::dyAxis("y", label = "Frequency (ST)")
+pt.plot(pt2interp) %>% dygraphs::dyAxis("y", label = "Frequency (ST re 100 Hz)")
 
 pt.write(pt2interp, "demo/H_cut_interp.PitchTier")
 ```

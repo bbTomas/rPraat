@@ -2,7 +2,7 @@
 
 rPraat package for R constitutes an interface between the most popular software for phonetic analyses, Praat, and R.
 
-Version 1.0.6.
+Version 1.0.7.
 
 For demonstration, see [html/rDemo.html](http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html)
 
@@ -46,6 +46,8 @@ The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-
 [Download BibTeX reference mpraatrpraat2016.bib](http://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
 
 ## What is new
+
+v1.0.7: tg.findLabels(), tg.duplicateTierMergeSegments()
 
 v1.0.6: pt.cut(), pt.cut0()
 

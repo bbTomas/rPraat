@@ -24,5 +24,5 @@ tg <- tg.sample()
 tg.getIntervalDuration(tg, "phone", 5)
 }
 \seealso{
-\code{\link{tg.getIntervalStartTime}}, \code{\link{tg.getIntervalEndTime}}, \code{\link{tg.getIntervalIndexAtTime}}
+\code{\link{tg.getIntervalStartTime}}, \code{\link{tg.getIntervalEndTime}}, \code{\link{tg.getIntervalIndexAtTime}}, \code{\link{tg.findLabels}}
 }

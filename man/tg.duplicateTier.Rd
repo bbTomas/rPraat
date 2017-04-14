@@ -4,14 +4,14 @@
 \alias{tg.duplicateTier}
 \title{tg.duplicateTier}
 \usage{
-tg.duplicateTier(tg, originalInd, newInd, newTierName = "")
+tg.duplicateTier(tg, originalInd, newInd = Inf, newTierName = "")
 }
 \arguments{
 \item{tg}{TextGrid object}
 
 \item{originalInd}{tier index or "name"}
 
-\item{newInd}{new tier index (1 = the first)}
+\item{newInd}{new tier index (1 = the first, Inf = the last [default])}
 
 \item{newTierName}{[optional but recommended] name of the new tier}
 }
@@ -33,5 +33,5 @@ tg2 <- tg.duplicateTier(tg, "word", 1, "NEW")
 tg.plot(tg2)
 }
 \seealso{
-\code{\link{tg.setTierName}}, \code{\link{tg.removeTier}}
+\code{\link{tg.duplicateTierMergeSegments}}, \code{\link{tg.setTierName}}, \code{\link{tg.removeTier}}
 }

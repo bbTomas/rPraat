@@ -25,5 +25,5 @@ tg <- tg.sample()
 tg.getPointIndexHigherThanTime(tg, "phoneme", 0.5)
 }
 \seealso{
-\code{\link{tg.getPointIndexNearestTime}}, \code{\link{tg.getPointIndexLowerThanTime}}, \code{\link{tg.getLabel}}
+\code{\link{tg.getPointIndexNearestTime}}, \code{\link{tg.getPointIndexLowerThanTime}}, \code{\link{tg.getLabel}}, \code{\link{tg.findLabels}}
 }

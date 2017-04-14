@@ -26,5 +26,5 @@ tg.getPointTime(tg, "phoneme", 4)
 \seealso{
 \code{\link{tg.getLabel}}, \code{\link{tg.getPointIndexNearestTime}}, \code{\link{tg.getPointIndexLowerThanTime}},
 
-\code{\link{tg.getPointIndexHigherThanTime}}
+\code{\link{tg.getPointIndexHigherThanTime}}, \code{\link{tg.findLabels}}
 }
