@@ -1,7 +1,7 @@
 Package: rPraat
 Type: Package
 Title: Read, write and manipulate Praat TextGrid and PitchTier
-Version: 1.0.7
+Version: 1.0.7-1
 Encoding: UTF-8
 Authors@R: person("Tomas", "Boril", email = "borilt@gmail.com", role = c("aut", "cre"))
 Maintainer: Tomas Boril <borilt@gmail.com>

@@ -24,7 +24,7 @@ tg.duplicateTierMergeSegments(tg, originalInd, newInd = Inf, newTierName,
 TextGrid object
 }
 \description{
-Duplicates tier originalInd and merge segments (according to the pattern) to the new tier with specified index newInd
+Duplicate tier originalInd and merge segments (according to the pattern) to the new tier with specified index newInd
 (existing tiers are shifted).
 Typical use: create new syllable tier from phone tier. It merges phones into syllables according to separators in pattern.
 }

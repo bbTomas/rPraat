@@ -920,7 +920,7 @@ tg.duplicateTier <- function(tg, originalInd, newInd = Inf, newTierName = "") {
 
 #' tg.duplicateTierMergeSegments
 #'
-#' Duplicates tier originalInd and merge segments (according to the pattern) to the new tier with specified index newInd
+#' Duplicate tier originalInd and merge segments (according to the pattern) to the new tier with specified index newInd
 #' (existing tiers are shifted).
 #' Typical use: create new syllable tier from phone tier. It merges phones into syllables according to separators in pattern.
 #'
@@ -994,7 +994,7 @@ tg.duplicateTierMergeSegments <- function(tg, originalInd, newInd = Inf, newTier
     tgNew <- tg
 
     tOrig <- tg[[originalInd]]
-    ## process tOrig - point or interval?
+    ## process tOrig
     collapsed <- paste0(tOrig$label, collapse = "")
     patternCollapsed <- gsub(sep, "", pattern, fixed = TRUE)
     if (collapsed != patternCollapsed) {
@@ -1032,7 +1032,7 @@ tg.duplicateTierMergeSegments <- function(tg, originalInd, newInd = Inf, newTier
             if (indPart > length(parts)) {
                 stop("more labels than parts")
             }
-            if (length(labTemp) > length(parts[indPart])) {
+            if (nchar(labTemp) > nchar(parts[indPart])) {
                 stop(paste0("unmatched label [", labTemp, "], the part should be [", parts[indPart], "]"))
             }
 
