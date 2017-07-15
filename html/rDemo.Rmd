@@ -356,6 +356,22 @@ plot(pt$t, pt$f, xlab = "Time (sec)", ylab = "F0 (ST re 100 Hz)")
 lines(ptLeg$t, ptLeg$f, col = "blue")
 ```
 
+
+## Pitch object
+
+In addition to PitchTier, a Pitch object represents periodicity candidates as a function of time.
+```{r}
+p <- pitch.read('demo/sound.Pitch')
+names(p)
+p$nx
+p$t[4]        # time instance of the 4th frame
+p$frame[[4]]  # 4th frame: pitch candidates
+p$frame[[4]]$frequency[2]
+p$frame[[4]]$strength[2]
+```
+
+
+
 ## Process all files in folder
 
 ```{R, eval = FALSE}

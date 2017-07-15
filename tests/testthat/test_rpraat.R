@@ -507,3 +507,22 @@ test_that("tg.duplicateTierMergeSegments", {
         },
         c(6, "syll", 0, 21, TRUE, 0.008, TRUE, "interval"))
 })
+
+context("Pitch")
+
+test_that("pitch.read", {
+    expect_equal({
+        p <- pitch.read("sound.Pitch")
+        c(p$xmin, p$xmax, p$nx, p$dx, p$x1, length(p$t), p$t[1], p$t[2], p$t[508], p$ceiling, p$maxnCandidates, length(p$frame), p$frame[[4]]$intensity,
+          p$frame[[4]]$nCandidates, length(p$frame[[4]]$frequency), length(p$frame[[4]]$strength), p$frame[[4]]$frequency[1], p$frame[[4]]$frequency[2],
+          p$frame[[4]]$frequency[3], p$frame[[4]]$frequency[4], p$frame[[4]]$strength[1], p$frame[[4]]$strength[2], p$frame[[4]]$strength[3],
+          p$frame[[4]]$strength[4], p$frame[[508]]$intensity, p$frame[[508]]$nCandidates, length(p$frame[[508]]$frequency), length(p$frame[[508]]$strength),
+          p$frame[[508]]$frequency[1], p$frame[[508]]$strength[1])
+    }, c(0, 5.112, 508, 0.01, 0.021000000000000015, 508, 0.021000000000000015, 0.031000000000000015, 5.091000000000000015, 600, 15, 508, 6.35938550499208e-005,
+         4, 4, 4, 0, 6252.408223974137, 3392.821528656231, 1197.0707582170926, 0, 0.3169408893924507, 0.2917449063347636, 0.2758620333629818, 0, 1, 1, 1, 0, 0))
+    expect_equal({
+        p <- pitch.read("sound.Pitch")
+        p2 <- pitch.read("sound_short.Pitch")
+        identical(p, p2)
+    }, TRUE)
+})
