@@ -1,12 +1,11 @@
 Package: rPraat
 Type: Package
-Title: Read, write and manipulate Praat TextGrid and PitchTier
+Title: Interface Between Praat and R
 Version: 1.0.8
 Encoding: UTF-8
 Authors@R: person("Tomas", "Boril", email = "borilt@gmail.com", role = c("aut", "cre"))
 Maintainer: Tomas Boril <borilt@gmail.com>
-Description: rPraat package for R constitutes an interface between the
-    most popular software for phonetic analyses, Praat, and R.
+Description: Read, write and manipulate Praat TextGrid, PitchTier and Pitch files.
 URL: https://github.com/bbTomas/rPraat/
 BugReports: https://github.com/bbTomas/rPraat/issues
 License: MIT + file LICENSE
@@ -19,7 +18,5 @@ Imports:
     stringr (>= 1.2.0),
     readr(>= 1.1.1),
     dygraphs (>= 1.1.1.4),
-    tbTools (>= 1.0.2)
 RoxygenNote: 6.0.1
-Remotes: bbTomas/tbTools
 Suggests: testthat

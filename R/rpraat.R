@@ -22,7 +22,7 @@ tg.checkTierInd <- function(tg, tierInd) {
             stop(paste0("tierInd must be one integer number [length(tierInd) = ", length(tierInd), "]"))
         }
 
-        if (!tbTools::isInt(tierInd)) {
+        if (!isInt(tierInd)) {
             stop(paste0("tierInd must be integer >= 1 [",  as.character(tierInd), "]"))
         }
 
@@ -72,7 +72,7 @@ tg.checkTierInd <- function(tg, tierInd) {
 #' tg.plot(tg)
 #' }
 tg.read <- function(fileNameTextGrid) {
-    if (!tbTools::isString(fileNameTextGrid)) {
+    if (!isString(fileNameTextGrid)) {
         stop("Invalid 'fileNameTextGrid' parameter.")
     }
 
@@ -119,15 +119,15 @@ tg.read <- function(fileNameTextGrid) {
         find <- find + 1
     }
 
-    for (tier in tbTools::seqM(1, nTiers)) {
+    for (tier in seqM(1, nTiers)) {
 
         if (shortFormat) {
             typ <- flines[find]; find <- find + 1
         } else {
-            r <- tbTools::strTrim(flines[find]); find <- find + 1
+            r <- strTrim(flines[find]); find <- find + 1
 
             while (substr(r, 1, 4) == "item") {
-                r <- tbTools::strTrim(flines[find]); find <- find + 1
+                r <- strTrim(flines[find]); find <- find + 1
             }
 
             if (substr(r, 1, 9) != 'class = "') {
@@ -141,7 +141,7 @@ tg.read <- function(fileNameTextGrid) {
             if (shortFormat) {
                 tierName <- substr(r, 2, nchar(r)-1)
             } else {
-                r <- tbTools::strTrim(r);
+                r <- strTrim(r);
                 tierName <- substr(r, 9, nchar(r)-1)
             }
             tierType <- "interval"
@@ -151,7 +151,7 @@ tg.read <- function(fileNameTextGrid) {
             if (shortFormat) {
                 nIntervals <- as.numeric(flines[find]); find <- find + 1
             } else {
-                r <- tbTools::strTrim(flines[find]); find <- find + 1
+                r <- strTrim(flines[find]); find <- find + 1
                 nIntervals <- as.numeric(substr(r, 19, nchar(r)))
             }
 
@@ -159,7 +159,7 @@ tg.read <- function(fileNameTextGrid) {
             tierT2 <- numeric(0)
             tierLabel <- character(0)
 
-            for (I in tbTools::seqM(1, nIntervals)) {
+            for (I in seqM(1, nIntervals)) {
                 if (!shortFormat) {
                     r <- flines[find]; find <- find + 1 # ignore line intervals [..]:
                 }
@@ -168,8 +168,8 @@ tg.read <- function(fileNameTextGrid) {
                     t <- as.numeric(flines[find]); find <- find + 1
                     t2 <- as.numeric(flines[find]); find <- find + 1
                 } else {
-                    r1 <- tbTools::strTrim(flines[find]); find <- find + 1
-                    r2 <- tbTools::strTrim(flines[find]); find <- find + 1
+                    r1 <- strTrim(flines[find]); find <- find + 1
+                    r2 <- strTrim(flines[find]); find <- find + 1
                     if ( (substr(r1, 1, 7) != "xmin = ")  ||  (substr(r2, 1, 7) != "xmax = ") ) {
                         stop("Unknown textgrid format");
                     }
@@ -179,11 +179,11 @@ tg.read <- function(fileNameTextGrid) {
 
                 r <- flines[find]; find <- find + 1;
                 if (!shortFormat) {
-                    if (!tbTools::str_contains(r, 'text = "')) {
+                    if (!str_contains(r, 'text = "')) {
                         stop("Unknown textgrid format");
                     }
-                    rind <- tbTools::str_find1(r, '"')
-                    nQuotationMarks <- length(tbTools::str_find(r, '"'))  # in Matlab: sum(r == '"')
+                    rind <- str_find1(r, '"')
+                    nQuotationMarks <- length(str_find(r, '"'))  # in Matlab: sum(r == '"')
                     if ((nQuotationMarks %% 2) != 1) { # remove whitespace at the end of line, it is only in the case of even number of quotation marks
                         if (sppasFormat != TRUE) {
                             r <- substr(r, rind, nchar(r)-1)
@@ -194,14 +194,14 @@ tg.read <- function(fileNameTextGrid) {
                         r <- substr(r, rind, nchar(r))
                     }
                 }
-                nQuotationMarks <- length(tbTools::str_find(r, '"'))
+                nQuotationMarks <- length(str_find(r, '"'))
                 label <- substr(r, 2, nchar(r))
                 if ((nQuotationMarks %% 2) == 1) {
                     label <- paste0(label, "\n")
 
                     repeat {
                         r <- flines[find]; find <- find + 1
-                        nQuotationMarks <- length(tbTools::str_find(r, '"'))
+                        nQuotationMarks <- length(str_find(r, '"'))
                         if (!shortFormat & (nQuotationMarks %% 2 == 1) & !sppasFormat) { # remove whitespace at the end of line, it is only in the case of odd number of quotation marks
                             r <- substr(r, 1, nchar(r)-1)
                         }
@@ -243,7 +243,7 @@ tg.read <- function(fileNameTextGrid) {
             if (shortFormat) {
                 tierName <- substr(r, 2, nchar(r)-1)
             } else {
-                r <- tbTools::strTrim(r)
+                r <- strTrim(r)
                 tierName <- substr(r, 9, nchar(r)-1)
             }
             tierType <- "point"
@@ -253,14 +253,14 @@ tg.read <- function(fileNameTextGrid) {
             if (shortFormat) {
                 nIntervals <- as.numeric(flines[find]); find <- find + 1
             } else {
-                r <- tbTools::strTrim(flines[find]); find <- find + 1
+                r <- strTrim(flines[find]); find <- find + 1
                 nIntervals <- as.numeric(substr(r, 16, nchar(r)))
             }
 
             tierT <- numeric(0)
             tierLabel <- character(0)
 
-            for (I in tbTools::seqM(1, nIntervals)) {
+            for (I in seqM(1, nIntervals)) {
                 if (!shortFormat) {
                     r <- flines[find]; find <- find + 1 # ignore line points [..]:
                 }
@@ -268,7 +268,7 @@ tg.read <- function(fileNameTextGrid) {
                 if (shortFormat) {
                     t <- as.numeric(flines[find]); find <- find + 1
                 } else {
-                    r <- tbTools::strTrim(flines[find]); find <- find + 1
+                    r <- strTrim(flines[find]); find <- find + 1
                     if (substr(r, 1, 9) != "number = ") {
                         stop("Unknown textgrid format");
                     }
@@ -277,11 +277,11 @@ tg.read <- function(fileNameTextGrid) {
 
                 r <- flines[find]; find <- find + 1
                 if (!shortFormat) {
-                    if (!tbTools::str_contains(r, 'mark = "')) {
+                    if (!str_contains(r, 'mark = "')) {
                         stop("Unknown textgrid format");
                     }
-                    rind <- tbTools::str_find1(r, '"')
-                    nQuotationMarks <- length(tbTools::str_find(r, '"'))
+                    rind <- str_find1(r, '"')
+                    nQuotationMarks <- length(str_find(r, '"'))
                     if (nQuotationMarks %% 2 != 1) { # remove whitespace at the end of line, it is only in the case of even number of quotation marks
                         if (!sppasFormat) {
                             r <- substr(r, rind, nchar(r)-1)
@@ -292,13 +292,13 @@ tg.read <- function(fileNameTextGrid) {
                         r <- substr(r, rind, nchar(r))
                     }
                 }
-                nQuotationMarks <- length(tbTools::str_find(r, '"'))
+                nQuotationMarks <- length(str_find(r, '"'))
                 label <- substr(r, 2, nchar(r))
                 if (nQuotationMarks %% 2 == 1) {
                     label <- paste0(label, "\n")
                     repeat {
                         r <- flines[find]; find <- find + 1
-                        nQuotationMarks <- length(tbTools::str_find(r, '"'))
+                        nQuotationMarks <- length(str_find(r, '"'))
                         if (!shortFormat & (nQuotationMarks %% 2 == 1) & !sppasFormat) { # remove whitespace at the end of line, it is only in the case of odd number of quotation marks
                             r <- substr(r, 1, nchar(r)-1)
                         }
@@ -369,7 +369,7 @@ tg.read <- function(fileNameTextGrid) {
 #' tg.write(tg, "demo_output.TextGrid")
 #' }
 tg.write <- function(tg, fileNameTextGrid) {
-    if (!tbTools::isString(fileNameTextGrid)) {
+    if (!isString(fileNameTextGrid)) {
         stop("Invalid 'fileNameTextGrid' parameter.")
     }
 
@@ -382,7 +382,7 @@ tg.write <- function(tg, fileNameTextGrid) {
         maxTimeTotal <- as.numeric(class(tg)["tmax"])
     }
 
-    for (I in tbTools::seqM(1, nTiers)) {
+    for (I in seqM(1, nTiers)) {
         if ("type" %in% names(tg[[I]])) {
 
             if (tg[[I]]$type == "interval") {
@@ -420,33 +420,33 @@ tg.write <- function(tg, fileNameTextGrid) {
     writeLines('File type = "ooTextFile"', fid)
     writeLines('Object class = "TextGrid"', fid)
     writeLines("", fid)
-    writeLines(as.character(tbTools::round2(minTimeTotal, -10)), fid)  # min time from all tiers
-    writeLines(as.character(tbTools::round2(maxTimeTotal, -10)), fid)  # max time from all tiers
+    writeLines(as.character(round2(minTimeTotal, -10)), fid)  # min time from all tiers
+    writeLines(as.character(round2(maxTimeTotal, -10)), fid)  # max time from all tiers
     writeLines("<exists>", fid)
     writeLines(as.character(nTiers), fid)
 
-    for (N in tbTools::seqM(1, nTiers)) {
+    for (N in seqM(1, nTiers)) {
         if (tg[[N]]$typInt == TRUE) {  # interval tier
             writeLines('"IntervalTier"', fid)
             writeLines(paste0('"', tg[[N]]$name, '"'), fid)
 
             nInt <- length(tg[[N]]$t1)  # number of intervals
             if (nInt > 0) {
-                writeLines(as.character(tbTools::round2(tg[[N]]$t1[1], -10)), fid)  # start time of the tier
-                writeLines(as.character(tbTools::round2(tg[[N]]$t2[length(tg[[N]]$t2)], -10)), fid)  # end time of the tier
+                writeLines(as.character(round2(tg[[N]]$t1[1], -10)), fid)  # start time of the tier
+                writeLines(as.character(round2(tg[[N]]$t2[length(tg[[N]]$t2)], -10)), fid)  # end time of the tier
                 writeLines(as.character(nInt), fid)  # pocet intervalu textgrid
 
-                for (I in tbTools::seqM(1, nInt)) {
-                    writeLines(as.character(tbTools::round2(tg[[N]]$t1[I], -10)), fid)
-                    writeLines(as.character(tbTools::round2(tg[[N]]$t2[I], -10)), fid)
+                for (I in seqM(1, nInt)) {
+                    writeLines(as.character(round2(tg[[N]]$t1[I], -10)), fid)
+                    writeLines(as.character(round2(tg[[N]]$t2[I], -10)), fid)
                     writeLines(paste0('"', tg[[N]]$label[I], '"'), fid)
                 }
             } else {   # create one empty interval
-                writeLines(as.character(tbTools::round2(minTimeTotal, -10)), fid)  # start time of the tier
-                writeLines(as.character(tbTools::round2(maxTimeTotal, -10)), fid)  # end time of the tier
+                writeLines(as.character(round2(minTimeTotal, -10)), fid)  # start time of the tier
+                writeLines(as.character(round2(maxTimeTotal, -10)), fid)  # end time of the tier
                 writeLines("1", fid)  # number of intervals
-                writeLines(as.character(tbTools::round2(minTimeTotal, -10)), fid)
-                writeLines(as.character(tbTools::round2(maxTimeTotal, -10)), fid)
+                writeLines(as.character(round2(minTimeTotal, -10)), fid)
+                writeLines(as.character(round2(maxTimeTotal, -10)), fid)
                 writeLines('""', fid)
             }
         } else { # pointTier
@@ -455,17 +455,17 @@ tg.write <- function(tg, fileNameTextGrid) {
 
             nInt <- length(tg[[N]]$t)  # number of intervals
             if (nInt > 0) {
-                writeLines(as.character(tbTools::round2(tg[[N]]$t[1], -10)), fid)  # start time of the tier
-                writeLines(as.character(tbTools::round2(tg[[N]]$t[length(tg[[N]]$t)], -10)), fid)  # end time of the tier
+                writeLines(as.character(round2(tg[[N]]$t[1], -10)), fid)  # start time of the tier
+                writeLines(as.character(round2(tg[[N]]$t[length(tg[[N]]$t)], -10)), fid)  # end time of the tier
                 writeLines(as.character(nInt), fid)  # number of points
 
-                for (I in tbTools::seqM(1, nInt)) {
-                    writeLines(as.character(tbTools::round2(tg[[N]]$t[I], -10)), fid)
+                for (I in seqM(1, nInt)) {
+                    writeLines(as.character(round2(tg[[N]]$t[I], -10)), fid)
                     writeLines(paste0('"', tg[[N]]$label[I], '"'), fid)
                 }
             } else { # prazdny pointtier
-                writeLines(as.character(tbTools::round2(minTimeTotal, -10)), fid)  # start time of the tier
-                writeLines(as.character(tbTools::round2(maxTimeTotal, -10)), fid)  # end time of the tier
+                writeLines(as.character(round2(minTimeTotal, -10)), fid)  # start time of the tier
+                writeLines(as.character(round2(maxTimeTotal, -10)), fid)  # end time of the tier
                 writeLines("0", fid)  # number of points
             }
         }
@@ -502,14 +502,14 @@ tg.plot <- function(tg, group = "") {
         stop("Sorry, tg.plot cannot display TextGrids with duplicated tier names.")
     }
 
-    if (!tbTools::isString(group)) {
+    if (!isString(group)) {
         stop("group must be a character string.")
     }
 
     tAll <- as.numeric(c(class(tg)["tmin"], class(tg)["tmax"]))
 
     # find all time instances
-    for (I in tbTools::seqM(1, ntiers)) {
+    for (I in seqM(1, ntiers)) {
 
         if (tg[[I]]$type == "point") {
             tAll <- c(tAll, tg[[I]]$t)
@@ -527,7 +527,7 @@ tg.plot <- function(tg, group = "") {
     data <- list(t = tAll)
 
     # create tiers
-    for (I in tbTools::seqM(1, ntiers)) {
+    for (I in seqM(1, ntiers)) {
 
         if (tg[[I]]$type == "point") {
             y <- rep(as.numeric(NA), length(tAll))
@@ -559,15 +559,15 @@ tg.plot <- function(tg, group = "") {
     }
 
     # Pridani popisku
-    for (I in tbTools::seqM(1, ntiers)) {
+    for (I in seqM(1, ntiers)) {
 
         if (tg[[I]]$type == "point") {
-            for (J in tbTools::seqM(1, length(tg[[I]]$label))) {
+            for (J in seqM(1, length(tg[[I]]$label))) {
                 g <- dygraphs::dyAnnotation(g, tg[[I]]$t[J], text = tg[[I]]$label[J], width = 10*max(1, nchar(tg[[I]]$label[J])), height = 25, series = tg[[I]]$name, tooltip = tg[[I]]$label[J])
             }
 
         } else if (tg[[I]]$type == "interval") {
-            for (J in tbTools::seqM(1, length(tg[[I]]$label))) {
+            for (J in seqM(1, length(tg[[I]]$label))) {
                 g <- dygraphs::dyAnnotation(g, tg[[I]]$t1[J], text = tg[[I]]$label[J], series = tg[[I]]$name, tooltip = tg[[I]]$label[J], width = 10*max(1, nchar(tg[[I]]$label[J])), height = 25, tickHeight = 10)
             }
 
@@ -578,7 +578,7 @@ tg.plot <- function(tg, group = "") {
     }
 
     # style of tiers
-    for (I in tbTools::seqM(1, ntiers)) {
+    for (I in seqM(1, ntiers)) {
         if (tg[[I]]$type == "point") {
             g <- dygraphs::dySeries(g, tg[[I]]$name, pointSize = 2, strokeWidth = 0)
 
@@ -619,9 +619,9 @@ tg.plot <- function(tg, group = "") {
 #' tg.write(tgNew, "demo_problem_OK.TextGrid")
 #' }
 tg.repairContinuity <- function(tg, verbose = FALSE) {
-    for (I in tbTools::seqM(1, length(tg))) {
+    for (I in seqM(1, length(tg))) {
         if (tg[[I]]$type == "interval") {
-            for (J in tbTools::seqM(1, length(tg[[I]]$label)-1)) {
+            for (J in seqM(1, length(tg[[I]]$label)-1)) {
                 if (tg[[I]]$t2[J] != tg[[I]]$t1[J+1]) {
                     newVal <- mean(c(tg[[I]]$t2[J], tg[[I]]$t1[J+1]))
                     if (!verbose) {
@@ -662,11 +662,11 @@ tg.repairContinuity <- function(tg, verbose = FALSE) {
 #' tg <- tg.insertInterval(tg, "word", 1, 2, "hello")
 #' tg.plot(tg)
 tg.createNewTextGrid <- function(tMin, tMax) {
-    if (!tbTools::isNum(tMin)) {
+    if (!isNum(tMin)) {
         stop("tMin must be a number")
     }
 
-    if (!tbTools::isNum(tMax)) {
+    if (!isNum(tMax)) {
         stop("tMin must be a number")
     }
 
@@ -789,7 +789,7 @@ tg.setTierName <- function(tg, tierInd, name) {
     tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
-    if (!tbTools::isString(name)) {
+    if (!isString(name)) {
         stop("name must be a character string")
     }
 
@@ -826,13 +826,13 @@ tg.countLabels <- function(tg, tierInd, label) {
     tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
-    if (!tbTools::isString(label)) {
+    if (!isString(label)) {
         stop("label must be a character string")
     }
 
     c <- 0  # count
 
-    for (I in tbTools::seqM(1, length(tg[[tierInd]]$label))) {
+    for (I in seqM(1, length(tg[[tierInd]]$label))) {
         if (tg[[tierInd]]$label[I] == label) {
             c <- c + 1
         }
@@ -870,7 +870,7 @@ tg.duplicateTier <- function(tg, originalInd, newInd = Inf, newTierName = "") {
     originalInd <- tg.checkTierInd(tg, originalInd)
     ntiers <- length(tg)
 
-    if (!tbTools::isInt(newInd)) {
+    if (!isInt(newInd)) {
         stop("newInd must be integer >= 1 or +Inf")
     }
 
@@ -886,7 +886,7 @@ tg.duplicateTier <- function(tg, originalInd, newInd = Inf, newTierName = "") {
         stop(paste0("newInd out of range <1; ntiers+1> [newInd = ", newInd, ", ntiers = ", ntiers, "]"))
     }
 
-    if (!tbTools::isString(newTierName)) {
+    if (!isString(newTierName)) {
         stop("newTierName must be a character string")
     }
 
@@ -894,7 +894,7 @@ tg.duplicateTier <- function(tg, originalInd, newInd = Inf, newTierName = "") {
 
     tOrig <- tg[[originalInd]]
 
-    for (I in tbTools::seqM(ntiers+1, newInd+1, by = -1)) {
+    for (I in seqM(ntiers+1, newInd+1, by = -1)) {
         tgNew[[I]] <- tgNew[[I-1]]
         names(tgNew)[I] <- names(tgNew)[I-1]
     }
@@ -966,7 +966,7 @@ tg.duplicateTierMergeSegments <- function(tg, originalInd, newInd = Inf, newTier
 
     ntiers <- length(tg)
 
-    if (!tbTools::isInt(newInd)) {
+    if (!isInt(newInd)) {
         stop("newInd must be integer >= 1 or +Inf")
     }
 
@@ -982,11 +982,11 @@ tg.duplicateTierMergeSegments <- function(tg, originalInd, newInd = Inf, newTier
         stop(paste0("newInd out of range <1; ntiers+1> [newInd = ", newInd, ", ntiers = ", ntiers, "]"))
     }
 
-    if (!tbTools::isString(newTierName)) {
+    if (!isString(newTierName)) {
         stop("newTierName must be a character string")
     }
 
-    if (!tbTools::isString(pattern)) {
+    if (!isString(pattern)) {
         stop("pattern must be a character string")
     }
 
@@ -1014,7 +1014,7 @@ tg.duplicateTierMergeSegments <- function(tg, originalInd, newInd = Inf, newTier
 
     # pozor, nějak se též vypořádat s prázdnými labely - ideálně je zachovat a brát je též jako oddělovač, tedy v rámci jedné "part" nemůže být uvnitř prázdný label
 
-    for (I in tbTools::seqM(1, length(tOrig$label))) {
+    for (I in seqM(1, length(tOrig$label))) {
         if (labTemp == "") {
             t1Last <- tOrig$t1[I]
         }
@@ -1058,7 +1058,7 @@ tg.duplicateTierMergeSegments <- function(tg, originalInd, newInd = Inf, newTier
 
     ##
 
-    for (I in tbTools::seqM(ntiers+1, newInd+1, by = -1)) {
+    for (I in seqM(ntiers+1, newInd+1, by = -1)) {
         tgNew[[I]] <- tgNew[[I-1]]
         names(tgNew)[I] <- names(tgNew)[I-1]
     }
@@ -1099,7 +1099,7 @@ tg.duplicateTierMergeSegments <- function(tg, originalInd, newInd = Inf, newTier
 #' tg.getStartTime(tg)
 #' tg.getStartTime(tg, "phone")
 tg.getStartTime <- function(tg, tierInd = 0) {
-    if (tbTools::isInt(tierInd) & tierInd == 0) {
+    if (isInt(tierInd) & tierInd == 0) {
         t <- as.numeric(class(tg)["tmin"])
         return(t)
     }
@@ -1147,7 +1147,7 @@ tg.getStartTime <- function(tg, tierInd = 0) {
 #' tg.getEndTime(tg)
 #' tg.getEndTime(tg, "phone")
 tg.getEndTime <- function(tg, tierInd = 0) {
-    if (tbTools::isInt(tierInd) & tierInd == 0) {
+    if (isInt(tierInd) & tierInd == 0) {
         t <- as.numeric(class(tg)["tmax"])
         return(t)
     }
@@ -1196,7 +1196,7 @@ tg.getEndTime <- function(tg, tierInd = 0) {
 #' tg.getTotalDuration(tg)
 #' tg.getTotalDuration(tg, "phone")
 tg.getTotalDuration <- function(tg, tierInd = 0) {
-    if (tbTools::isInt(tierInd) & tierInd == 0) {
+    if (isInt(tierInd) & tierInd == 0) {
         t <- tg.getEndTime(tg) - tg.getStartTime(tg)
         return(t)
     }
@@ -1310,7 +1310,7 @@ tg.getLabel <- function(tg, tierInd, index) {
     tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
-    if (!tbTools::isInt(index)) {
+    if (!isInt(index)) {
         stop("index must be integer >= 1")
     }
 
@@ -1357,11 +1357,11 @@ tg.setLabel <- function(tg, tierInd, index, newLabel) {
     tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
-    if (!tbTools::isInt(index)) {
+    if (!isInt(index)) {
         stop("index must be integer >= 1")
     }
 
-    if (!tbTools::isString(newLabel)) {
+    if (!isString(newLabel)) {
         stop("newLabel must be a character string")
     }
 
@@ -1408,7 +1408,7 @@ tg.getIntervalStartTime <- function(tg, tierInd, index) {
     tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
-    if (!tbTools::isInt(index)) {
+    if (!isInt(index)) {
         stop("index must be integer >= 1")
     }
 
@@ -1450,7 +1450,7 @@ tg.getIntervalEndTime <- function(tg, tierInd, index) {
     tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
-    if (!tbTools::isInt(index)) {
+    if (!isInt(index)) {
         stop("index must be integer >= 1")
     }
 
@@ -1491,7 +1491,7 @@ tg.getIntervalDuration <- function(tg, tierInd, index) {
     tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
-    if (!tbTools::isInt(index)) {
+    if (!isInt(index)) {
         stop("index must be integer >= 1")
     }
 
@@ -1533,7 +1533,7 @@ tg.getPointTime <- function(tg, tierInd, index) {
     tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
-    if (!tbTools::isInt(index)) {
+    if (!isInt(index)) {
         stop("index must be integer >= 1")
     }
 
@@ -1578,7 +1578,7 @@ tg.removeTier <- function(tg, tierInd) {
 
     tgNew <- tg
 
-    for (I in tbTools::seqM(tierInd, ntiers - 1)) {
+    for (I in seqM(tierInd, ntiers - 1)) {
         tgNew[[I]] <- tgNew[[I+1]]
         names(tgNew)[I] <- names(tgNew)[I+1]
     }
@@ -1616,7 +1616,7 @@ tg.removeTier <- function(tg, tierInd) {
 tg.insertNewPointTier <- function(tg, newInd = Inf, newTierName) {
     ntiers <- length(tg)
 
-    if (!tbTools::isInt(newInd)) {
+    if (!isInt(newInd)) {
         stop("newInd must be integer >= 1 or +Inf")
     }
 
@@ -1632,7 +1632,7 @@ tg.insertNewPointTier <- function(tg, newInd = Inf, newTierName) {
         stop(paste0("newInd out of range <1; ntiers+1> [newInd = ", newInd, ", ntiers = ", ntiers, "]"))
     }
 
-    if (!tbTools::isString(newTierName)) {
+    if (!isString(newTierName)) {
         stop("newTierName must be a character string")
     }
 
@@ -1640,7 +1640,7 @@ tg.insertNewPointTier <- function(tg, newInd = Inf, newTierName) {
 
     tNew <- list(name = newTierName, type = "point", t = numeric(0), label = character(0))
 
-    for (I in tbTools::seqM(ntiers+1, newInd+1, by = -1)) {
+    for (I in seqM(ntiers+1, newInd+1, by = -1)) {
         tgNew[[I]] <- tgNew[[I-1]]
         names(tgNew)[I] <- names(tgNew)[I-1]
     }
@@ -1690,7 +1690,7 @@ tg.insertNewPointTier <- function(tg, newInd = Inf, newTierName) {
 tg.insertNewIntervalTier <- function(tg, newInd = Inf, newTierName, tMin=NA, tMax=NA) {
     ntiers <- length(tg)
 
-    if (!tbTools::isInt(newInd)) {
+    if (!isInt(newInd)) {
         stop("newInd must be integer >= 1 or +Inf")
     }
 
@@ -1706,27 +1706,27 @@ tg.insertNewIntervalTier <- function(tg, newInd = Inf, newTierName, tMin=NA, tMa
         stop(paste0("newInd out of range <1; ntiers+1> [newInd = ", newInd, ", ntiers = ", ntiers, "]"))
     }
 
-    if (!tbTools::isString(newTierName)) {
+    if (!isString(newTierName)) {
         stop("newTierName must be a character string")
     }
 
-    if (class(tMin) != "logical" & !tbTools::isNum(tMin)) {
+    if (class(tMin) != "logical" & !isNum(tMin)) {
         stop("tMin must be a number")
     }
     if (class(tMin) == "logical" & length(tMin) != 1) {
         stop("tMin must be a number")
     }
-    if (!tbTools::isNum(tMin) & !is.na(tMin)) {
+    if (!isNum(tMin) & !is.na(tMin)) {
         stop("tMin must be a number")
     }
 
-    if (class(tMax) != "logical" & !tbTools::isNum(tMax)) {
+    if (class(tMax) != "logical" & !isNum(tMax)) {
         stop("tMax must be a number")
     }
     if (class(tMax) == "logical" & length(tMax) != 1) {
         stop("tMax must be a number")
     }
-    if (!tbTools::isNum(tMax) & !is.na(tMax)) {
+    if (!isNum(tMax) & !is.na(tMax)) {
         stop("tMax must be a number")
     }
 
@@ -1758,7 +1758,7 @@ tg.insertNewIntervalTier <- function(tg, newInd = Inf, newTierName, tMin=NA, tMa
 
     tNew <- list(name = newTierName, type = "interval", t1 = tMin, t2 = tMax, label = "")
 
-    for (I in tbTools::seqM(ntiers+1, newInd+1, by = -1)) {
+    for (I in seqM(ntiers+1, newInd+1, by = -1)) {
         tgNew[[I]] <- tgNew[[I-1]]
         names(tgNew)[I] <- names(tgNew)[I-1]
     }
@@ -1801,14 +1801,14 @@ tg.getIntervalIndexAtTime <- function(tg, tierInd, time) {
         stop(paste0("tier ", tierInd, " is not IntervalTier."))
     }
 
-    if (!tbTools::isNum(time)) {
+    if (!isNum(time)) {
         stop("Time must be a number.")
     }
 
     ind <- NA
 
     nint <- length(tg[[tierInd]]$t1)
-    for (I in tbTools::seqM(1, nint)) {
+    for (I in seqM(1, nint)) {
         if (tg[[tierInd]]$t1[I] <= time  &  time < tg[[tierInd]]$t2[I]) {
             ind <- I
             break
@@ -1845,14 +1845,14 @@ tg.getPointIndexHigherThanTime <- function(tg, tierInd, time) {
         stop(paste0("tier ", tierInd, " is not PointTier."))
     }
 
-    if (!tbTools::isNum(time)) {
+    if (!isNum(time)) {
         stop("Time must be a number.")
     }
 
     ind <- NA
 
     npoints <- length(tg[[tierInd]]$t)
-    for (I in tbTools::seqM(1, npoints)) {
+    for (I in seqM(1, npoints)) {
         if (time <= tg[[tierInd]]$t[I]) {
             ind <- I
             break
@@ -1890,14 +1890,14 @@ tg.getPointIndexLowerThanTime <- function(tg, tierInd, time) {
         stop(paste0("tier ", tierInd, " is not PointTier."))
     }
 
-    if (!tbTools::isNum(time)) {
+    if (!isNum(time)) {
         stop("Time must be a number.")
     }
 
     ind <- NA
 
     npoints <- length(tg[[tierInd]]$t)
-    for (I in tbTools::seqM(npoints, 1, by = -1)) {
+    for (I in seqM(npoints, 1, by = -1)) {
         if (time >= tg[[tierInd]]$t[I]) {
             ind <- I
             break
@@ -1935,7 +1935,7 @@ tg.getPointIndexNearestTime <- function(tg, tierInd, time) {
         stop(paste0("tier ", tierInd, " is not PointTier."))
     }
 
-    if (!tbTools::isNum(time)) {
+    if (!isNum(time)) {
         stop("Time must be a number.")
     }
 
@@ -1945,7 +1945,7 @@ tg.getPointIndexNearestTime <- function(tg, tierInd, time) {
     minDist <- Inf
     minInd <- NA
 
-    for (I in tbTools::seqM(1, npoints)) {
+    for (I in seqM(1, npoints)) {
         dist <- abs(tg[[tierInd]]$t[I] - time)
         if (dist < minDist) {
             minDist <- dist
@@ -1986,7 +1986,7 @@ tg.removePoint <- function(tg, tierInd, index) {
         stop(paste0("tier ", tierInd, " is not PointTier."))
     }
 
-    if (!tbTools::isInt(index)) {
+    if (!isInt(index)) {
         stop("index must be an integer.")
     }
 
@@ -1998,7 +1998,7 @@ tg.removePoint <- function(tg, tierInd, index) {
 
 
     tgNew <- tg
-    for (I in tbTools::seqM(index, npoints - 1)) {
+    for (I in seqM(index, npoints - 1)) {
         tgNew[[tierInd]]$t[I] <- tgNew[[tierInd]]$t[I+1]
         tgNew[[tierInd]]$label[I] <- tgNew[[tierInd]]$label[I+1]
     }
@@ -2039,11 +2039,11 @@ tg.insertPoint <- function(tg, tierInd, time, label) {
         stop(paste0("tier ", tierInd, " is not PointTier."))
     }
 
-    if (!tbTools::isNum(time)) {
+    if (!isNum(time)) {
         stop("time must be a number.")
     }
 
-    if (!tbTools::isString(label)) {
+    if (!isString(label)) {
         stop("label must be a character string.")
     }
 
@@ -2054,7 +2054,7 @@ tg.insertPoint <- function(tg, tierInd, time, label) {
     npoints <- length(tg[[tierInd]]$t)
 
     if (!is.na(indPosun)) {
-        for (I in tbTools::seqM(npoints, indPosun, by = -1)) {
+        for (I in seqM(npoints, indPosun, by = -1)) {
             tgNew[[tierInd]]$t[I+1] <- tgNew[[tierInd]]$t[I]
             tgNew[[tierInd]]$label[I+1] <- tgNew[[tierInd]]$label[I]
         }
@@ -2109,7 +2109,7 @@ tg.removeIntervalLeftBoundary <- function(tg, tierInd, index) {
         stop(paste0("tier ", tierInd, " is not IntervalTier."))
     }
 
-    if (!tbTools::isInt(index)) {
+    if (!isInt(index)) {
         stop("index must be an integer.")
     }
 
@@ -2127,7 +2127,7 @@ tg.removeIntervalLeftBoundary <- function(tg, tierInd, index) {
     lab <- paste0(tg[[tierInd]]$label[index-1], tg[[tierInd]]$label[index])
 
     tgNew <- tg
-    for (I in tbTools::seqM(index, nint - 1)) {
+    for (I in seqM(index, nint - 1)) {
         tgNew[[tierInd]]$t1[I] <- tgNew[[tierInd]]$t1[I+1]
         tgNew[[tierInd]]$t2[I] <- tgNew[[tierInd]]$t2[I+1]
         tgNew[[tierInd]]$label[I] <- tgNew[[tierInd]]$label[I+1]
@@ -2183,7 +2183,7 @@ tg.removeIntervalRightBoundary <- function(tg, tierInd, index) {
         stop(paste0("tier ", tierInd, " is not IntervalTier."))
     }
 
-    if (!tbTools::isInt(index)) {
+    if (!isInt(index)) {
         stop("index must be an integer.")
     }
 
@@ -2201,7 +2201,7 @@ tg.removeIntervalRightBoundary <- function(tg, tierInd, index) {
     lab <- paste0(tg[[tierInd]]$label[index], tg[[tierInd]]$label[index+1])
 
     tgNew <- tg
-    for (I in tbTools::seqM(index, nint - 1)) {
+    for (I in seqM(index, nint - 1)) {
         tgNew[[tierInd]]$t1[I] <- tgNew[[tierInd]]$t1[I+1]
         tgNew[[tierInd]]$t2[I] <- tgNew[[tierInd]]$t2[I+1]
         tgNew[[tierInd]]$label[I] <- tgNew[[tierInd]]$label[I+1]
@@ -2260,7 +2260,7 @@ tg.removeIntervalBothBoundaries <- function(tg, tierInd, index) {
         stop(paste0("tier ", tierInd, " is not IntervalTier."))
     }
 
-    if (!tbTools::isInt(index)) {
+    if (!isInt(index)) {
         stop("index must be an integer.")
     }
 
@@ -2282,7 +2282,7 @@ tg.removeIntervalBothBoundaries <- function(tg, tierInd, index) {
     lab <- paste0(tg[[tierInd]]$label[index-1], tg[[tierInd]]$label[index], tg[[tierInd]]$label[index+1])
 
     tgNew <- tg
-    for (I in tbTools::seqM(index, nint - 2)) {
+    for (I in seqM(index, nint - 2)) {
         tgNew[[tierInd]]$t1[I] <- tgNew[[tierInd]]$t1[I+2]
         tgNew[[tierInd]]$t2[I] <- tgNew[[tierInd]]$t2[I+2]
         tgNew[[tierInd]]$label[I] <- tgNew[[tierInd]]$label[I+2]
@@ -2364,11 +2364,11 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
         stop(paste0("tier ", tierInd, " is not IntervalTier."))
     }
 
-    if (!tbTools::isNum(time)) {
+    if (!isNum(time)) {
         stop("time must be a number.")
     }
 
-    if (!tbTools::isString(label)) {
+    if (!isString(label)) {
         stop("label must be a character string.")
     }
 
@@ -2388,7 +2388,7 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
             tgNew[[tierInd]]$label[nint+1] <- label
             class(tgNew)["tmax"] <- max(c(as.numeric(class(tg)["tmax"]), time), na.rm = TRUE)
         } else if (time < tg[[tierInd]]$t1[1]) { # situation b) On the left of existing interval
-            for (I in tbTools::seqM(nint, 1, by = -1)) {
+            for (I in seqM(nint, 1, by = -1)) {
                 tgNew[[tierInd]]$t1[I+1] <- tgNew[[tierInd]]$t1[I]
                 tgNew[[tierInd]]$t2[I+1] <- tgNew[[tierInd]]$t2[I]
                 tgNew[[tierInd]]$label[I+1] <- tgNew[[tierInd]]$label[I]
@@ -2403,13 +2403,13 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
             stop("Nonsense: missing interval, even though time is between intervals. Please check continuity using tg.repairContinuity().")
         }
     } else { # situation a) New boundary into the existing interval
-        for (I in tbTools::seqM(1, nint)) {
+        for (I in seqM(1, nint)) {
             if ((time %in% tgNew[[tierInd]]$t1) | (time %in% tgNew[[tierInd]]$t2)) {
                 stop(paste0("Cannot insert boundary because one already exists at the same position [tierInd = ", tierInd, ", time = ", time, "]."))
             }
         }
 
-        for (I in tbTools::seqM(nint, index+1, by = -1)) {
+        for (I in seqM(nint, index+1, by = -1)) {
             tgNew[[tierInd]]$t1[I+1] <- tgNew[[tierInd]]$t1[I]
             tgNew[[tierInd]]$t2[I+1] <- tgNew[[tierInd]]$t2[I]
             tgNew[[tierInd]]$label[I+1] <- tgNew[[tierInd]]$label[I]
@@ -2510,10 +2510,10 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
         stop(paste0("tier ", tierInd, " is not IntervalTier."))
     }
 
-    if (!tbTools::isNum(tStart)) {
+    if (!isNum(tStart)) {
         stop("tStart must be a number.")
     }
-    if (!tbTools::isNum(tEnd)) {
+    if (!isNum(tEnd)) {
         stop("tEnd must be a number.")
     }
     if (tStart >= tEnd) {
@@ -2523,7 +2523,7 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
     # (tStart == tEnd), thus it is easier. By the way, Praat does not allow to have 2 boundaries
     # in the same time instance, do it is fully compatible.
 
-    if (!tbTools::isString(label)) {
+    if (!isString(label)) {
         stop("label must be a character string.")
     }
 
@@ -2572,7 +2572,7 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
         # the time can belong to two intervals
         iStart <- integer(0)
         iEnd <- integer(0)
-        for (I in tbTools::seqM(1, nint)) {
+        for (I in seqM(1, nint)) {
             if (dplyr::between(tStart, tg[[tierInd]]$t1[I], tg[[tierInd]]$t2[I])) {  # tStart >= tg[[tierInd]]$t1[I] & tStart <= tg[[tierInd]]$t2[I]
                 iStart <- c(iStart, I)
             }
@@ -2591,7 +2591,7 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
                 iStart <- inters[1]
                 iEnd <- inters[1]
                 if (length(inters) > 1) { # attempt to find the first suitable candidate
-                    for (I in tbTools::seqM(1, length(inters))) {
+                    for (I in seqM(1, length(inters))) {
                         if (tg[[tierInd]]$label[inters[I]] == "") {
                             iStart <- inters[I]
                             iEnd <- inters[I]
@@ -2700,7 +2700,7 @@ tg.insertInterval <- function(tg, tierInd, tStart, tEnd, label="") {
 #' pt.plot(pt.cut(pt, tStart, tEnd))
 #' }
 tg.findLabels <- function(tg, tierInd, labelVector, returnTime = FALSE) {
-    if (!tbTools::isLogical(returnTime)) {
+    if (!isLogical(returnTime)) {
         stop("returnTime must be a logical value.")
     }
 
@@ -2735,14 +2735,14 @@ tg.findLabels <- function(tg, tierInd, labelVector, returnTime = FALSE) {
 
         for (I in indStart) {
             ok <- TRUE
-            for (J in tbTools::seqM(2, nlabs)) {
+            for (J in seqM(2, nlabs)) {
                 if (tg[[tierInd]]$label[I+J-1] != labelVector[J]) {
                     ok <- FALSE
                     break
                 }
             }
             if (ok) {
-                indLab <- c(indLab, list(tbTools::seqM(I, I+nlabs-1)))
+                indLab <- c(indLab, list(seqM(I, I+nlabs-1)))
             }
         }
 
@@ -2752,14 +2752,14 @@ tg.findLabels <- function(tg, tierInd, labelVector, returnTime = FALSE) {
             if (tg.isIntervalTier(tg, tierInd)) {
                 t1 <- numeric(length(indLab))
                 t2 <- numeric(length(indLab))
-                for (I in tbTools::seqM(1, length(indLab))) {
+                for (I in seqM(1, length(indLab))) {
                     t1[I] <- tg[[tierInd]]$t1[ indLab[[I]][1] ]
                     t2[I] <- tg[[tierInd]]$t2[ indLab[[I]][ length(indLab[[I]]) ]   ]
                 }
             } else { # PointTier
                 t1 <- numeric(length(indLab))
                 t2 <- numeric(length(indLab))
-                for (I in tbTools::seqM(1, length(indLab))) {
+                for (I in seqM(1, length(indLab))) {
                     t1[I] <- tg[[tierInd]]$t[ indLab[[I]][1] ]
                     t2[I] <- tg[[tierInd]]$t[ indLab[[I]][ length(indLab[[I]]) ]   ]
                 }
@@ -2810,7 +2810,7 @@ tg.findLabels <- function(tg, tierInd, labelVector, returnTime = FALSE) {
 #' p$frame[[4]]$strength[2]
 #' }
 pitch.read <- function(fileNamePitch) {
-    if (!tbTools::isString(fileNamePitch)) {
+    if (!isString(fileNamePitch)) {
         stop("Invalid 'fileNamePitch' parameter.")
     }
 
@@ -2857,7 +2857,7 @@ pitch.read <- function(fileNamePitch) {
 
             iline <- 12  # index of line to read
 
-            for (I in tbTools::seqM(1, nx)) {
+            for (I in seqM(1, nx)) {
                 if (flines[iline] != paste0("    frame [", I, "]:")) {
                     stop(paste0("Unknown Pitch format, wrong frame id (", I, "')."))
                 }
@@ -2874,7 +2874,7 @@ pitch.read <- function(fileNamePitch) {
                 frequency <- numeric(nCandidates)
                 strength <- numeric(nCandidates)
 
-                for (Ic in tbTools::seqM(1, nCandidates)) {
+                for (Ic in seqM(1, nCandidates)) {
                     if (flines[iline] != paste0("            candidate [", Ic, "]:")) {
                         stop(paste0("Unknown Pitch format, wrong candidate nr. (", Ic, ") in frame id (", I, "')."))
                     }
@@ -2901,14 +2901,14 @@ pitch.read <- function(fileNamePitch) {
 
             iline <- 11  # index of line to read
 
-            for (I in tbTools::seqM(1, nx)) {
+            for (I in seqM(1, nx)) {
                 intensity <- as.numeric(flines[iline]); iline <- iline + 1
                 nCandidates <- as.numeric(flines[iline]); iline <- iline + 1
 
                 frequency <- numeric(nCandidates)
                 strength <- numeric(nCandidates)
 
-                for (Ic in tbTools::seqM(1, nCandidates)) {
+                for (Ic in seqM(1, nCandidates)) {
                     frequency[Ic] <- as.numeric(flines[iline]); iline <- iline + 1
                     strength[Ic] <- as.numeric(flines[iline]); iline <- iline + 1
                 }
@@ -2923,7 +2923,7 @@ pitch.read <- function(fileNamePitch) {
     }
 
 
-    p <- list(xmin = xmin, xmax = xmax, nx = nx, dx = dx, x1 = x1, t = tbTools::seqM(0, (nx-1))*dx + x1,
+    p <- list(xmin = xmin, xmax = xmax, nx = nx, dx = dx, x1 = x1, t = seqM(0, (nx-1))*dx + x1,
               ceiling = ceil, maxnCandidates = maxnCandidates,
               frame = frame)
 
@@ -2951,7 +2951,7 @@ pitch.read <- function(fileNamePitch) {
 #' pt.plot(pt)
 #' }
 pt.read <- function(fileNamePitchTier) {
-    if (!tbTools::isString(fileNamePitchTier)) {
+    if (!isString(fileNamePitchTier)) {
         stop("Invalid 'fileNamePitchTier' parameter.")
     }
 
@@ -2987,7 +2987,7 @@ pt.read <- function(fileNamePitchTier) {
         t <- numeric(N)
         f <- numeric(N)
 
-        for (I in tbTools::seqM(1, N, by = 1)) {
+        for (I in seqM(1, N, by = 1)) {
             tf <- stringr::str_split(flines[I+3], "\\s")
             if (length(tf[[1]]) != 2) {
                 stop("Unknown PitchTier format.")
@@ -3025,7 +3025,7 @@ pt.read <- function(fileNamePitchTier) {
             t <- numeric(N)
             f <- numeric(N)
 
-            for (I in tbTools::seqM(1, N, by = 1)) {
+            for (I in seqM(1, N, by = 1)) {
                 t[I] <- as.numeric(substr(flines[8 + (I-1)*3], 14, nchar(flines[8 + (I-1)*3])))
                 f[I] <- as.numeric(substr(flines[9 + (I-1)*3], 13, nchar(flines[9 + (I-1)*3])))
             }
@@ -3042,7 +3042,7 @@ pt.read <- function(fileNamePitchTier) {
             t <- numeric(N)
             f <- numeric(N)
 
-            for (I in tbTools::seqM(1, N, by = 1)) {
+            for (I in seqM(1, N, by = 1)) {
                 t[I] <- as.numeric(flines[7 + (I-1)*2])
                 f[I] <- as.numeric(flines[8 + (I-1)*2])
             }
@@ -3056,7 +3056,7 @@ pt.read <- function(fileNamePitchTier) {
         t <- numeric(N)
         f <- numeric(N)
 
-        for (I in tbTools::seqM(1, N, by = 1)) {
+        for (I in seqM(1, N, by = 1)) {
             tf <- stringr::str_split(flines[I], "\\s")
             if (length(tf[[1]]) != 2) {
                 stop("Unknown PitchTier format.")
@@ -3098,7 +3098,7 @@ pt.read <- function(fileNamePitchTier) {
 #' pt.write(pt, "demo/H_st.PitchTier")
 #' }
 pt.write <- function(pt, fileNamePitchTier) {
-    if (!tbTools::isString(fileNamePitchTier)) {
+    if (!isString(fileNamePitchTier)) {
         stop("Invalid 'fileNamePitchTier' parameter.")
     }
 
@@ -3133,10 +3133,10 @@ pt.write <- function(pt, fileNamePitchTier) {
 
     writeLines('"ooTextFile"', fid)
     writeLines('"PitchTier"', fid)
-    writeLines(paste0(as.character(tbTools::round2(xmin, -20)), " ", as.character(tbTools::round2(xmax, -20)), " ", as.character(N)), fid)
+    writeLines(paste0(as.character(round2(xmin, -20)), " ", as.character(round2(xmax, -20)), " ", as.character(N)), fid)
 
-    for (n in tbTools::seqM(1, N)) {
-        writeLines(paste0(as.character(tbTools::round2(pt$t[n], -20)), "\t", as.character(tbTools::round2(pt$f[n], -20))), fid)
+    for (n in seqM(1, N)) {
+        writeLines(paste0(as.character(round2(pt$t[n], -20)), "\t", as.character(round2(pt$f[n], -20))), fid)
     }
 
     close(fid)
@@ -3275,7 +3275,7 @@ pt.interpolate <- function(pt, t) {
 #' pt.plot(pt2) %>% dygraphs::dyAxis("y", label = "Frequency (ST re 200 Hz)")
 #' }
 pt.Hz2ST <- function(pt, ref=100) {
-    if (!tbTools::isNum(ref) | ref <= 0) {
+    if (!isNum(ref) | ref <= 0) {
         stop("ref must be a positive number.")
     }
 
@@ -3311,11 +3311,11 @@ pt.Hz2ST <- function(pt, ref=100) {
 #' lines(ptLeg$t, ptLeg$f, col = "blue")
 #' }
 pt.legendre <- function(pt, npoints = 1000, npolynomials = 4) {
-    if (!tbTools::isInt(npoints) | npoints < 0) {
+    if (!isInt(npoints) | npoints < 0) {
         stop("npoints must be integer >= 0.")
     }
 
-    if (!tbTools::isInt(npolynomials) | npolynomials <= 0) {
+    if (!isInt(npolynomials) | npolynomials <= 0) {
         stop("npolynomials must be integer > 0.")
     }
 
@@ -3330,10 +3330,10 @@ pt.legendre <- function(pt, npoints = 1000, npolynomials = 4) {
     B <- matrix(nrow = nP, ncol = lP)  # báze
     x <- seq(-1, 1, length.out = lP)
 
-    for (i in tbTools::seqM(1, nP)) {
+    for (i in seqM(1, nP)) {
         n <- i - 1
         p <- numeric(lP)
-        for (k in tbTools::seqM(0, n)) {
+        for (k in seqM(0, n)) {
             p <- p + x^k*choose(n, k)*choose((n+k-1)/2, n)
         }
         p <- p*2^n
@@ -3380,7 +3380,7 @@ pt.legendreSynth <- function(c, npoints = 1000) {
         stop("c must be numeric vector")
     }
 
-    if (!tbTools::isInt(npoints) | npoints < 0) {
+    if (!isInt(npoints) | npoints < 0) {
         stop("npoints must be integer >= 0.")
     }
 
@@ -3390,10 +3390,10 @@ pt.legendreSynth <- function(c, npoints = 1000) {
     B <- matrix(nrow = nP, ncol = lP)  # báze
     x <- seq(-1, 1, length.out = lP)
 
-    for (i in tbTools::seqM(1, nP)) {
+    for (i in seqM(1, nP)) {
         n <- i - 1
         p <- numeric(lP)
-        for (k in tbTools::seqM(0, n)) {
+        for (k in seqM(0, n)) {
             p <- p + x^k*choose(n, k)*choose((n+k-1)/2, n)
         }
         p <- p*2^n
@@ -3466,10 +3466,10 @@ pt.legendreDemo <- function() {
 #' pt.plot(pt5_0)
 #' }
 pt.cut <- function(pt, tStart = -Inf, tEnd = Inf) {
-    if (!tbTools::isNum(tStart)) {
+    if (!isNum(tStart)) {
         stop("tStart must be a number.")
     }
-    if (!tbTools::isNum(tEnd)) {
+    if (!isNum(tEnd)) {
         stop("tEnd must be a number.")
     }
     if (is.infinite(tStart) & tStart>0) {
@@ -3532,10 +3532,10 @@ pt.cut <- function(pt, tStart = -Inf, tEnd = Inf) {
 #' pt.plot(pt5_0)
 #' }
 pt.cut0 <- function(pt, tStart = -Inf, tEnd = Inf) {
-    if (!tbTools::isNum(tStart)) {
+    if (!isNum(tStart)) {
         stop("tStart must be a number.")
     }
-    if (!tbTools::isNum(tEnd)) {
+    if (!isNum(tEnd)) {
         stop("tEnd must be a number.")
     }
     if (is.infinite(tStart) & tStart>0) {
@@ -3576,19 +3576,494 @@ pt.cut0 <- function(pt, tStart = -Inf, tEnd = Inf) {
 
 
 
-# if (!tbTools::isString(name)) {
+# if (!isString(name)) {
 #     stop("Name must be a character string.")
 # }
 
-# if (!tbTools::isLogical(name)) {
+# if (!isLogical(name)) {
 #     stop("Name must be a logical value.")
 # }
 
-# if (!tbTools::isNum(tMin)) {
+# if (!isNum(tMin)) {
 #     stop("tMin must be a number.")
 # }
 
-# if (!tbTools::isInt(newInd)) {
+# if (!isInt(newInd)) {
 #     stop("newInd must be integer >= 1.")
 # }
 
+
+
+#' strTrim
+#'
+#' Trim leading and trailing whitespace in character string.
+#'
+#' Like str_trim() in stringr package or trimws() in R3.2.0 but way faster.
+#'
+#' Source: Hadley Wickham comment at http://stackoverflow.com/questions/2261079/how-to-trim-leading-and-trailing-whitespace-in-r
+#'
+#' @param string character string
+#'
+#' @return returns a character string with removed leading and trailing whitespace characters.
+#' @export
+#' @seealso \code{\link{isString}} for testing whether it is 1 character vector, \code{\link{str_contains}} for finding string in string without regexp, \code{\link{str_find}} for all indices without regexp, \code{\link{str_find1}} for the first index withoud regexp.
+#' @examples
+#' strTrim("      Hello World!    ")
+strTrim <- function (string) {
+    gsub("^\\s+|\\s+$", "", string)
+}
+
+
+
+
+
+
+#' seqM
+#'
+#' Matlab-like behaviour of colon operator or linspace for creating sequences, for-loop friendly.
+#'
+#' Like \code{seq()} but with Matlab-like behavior ([: operator] with \code{by} or [linspace] with \code{length.out}).
+#'
+#' If I create a for-loop, I would like to get an empty vector for 3:1 (I want a default step +1)
+#' and also an empty vector for seq(3, 1, by = 1) (not an error). This is solved by this \code{seqM} function.
+#'
+#' @section Comparison:
+#' \tabular{lllll}{
+#'   R: seqM  \tab    \tab                        Matlab  \tab \tab                          R: seq  \cr
+#'   seqM(1, 3)  \tab       [1] 1 2 3      \tab           1:3           \tab  the same           \tab        the same \cr
+#'   seqM(1, 3, by=.8) \tab [1] 1.0 1.8 2.6 \tab          1:.8:3        \tab  the same            \tab       the same \cr
+#'   seqM(1, 3, by=5)  \tab [1] 1          \tab           1:5:3         \tab  the same             \tab      the same \cr
+#'   seqM(3, 1)     \tab    integer(0)    \tab            3:1           \tab  the same            \tab       [1] 3 2 1 \cr
+#'   seqM(3, 1, by=+1) \tab integer(0)    \tab            3:1:1         \tab  the same            \tab       Error: wrong 'by' \cr
+#'   seqM(3, 1, by=-1) \tab [1] 3 2 1     \tab            3:-1:1        \tab  the same            \tab       the same \cr
+#'   seqM(3, 1, by=-3) \tab [1] 3        \tab             3:-3:1        \tab  the same            \tab       the same \cr
+#'   seqM(1, 3, len=5) \tab [1] 1.0 1.5 2.0 2.5 3.0  \tab linspace(1,3,5) \tab the same           \tab        the same \cr
+#'   seqM(1, 3, len=3) \tab [1] 1 2 3       \tab          linspace(1,3,3) \tab the same           \tab        the same \cr
+#'   seqM(1, 3, len=2) \tab [1] 1 3        \tab           linspace(1,3,2) \tab the same           \tab        the same \cr
+#'   seqM(1, 3, len=1) \tab [1] 3          \tab          linspace(1,3,1) \tab the same             \tab      [1] 1 \cr
+#'   seqM(1, 3, len=0) \tab integer(0) + warning \tab     linspace(1,3,0) \tab the same without warning \tab  the same without warning \cr
+#'   seqM(3, 1, len=3) \tab [1] 3 2 1          \tab       linspace(3,1,3) \tab the same                \tab   the same  \cr
+#' }
+#'
+#'
+#' @param from starting value of the sequence (the first number)
+#' @param to end value of the sequence (the last number or the boundary number)
+#' @param by increment of the sequence (if specified, do not use the \code{length.out} parameter). If both \code{by} and \code{length.out} are not specified, then \code{by = +1}.
+#' @param length.out desired length of the sequence (if specified, do not use the \code{by} parameter)
+#'
+#' @return returns a vector of type "integer" or "double"
+#' @export
+#' @seealso \code{\link{round2}}, \code{\link{isNum}}, \code{\link{isInt}}, \code{\link{ifft}}.
+#'
+#' @examples
+#' seqM(1, 3)
+#' seqM(1, 3, by=.8)
+#' seqM(1, 3, by=5)
+#' seqM(3, 1)
+#' seqM(3, 1, by=+1)
+#' seqM(3, 1, by=-1)
+#' seqM(3, 1, by=-3)
+#' seqM(1, 3, len=5)
+#' seqM(1, 3, len=3)
+#' seqM(1, 3, len=2)
+#' seqM(1, 3, len=1)
+#' seqM(1, 3, len=0)
+#' seqM(3, 1, len=3)
+#'
+#'
+#'
+seqM <- function(from=NA, to=NA, by=NA, length.out=NA) {
+    # nonsense or default parameters
+
+    if (!is.na(from) & class(from) != "numeric" & class(from) != "integer")
+        stop("'from' must be numeric or integer")
+    if (!is.na(from) & length(from) != 1)
+        stop("'from' must be 1 number")
+
+    if (!is.na(to) & class(to) != "numeric" & class(to) != "integer")
+        stop("'to' must be numeric or integer")
+    if (!is.na(to) & length(to) != 1)
+        stop("'to' must be 1 number")
+
+    if (length(by) != 1)
+        stop("'by' must be 1 number")
+    if (!is.na(by)) {
+        if (class(by) != "numeric" & class(by) != "integer")
+            stop("'by' must be numeric or integer")
+    }
+
+    if (length(length.out) != 1)
+        stop("'length.out' must be 1 number")
+    if (!is.na(length.out)) {
+        if (class(length.out) != "numeric" & class(length.out) != "integer")
+            stop("'length.out' must be numeric or integer")
+    }
+
+    if (!is.na(by) & !is.na(length.out)) {
+        if (!is.na(from) & !is.na(to)) {
+            stop("too many arguments, cannot set 'by' and 'length.out' together with both 'from' and 'to'")
+        }
+
+        # VAR 3) length.out + by
+        if (!isInt(length.out)) {
+            len <- trunc(length.out)
+            warning(paste0("length.out is not integer (length.out=", length.out, "), truncating it to: ", len))
+            length.out <- len
+        }
+        if (length.out == 0) {
+            warning("length.out == 0, return empty vector")
+            return(integer(0))
+        }
+        if (length.out < 0) {
+            warning(paste0("length.out < 0 (length.out=", length.out, "), return empty vector"))
+            return(integer(0))
+        }
+
+        if (is.na(to)) {  # from
+            if (isInt(from) & isInt(by)) {
+                outInt <- TRUE
+                from <- as.integer(from)
+                by <- as.integer(by)
+            }
+            else {
+                outInt <- FALSE
+            }
+
+            if (outInt)
+                return(seq.int(from = from, by = by, length.out = length.out))
+            else
+                return(seq(from = from, by = by, length.out = length.out))
+
+        } else {          # to
+            if (isInt(to) & isInt(by)) {
+                outInt <- TRUE
+                to <- as.integer(to)
+                by <- as.integer(by)
+            }
+            else {
+                outInt <- FALSE
+            }
+
+            if (outInt)
+                return(seq.int(to = to, by = by, length.out = length.out))
+            else
+                return(seq(to = to, by = by, length.out = length.out))
+        }
+    }
+
+    if (is.na(by) & is.na(length.out))
+        by <- 1
+
+
+    # VAR 1) length.out
+    if (!is.na(length.out)) {
+        if (!isInt(length.out)) {
+            len <- trunc(length.out)
+            warning(paste0("length.out is not integer (length.out=", length.out, "), truncating it to: ", len))
+            length.out <- len
+        }
+        if (length.out == 0) {
+            warning("length.out == 0, return empty vector")
+            return(integer(0))
+        }
+        if (length.out < 0) {
+            warning(paste0("length.out < 0 (length.out=", length.out, "), return empty vector"))
+            return(integer(0))
+        }
+        if (length.out == 1) {
+            return(to)  # Matlab behavior
+        }
+        return(seq(from, to, length.out = length.out))
+    }
+
+
+    # VAR 2) by
+    # integer or numeric?
+    if (isInt(from) & isInt(to) & isInt(by)) {
+        outInt <- TRUE
+        from <- as.integer(from)
+        to <- as.integer(to)
+        by <- as.integer(by)
+    }
+    else {
+        outInt <- FALSE
+    }
+
+    if (by == 0) {
+        warning("by == 0, return empty vector")
+        return(integer(0))
+    }
+
+    if (by > 0) {
+        if (from > to)
+            return(integer(0))
+
+        if (outInt)
+            return(seq.int(from, to, by))
+        else
+            return(seq(from, to, by))
+
+    } else {
+        if (from < to)
+            return(integer(0))
+
+        if (outInt)
+            return(seq.int(from, to, by))
+        else
+            return(seq(from, to, by))
+    }
+
+}
+
+
+
+
+#' isInt
+#'
+#' Returns TRUE / FALSE whether it is exactly 1 integer number (in fact, the class can be numeric but the number must be integer), non-missing
+#'
+#' @param num variable to be tested
+#'
+#' @return TRUE / FALSE
+#' @export
+#' @seealso \code{\link{isNum}}, \code{\link{isLogical}}, \code{\link{isString}}
+#'
+#' @examples
+#' isInt(2)
+#' isInt(2L)
+#' isInt(-2)
+#' isInt(-2L)
+#' isInt(2.1)
+#' isInt(-2.1)
+#' isInt(1:5)
+#' isInt(NA_integer_)
+#' isInt(integer(0))
+isInt <- function(num) {
+    if (!("numeric" %in% class(num))  &  !("integer" %in% class(num)))
+        return(FALSE)
+
+    if (length(num) != 1)
+        return(FALSE)
+
+    if (is.na(num))
+        return(FALSE)
+
+    if (trunc(num) == num)
+        return(TRUE)
+    else
+        return(FALSE)
+}
+
+#' isString
+#'
+#' Returns TRUE / FALSE whether it is exactly 1 character string (character vector of length 1, non-missing)
+#'
+#' @param string variable to be tested
+#'
+#' @return TRUE / FALSE
+#' @export
+#' @seealso \code{\link{isInt}}, \code{\link{isNum}}, \code{\link{isLogical}}
+#'
+#' @examples
+#' isString("hello")
+#' isString(2)
+#' isString(c("hello", "world"))
+#' isString(NA_character_)
+isString <- function(string) {
+    if (!("character" %in% class(string)))
+        return(FALSE)
+
+    if (length(string) != 1)
+        return(FALSE)
+
+    if (is.na(string))
+        return(FALSE)
+
+    return(TRUE)
+}
+
+#' isNum
+#'
+#' Returns TRUE / FALSE whether it is exactly 1 number (numeric or integer vector of length 1, non-missing)
+#'
+#' @param num variable to be tested
+#'
+#' @return TRUE / FALSE
+#' @export
+#' @seealso \code{\link{isInt}}, \code{\link{isLogical}}, \code{\link{isString}}
+#'
+#' @examples
+#' isNum(2)
+#' isNum(2L)
+#' isNum(-2)
+#' isNum(-2L)
+#' isNum(2.1)
+#' isNum(-2.1)
+#' isNum(1:5)
+#' isNum(NA_real_)
+#' isNum(numeric(0))
+isNum <- function(num) {
+    if (!("numeric" %in% class(num))  &  !("integer" %in% class(num)))
+        return(FALSE)
+
+    if (length(num) != 1)
+        return(FALSE)
+
+    if (is.na(num))
+        return(FALSE)
+
+    return(TRUE)
+}
+
+#' isLogical
+#'
+#' Returns TRUE / FALSE whether it is exactly 1 logical value, non-missing
+#'
+#' @param logical variable to be tested
+#'
+#' @return TRUE / FALSE
+#' @export
+#' @seealso \code{\link{isNum}}, \code{\link{isInt}}, \code{\link{isString}}
+#'
+#' @examples
+#' isLogical(TRUE)
+#' isLogical(FALSE)
+#' isLogical(1)
+#' isLogical(0)
+#' isLogical(2)
+#' isLogical(NA)
+#' isLogical(NaN)
+#' isLogical(logical(0))
+isLogical <- function(logical) {
+    if (!("logical" %in% class(logical)))
+        return(FALSE)
+
+    if (length(logical) != 1)
+        return(FALSE)
+
+    if (is.na(logical))
+        return(FALSE)
+
+    return(TRUE)
+}
+
+
+
+#' round2
+#'
+#' Rounds a number to the specified order. Round half away from zero (this is the difference from built-in \code{round} function.)
+#'
+#' @param x number to be rounded
+#' @param order 0 (default) = units, -1 = 0.1, +1 = 10
+#'
+#' @return rounded number to the specified order
+#' @export
+#' @seealso \code{\link[base]{round}}, \code{\link[base]{trunc}}, \code{\link[base]{ceiling}}, \code{\link[base]{floor}}
+#'
+#' @examples
+#' round2(23.5)   # = 24, compare: round(23.5) = 24
+#' round2(23.4)   # = 23
+#' round2(24.5)   # = 25, compare: round(24.5) = 24
+#' round2(-23.5)   # = -24, compare: round(-23.5) = -24
+#' round2(-23.4)   # = -23
+#' round2(-24.5)   # = -25, compare: round(-24.5) = -24
+#' round2(123.456, -1)   # 123.5
+#' round2(123.456, -2)   # 123.46
+#' round2(123.456, 1)  # 120
+#' round2(123.456, 2)  # 100
+#' round2(123.456, 3)  # 0
+#' round2(-123.456, -1)   # -123.5
+#' round2(-123.456, -2)   # -123.46
+#' round2(-123.456, 1)  # -120
+#' round2(-123.456, 2)  # -100
+#' round2(-123.456, 3)  # 0
+round2 <- function(x, order = 0) {
+    zaokrouhli <- function(cislo) {
+        return(trunc(cislo + sign(cislo)*0.5))
+    }
+
+    return(zaokrouhli(x / 10^order) * 10^order)
+}
+
+
+#' str_contains
+#'
+#' Find string in another string (without regular expressions), returns TRUE / FALSE.
+#'
+#' @param string string in which we try to find something
+#' @param patternNoRegex string we want to find, "as it is" - no regular exprressions
+#'
+#' @return TRUE / FALSE
+#' @export
+#' @seealso \code{\link{str_find}}, \code{\link{str_find1}}, \code{\link{isString}}
+#'
+#' @examples
+#' str_contains("Hello world", "wor")  # TRUE
+#' str_contains("Hello world", "WOR")  # FALSE
+#' str_contains(tolower("Hello world"), tolower("wor"))  # TRUE
+#' str_contains("Hello world", "")  # TRUE
+str_contains <- function(string, patternNoRegex) {
+    return(regexpr(patternNoRegex, string, fixed = TRUE)[1] != -1)
+}
+
+
+#' str_find
+#'
+#' Find string in another string (without regular expressions), returns indices of all occurences.
+#'
+#' @param string string in which we try to find something
+#' @param patternNoRegex string we want to find, "as it is" - no regular exprressions
+#'
+#' @return indices of all occurences (1 = 1st character)
+#' @export
+#' @seealso \code{\link{str_find1}}, \code{\link{str_contains}}, \code{\link{isString}}
+#'
+#' @examples
+#' str_find("Hello, hello, hello world", "ell")   # 2 9 16
+#' str_find("Hello, hello, hello world", "q")     # integer(0)
+str_find <- function(string, patternNoRegex) {
+    indexy <- as.integer(gregexpr(patternNoRegex, string, fixed = TRUE)[[1]])
+    if (length(indexy) == 1 & indexy[1] == -1)
+        indexy <- integer(0)
+    return(indexy)
+}
+
+
+#' str_find1
+#'
+#' Find string in another string (without regular expressions), returns indices of the first occurence only.
+#'
+#' @param string string in which we try to find something
+#' @param patternNoRegex string we want to find, "as it is" - no regular exprressions
+#'
+#' @return index of the first occurence only (1 = 1st character)
+#' @export
+#' @seealso \code{\link{str_find}}, \code{\link{str_contains}}, \code{\link{isString}}
+#'
+#' @examples
+#' str_find1("Hello, hello, hello world", "ell")   # 2
+#' str_find1("Hello, hello, hello world", "q")     # integer(0)
+str_find1 <- function(string, patternNoRegex) {
+    index <- regexpr(patternNoRegex, string, fixed = TRUE)[1]
+    if (index == -1)
+        index <- integer(0)
+    return(index)
+}
+
+#' ifft
+#'
+#' Inverse Fast Fourier Transform (discrete FT), Matlab-like behavior.
+#'
+#' This is really the inverse of the fft function, so ifft(fft(x)) == x.
+#'
+#' @param sig input vector
+#'
+#' @return output vector of the same length as the input vector
+#' @export
+#' @seealso \code{\link[stats]{fft}}, \code{\link[base]{Re}}, \code{\link[base]{Im}}, \code{\link[base]{Mod}}, \code{\link[base]{Conj}}
+#'
+#' @examples
+#' ifft(fft(1:5))
+ifft <- function(sig) {
+    return(stats::fft(sig, inverse = TRUE) / length(sig))
+}
