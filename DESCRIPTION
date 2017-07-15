@@ -1,11 +1,11 @@
 Package: rPraat
 Type: Package
-Title: Interface Between Praat and R
+Title: Interface to Praat
 Version: 1.0.8
 Encoding: UTF-8
 Authors@R: person("Tomas", "Boril", email = "borilt@gmail.com", role = c("aut", "cre"))
 Maintainer: Tomas Boril <borilt@gmail.com>
-Description: Read, write and manipulate Praat TextGrid, PitchTier and Pitch files.
+Description: Read, write and manipulate 'Praat' <http://www.fon.hum.uva.nl/praat/> TextGrid <http://www.fon.hum.uva.nl/praat/manual/TextGrid.html>, PitchTier <http://www.fon.hum.uva.nl/praat/manual/PitchTier.html> and Pitch <http://www.fon.hum.uva.nl/praat/manual/Pitch.html> files.
 URL: https://github.com/bbTomas/rPraat/
 BugReports: https://github.com/bbTomas/rPraat/issues
 License: MIT + file LICENSE
