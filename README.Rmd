@@ -17,8 +17,7 @@ rPraat and mPraat homepage: [http://fu.ff.cuni.cz/praat/](http://fu.ff.cuni.cz/p
 One-time installation (internet connection needed). 
 
 ```{r, eval=FALSE}
-install.packages("devtools")
-devtools::install_github("bbTomas/rPraat")
+install.packages("rPraat")
 ```
 
 ### Initialize and Test

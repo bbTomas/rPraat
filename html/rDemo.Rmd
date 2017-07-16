@@ -20,8 +20,7 @@ rPraat and mPraat homepage: [http://fu.ff.cuni.cz/praat/](http://fu.ff.cuni.cz/p
 Package rPraat at github: [https://github.com/bbTomas/rPraat/](https://github.com/bbTomas/rPraat/)
 
 ```{r, eval=FALSE}
-install.packages("devtools")
-devtools::install_github("bbTomas/rPraat")
+install.packages("rPraat")
 ```
 
 At each R session, you have to initialize the package.
@@ -44,8 +43,8 @@ To reproduce the following examples, you will need some sample files. Download a
 ### Read and plot Sound, TextGrid, and PitchTier
 ```{r, fig.height=2.5}
 library(tuneR)
-library(tbTools)
 library(dygraphs)
+library(rPraat)
 library(dplyr)
 
 sndWav <- readWave("demo/H.wav"); fs <- sndWav@samp.rate; snd <- sndWav@left / (2^(sndWav@bit-1))
