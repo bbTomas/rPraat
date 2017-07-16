@@ -17,6 +17,8 @@ The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-
 
 rPraat and mPraat homepage: [http://fu.ff.cuni.cz/praat/](http://fu.ff.cuni.cz/praat/)
 
+CRAN link: [https://CRAN.R-project.org/package=rPraat](https://CRAN.R-project.org/package=rPraat)
+
 Package rPraat at github: [https://github.com/bbTomas/rPraat/](https://github.com/bbTomas/rPraat/)
 
 ```{r, eval=FALSE}
