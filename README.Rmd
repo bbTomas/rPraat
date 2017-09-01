@@ -2,7 +2,7 @@
 
 rPraat package for R constitutes an interface between the most popular software for phonetic analyses, Praat, and R.
 
-Version 1.0.8.
+Version 1.0.8-1.
 
 For demonstration, see [html/rDemo.html](http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html)
 
@@ -48,15 +48,17 @@ The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-
 
 ## What is new
 
-v1.0.8: pitch.read() to read Pitch-object files with time frames of pitch candidates
+v1.0.8-1 (2017/09/01): bugfix, short-text TextGrid with multiple lines in a label no longer produces "missing sppasFormat variable" error
 
-v1.0.7: tg.findLabels(), tg.duplicateTierMergeSegments()
+v1.0.8 (2017/07/16): pitch.read() to read Pitch-object files with time frames of pitch candidates
 
-v1.0.6: pt.cut(), pt.cut0()
+v1.0.7 (2017/04/19): tg.findLabels(), tg.duplicateTierMergeSegments()
 
-v1.0.5: pt.legendre(), pt.legendreSynth(), pt.legendreDemo()
+v1.0.6 (2017/04/11): pt.cut(), pt.cut0()
 
-v1.0.4: pt.interpolate(), pt.Hz2ST()
+v1.0.5 (2017/04/10): pt.legendre(), pt.legendreSynth(), pt.legendreDemo()
+
+v1.0.4 (2017/03/06): pt.interpolate(), pt.Hz2ST()
 
 ## License
 
