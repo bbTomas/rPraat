@@ -732,7 +732,7 @@ tg.plot <- function(tg, group = "") {
 #' cannot be manually moved in Praat edit window.
 #'
 #' @param tg TextGrid object
-#' @param verbose [optional, default=FALSE] If TRUE, the function performs everything quietly.
+#' @param verbose [optional, default=TRUE] If FALSE, the function performs everything quietly.
 #'
 #' @return TextGrid object
 #' @export
@@ -744,13 +744,13 @@ tg.plot <- function(tg, group = "") {
 #' tgNew <- tg.repairContinuity(tgProblem)
 #' tg.write(tgNew, "demo_problem_OK.TextGrid")
 #' }
-tg.repairContinuity <- function(tg, verbose = FALSE) {
+tg.repairContinuity <- function(tg, verbose = TRUE) {
     for (I in seqM(1, length(tg))) {
         if (tg[[I]]$type == "interval") {
             for (J in seqM(1, length(tg[[I]]$label)-1)) {
                 if (tg[[I]]$t2[J] != tg[[I]]$t1[J+1]) {
                     newVal <- mean(c(tg[[I]]$t2[J], tg[[I]]$t1[J+1]))
-                    if (!verbose) {
+                    if (verbose) {
                         cat("Problem found [tier: ", I, ", int: ", J, ", ", J+1, "] t2 = ", as.character(tg[[I]]$t2[J]), ", t1 = ", as.character(tg[[I]]$t1[J+1]), ". New value: ", as.character(newVal), ".\n", sep = "")
                     }
 

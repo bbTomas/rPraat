@@ -165,7 +165,7 @@ test_that("tg.read", {
 
 test_that("tg.repairContinuity", {
     expect_equal({
-        tg <- tg.repairContinuity(tg.sampleProblem(), verbose = TRUE)
+        tg <- tg.repairContinuity(tg.sampleProblem(), verbose = FALSE)
         tg[[2]]$t2[16] > tg[[2]]$t1[17]
         }, FALSE)
     expect_error(tg.repairContinuity(pt.sample()))

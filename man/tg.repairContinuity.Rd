@@ -4,12 +4,12 @@
 \alias{tg.repairContinuity}
 \title{tg.repairContinuity}
 \usage{
-tg.repairContinuity(tg, verbose = FALSE)
+tg.repairContinuity(tg, verbose = TRUE)
 }
 \arguments{
 \item{tg}{TextGrid object}
 
-\item{verbose}{[optional, default=FALSE] If TRUE, the function performs everything quietly.}
+\item{verbose}{[optional, default=TRUE] If FALSE, the function performs everything quietly.}
 }
 \value{
 TextGrid object
