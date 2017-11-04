@@ -53,6 +53,43 @@ tg.checkTierInd <- function(tg, tierInd) {
 }
 
 
+#' detectEncoding
+#'
+#' Detects unicode encoding of Praat text files
+#'
+#' @param fileName Input file name
+#'
+#' @return detected encoding of the text input file
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' detectEncoding("demo/H.TextGrid")
+#' detectEncoding("demo/H_UTF16.TextGrid")
+#' }
+detectEncoding <- function(fileName) {
+    # Inspired by Weirong Chen.
+
+    encodings <- c("UTF-8", "UTF-16", "UTF-16BE", "UTF-16LE")
+    encodingWeight <- numeric(length(encodings))
+
+    for (I in 1:length(encodings)) {
+        encoding <- encodings[I]
+
+        if (encoding == "UTF-8") {
+            flines <- readr::read_lines(fileName, locale = readr::locale(encoding = "UTF-8"))  # Does not support UTF-16 at this point :-(
+        } else {
+            fid <- file(fileName, open = "r", encoding = encoding)
+            flines <- suppressWarnings(readLines(fid))   # does not work with tests/testthat/utf8.TextGrid  :-(
+            close(fid)
+        }
+
+        encodingWeight[I] <- length(grep('Text', flines))
+    }
+
+    return(encodings[which.max(encodingWeight)])
+}
+
 
 #' tg.read
 #'
@@ -61,6 +98,7 @@ tg.checkTierInd <- function(tg, tierInd) {
 #' Labels can may contain quotation marks and new lines.
 #'
 #' @param fileNameTextGrid Input file name
+#' @param encoding File encoding (default: "UTF-8"), "auto" for auto-detect of Unicode encoding
 #'
 #' @return TextGrid object
 #' @export
@@ -71,17 +109,29 @@ tg.checkTierInd <- function(tg, tierInd) {
 #' tg <- tg.read("demo/H.TextGrid")
 #' tg.plot(tg)
 #' }
-tg.read <- function(fileNameTextGrid) {
+tg.read <- function(fileNameTextGrid, encoding = "UTF-8") {
     if (!isString(fileNameTextGrid)) {
         stop("Invalid 'fileNameTextGrid' parameter.")
     }
 
+    if (!isString(encoding)) {
+        stop("Invalid 'encoding' parameter.")
+    }
+
     tg <- list()  # new textgrid
 
-    # fid <- file(fileNameTextGrid, open = "r", encoding = "UTF-8")
-    # flines <- readLines(fid)
-    flines <- readr::read_lines(fileNameTextGrid, locale = readr::locale(encoding = "UTF-8"))
-    # close(fid)
+    if (encoding == "auto") {
+        encoding <- detectEncoding(fileNameTextGrid)
+    }
+
+    if (encoding == "UTF-8") {
+        flines <- readr::read_lines(fileNameTextGrid, locale = readr::locale(encoding = "UTF-8"))  # Does not support UTF-16 at this point :-(
+    } else {
+        fid <- file(fileNameTextGrid, open = "r", encoding = encoding)
+        flines <- readLines(fid)   # does not work with tests/testthat/utf8.TextGrid  :-(
+        close(fid)
+    }
+
     find <- 4   # index of line to read, we ignore the first three
 
     xminStr <- flines[find]; find <- find + 1 # xmin
@@ -359,10 +409,11 @@ tg.read <- function(fileNameTextGrid) {
 #' tiers (tg[[1]], tg[[2]], tg[[3]], etc.). If tier type is not specified in $type,
 #' is is assumed to be "interval". If specified, $type have to be "interval" or "point".
 #' If there is no class(tg)["tmin"] and class(tg)["tmax"], they are calculated as min and max of
-#' all tiers. The file is saved in Short text file, UTF-8 format.
+#' all tiers. The file is saved in UTF-8 encoding.
 #'
 #' @param tg TextGrid object
 #' @param fileNameTextGrid Output file name
+#' @param format Output file format ("short" (default, short text format) or "text" (a.k.a. full text format))
 #'
 #' @export
 #' @seealso \code{\link{tg.read}}, \code{\link{pt.write}}
@@ -372,10 +423,18 @@ tg.read <- function(fileNameTextGrid) {
 #' tg <- tg.sample()
 #' tg.write(tg, "demo_output.TextGrid")
 #' }
-tg.write <- function(tg, fileNameTextGrid) {
+tg.write <- function(tg, fileNameTextGrid, format = "short") {
     if (!isString(fileNameTextGrid)) {
         stop("Invalid 'fileNameTextGrid' parameter.")
     }
+
+    if (!isString(format)) {
+        stop("Invalid 'format' parameter.")
+    }
+    if (format != "short" && format != "text") {
+        stop("Unsupported format (supported: short [default], text)")
+    }
+
 
     nTiers <- length(tg)  # number of Tiers
 
@@ -424,53 +483,116 @@ tg.write <- function(tg, fileNameTextGrid) {
     writeLines('File type = "ooTextFile"', fid)
     writeLines('Object class = "TextGrid"', fid)
     writeLines("", fid)
-    writeLines(as.character(round2(minTimeTotal, -10)), fid)  # min time from all tiers
-    writeLines(as.character(round2(maxTimeTotal, -10)), fid)  # max time from all tiers
-    writeLines("<exists>", fid)
-    writeLines(as.character(nTiers), fid)
+    if (format == "short") {
+        writeLines(as.character(round2(minTimeTotal, -15)), fid)  # min time from all tiers
+        writeLines(as.character(round2(maxTimeTotal, -15)), fid)  # max time from all tiers
+        writeLines("<exists>", fid)
+        writeLines(as.character(nTiers), fid)
+    } else if (format == "text") {
+        writeLines(paste0("xmin = ", as.character(round2(minTimeTotal, -15)), " "), fid)  # min time from all tiers
+        writeLines(paste0("xmax = ", as.character(round2(maxTimeTotal, -15)), " "), fid)  # max time from all tiers
+        writeLines("tiers? <exists> ", fid)
+        writeLines(paste0("size = ", as.character(nTiers), " "), fid)
+        writeLines("item []: ", fid)
+    }
 
     for (N in seqM(1, nTiers)) {
+        if (format == "text") {
+            writeLines(paste0("    item [", as.character(N), "]:"), fid)
+        }
+
         if (tg[[N]]$typInt == TRUE) {  # interval tier
-            writeLines('"IntervalTier"', fid)
-            writeLines(paste0('"', tg[[N]]$name, '"'), fid)
+            if (format == "short") {
+                writeLines('"IntervalTier"', fid)
+                writeLines(paste0('"', tg[[N]]$name, '"'), fid)
+            } else if (format == "text") {
+                writeLines('        class = "IntervalTier" ', fid)
+                writeLines(paste0('        name = "', tg[[N]]$name, '" '), fid)
+            }
 
             nInt <- length(tg[[N]]$t1)  # number of intervals
             if (nInt > 0) {
-                writeLines(as.character(round2(tg[[N]]$t1[1], -10)), fid)  # start time of the tier
-                writeLines(as.character(round2(tg[[N]]$t2[length(tg[[N]]$t2)], -10)), fid)  # end time of the tier
-                writeLines(as.character(nInt), fid)  # pocet intervalu textgrid
+                if (format == "short") {
+                    writeLines(as.character(round2(tg[[N]]$t1[1], -15)), fid)  # start time of the tier
+                    writeLines(as.character(round2(tg[[N]]$t2[length(tg[[N]]$t2)], -15)), fid)  # end time of the tier
+                    writeLines(as.character(nInt), fid)  # pocet intervalu textgrid
+                } else if (format == "text") {
+                    writeLines(paste0("        xmin = ", as.character(round2(tg[[N]]$t1[1], -15)), " "), fid)  # start time of the tier
+                    writeLines(paste0("        xmax = ", as.character(round2(tg[[N]]$t2[length(tg[[N]]$t2)], -15)), " "), fid)  # end time of the tier
+                    writeLines(paste0("        intervals: size = ", as.character(nInt), " "), fid)  # pocet intervalu textgrid
+                }
 
                 for (I in seqM(1, nInt)) {
-                    writeLines(as.character(round2(tg[[N]]$t1[I], -10)), fid)
-                    writeLines(as.character(round2(tg[[N]]$t2[I], -10)), fid)
-                    writeLines(paste0('"', tg[[N]]$label[I], '"'), fid)
+                    if (format == "short") {
+                        writeLines(as.character(round2(tg[[N]]$t1[I], -15)), fid)
+                        writeLines(as.character(round2(tg[[N]]$t2[I], -15)), fid)
+                        writeLines(paste0('"', tg[[N]]$label[I], '"'), fid)
+                    } else if (format == "text") {
+                        writeLines(paste0("        intervals [", as.character(I), "]:"), fid)
+                        writeLines(paste0("            xmin = ", as.character(round2(tg[[N]]$t1[I], -15)), " "), fid)
+                        writeLines(paste0("            xmax = ", as.character(round2(tg[[N]]$t2[I], -15)), " "), fid)
+                        writeLines(paste0('            text = "', tg[[N]]$label[I], '" '), fid)
+                    }
                 }
             } else {   # create one empty interval
-                writeLines(as.character(round2(minTimeTotal, -10)), fid)  # start time of the tier
-                writeLines(as.character(round2(maxTimeTotal, -10)), fid)  # end time of the tier
-                writeLines("1", fid)  # number of intervals
-                writeLines(as.character(round2(minTimeTotal, -10)), fid)
-                writeLines(as.character(round2(maxTimeTotal, -10)), fid)
-                writeLines('""', fid)
+                if (format == "short") {
+                    writeLines(as.character(round2(minTimeTotal, -15)), fid)  # start time of the tier
+                    writeLines(as.character(round2(maxTimeTotal, -15)), fid)  # end time of the tier
+                    writeLines("1", fid)  # number of intervals
+                    writeLines(as.character(round2(minTimeTotal, -15)), fid)
+                    writeLines(as.character(round2(maxTimeTotal, -15)), fid)
+                    writeLines('""', fid)
+                } else if (format == "text") {
+                    writeLines(paste0("        xmin = ", as.character(round2(minTimeTotal, -15)), " "), fid)  # start time of the tier
+                    writeLines(paste0("        xmax = ", as.character(round2(maxTimeTotal, -15)), " "), fid)  # end time of the tier
+                    writeLines("        intervals: size = 1 ", fid)  # pocet intervalu textgrid
+                    writeLines("        intervals [1]:", fid)
+                    writeLines(paste0("            xmin = ", as.character(round2(minTimeTotal, -15)), " "), fid)
+                    writeLines(paste0("            xmax = ", as.character(round2(maxTimeTotal, -15)), " "), fid)
+                    writeLines('            text = "" ', fid)
+                }
             }
         } else { # pointTier
-            writeLines('"TextTier"', fid)
-            writeLines(paste0('"', tg[[N]]$name, '"'), fid)
+            if (format == "short") {
+                writeLines('"TextTier"', fid)
+                writeLines(paste0('"', tg[[N]]$name, '"'), fid)
+            } else if (format == "text") {
+                writeLines('        class = "TextTier" ', fid)
+                writeLines(paste0('        name = "', tg[[N]]$name, '" '), fid)
+            }
 
-            nInt <- length(tg[[N]]$t)  # number of intervals
+            nInt <- length(tg[[N]]$t)  # number of points
             if (nInt > 0) {
-                writeLines(as.character(round2(tg[[N]]$t[1], -10)), fid)  # start time of the tier
-                writeLines(as.character(round2(tg[[N]]$t[length(tg[[N]]$t)], -10)), fid)  # end time of the tier
-                writeLines(as.character(nInt), fid)  # number of points
+                if (format == "short") {
+                    writeLines(as.character(round2(tg[[N]]$t[1], -15)), fid)  # start time of the tier
+                    writeLines(as.character(round2(tg[[N]]$t[length(tg[[N]]$t)], -15)), fid)  # end time of the tier
+                    writeLines(as.character(nInt), fid)  # number of points
+                } else if (format == "text") {
+                    writeLines(paste0("        xmin = ", as.character(round2(tg[[N]]$t[1], -15)), " "), fid)  # start time of the tier
+                    writeLines(paste0("        xmax = ", as.character(round2(tg[[N]]$t[length(tg[[N]]$t)], -15)), " "), fid)  # end time of the tier
+                    writeLines(paste0("        points: size = ", as.character(nInt), " "), fid)  # number of points
+                }
 
                 for (I in seqM(1, nInt)) {
-                    writeLines(as.character(round2(tg[[N]]$t[I], -10)), fid)
-                    writeLines(paste0('"', tg[[N]]$label[I], '"'), fid)
+                    if (format == "short") {
+                        writeLines(as.character(round2(tg[[N]]$t[I], -15)), fid)
+                        writeLines(paste0('"', tg[[N]]$label[I], '"'), fid)
+                    } else if (format == "text") {
+                        writeLines(paste0("        points [", as.character(I), "]:"), fid)
+                        writeLines(paste0("            number = ", as.character(round2(tg[[N]]$t[I], -15)), " "), fid)
+                        writeLines(paste0('            mark = "', tg[[N]]$label[I], '" '), fid)
+                    }
                 }
-            } else { # prazdny pointtier
-                writeLines(as.character(round2(minTimeTotal, -10)), fid)  # start time of the tier
-                writeLines(as.character(round2(maxTimeTotal, -10)), fid)  # end time of the tier
-                writeLines("0", fid)  # number of points
+            } else { # empty pointtier
+                if (format == "short") {
+                    writeLines(as.character(round2(minTimeTotal, -15)), fid)  # start time of the tier
+                    writeLines(as.character(round2(maxTimeTotal, -15)), fid)  # end time of the tier
+                    writeLines("0", fid)  # number of points
+                } else if (format == "text") {
+                    writeLines(paste0("        xmin = ", as.character(round2(minTimeTotal, -15)), " "), fid)  # start time of the tier
+                    writeLines(paste0("        xmax = ", as.character(round2(maxTimeTotal, -15)), " "), fid)  # end time of the tier
+                    writeLines("        points: size = 0 ", fid)  # number of points
+                }
             }
         }
 
@@ -2783,6 +2905,7 @@ tg.findLabels <- function(tg, tierInd, labelVector, returnTime = FALSE) {
 #' Supported formats: text file, short text file.
 #'
 #' @param fileNamePitch file name of Pitch object
+#' @param encoding File encoding (default: "UTF-8"), "auto" for auto-detect of Unicode encoding
 #'
 #' @return A Pitch object represents periodicity candidates as a function of time.
 #' @return   [ref: Praat help, http://www.fon.hum.uva.nl/praat/manual/Pitch.html]
@@ -2813,15 +2936,26 @@ tg.findLabels <- function(tg, tierInd, labelVector, returnTime = FALSE) {
 #' p$frame[[4]]$frequency[2]
 #' p$frame[[4]]$strength[2]
 #' }
-pitch.read <- function(fileNamePitch) {
+pitch.read <- function(fileNamePitch, encoding = "UTF-8") {
     if (!isString(fileNamePitch)) {
         stop("Invalid 'fileNamePitch' parameter.")
     }
 
-    # fid <- file(fileNamePitchTier, open = "r", encoding = "UTF-8")
-    # flines <- readLines(fid)
-    flines <- readr::read_lines(fileNamePitch, locale = readr::locale(encoding = "UTF-8"))
-    # close(fid)
+    if (!isString(encoding)) {
+        stop("Invalid 'encoding' parameter.")
+    }
+
+    if (encoding == "auto") {
+        encoding <- detectEncoding(fileNamePitch)
+    }
+
+    if (encoding == "UTF-8") {
+        flines <- readr::read_lines(fileNamePitch, locale = readr::locale(encoding = "UTF-8"))  # Does not support UTF-16 at this point :-(
+    } else {
+        fid <- file(fileNamePitch, open = "r", encoding = encoding)
+        flines <- readLines(fid)   # does not work with tests/testthat/utf8.TextGrid  :-(
+        close(fid)
+    }
 
     if (length(flines) < 1) {
         stop("Empty file.")
@@ -2940,10 +3074,11 @@ pitch.read <- function(fileNamePitch) {
 #' pt.read
 #'
 #' Reads PitchTier from Praat. Supported formats: text file, short text file,
-#' spread sheet, headerless spread sheet (headerless not recommended,
+#' spreadsheet, headerless spreadsheet (headerless not recommended,
 #' it does not contain tmin and tmax info).
 #'
 #' @param fileNamePitchTier file name of PitchTier
+#' @param encoding File encoding (default: "UTF-8"), "auto" for auto-detect of Unicode encoding
 #'
 #' @return PitchTier object
 #' @export
@@ -2954,15 +3089,27 @@ pitch.read <- function(fileNamePitch) {
 #' pt <- pt.read("demo/H.PitchTier")
 #' pt.plot(pt)
 #' }
-pt.read <- function(fileNamePitchTier) {
+pt.read <- function(fileNamePitchTier, encoding = "UTF-8") {
     if (!isString(fileNamePitchTier)) {
         stop("Invalid 'fileNamePitchTier' parameter.")
     }
 
-    # fid <- file(fileNamePitchTier, open = "r", encoding = "UTF-8")
-    # flines <- readLines(fid)
-    flines <- readr::read_lines(fileNamePitchTier, locale = readr::locale(encoding = "UTF-8"))
-    # close(fid)
+    if (!isString(encoding)) {
+        stop("Invalid 'encoding' parameter.")
+    }
+
+    if (encoding == "auto") {
+        encoding <- detectEncoding(fileNamePitchTier)
+    }
+
+    if (encoding == "UTF-8") {
+        flines <- readr::read_lines(fileNamePitchTier, locale = readr::locale(encoding = "UTF-8"))  # Does not support UTF-16 at this point :-(
+    } else {
+        fid <- file(fileNamePitchTier, open = "r", encoding = encoding)
+        flines <- readLines(fid)   # does not work with tests/testthat/utf8.TextGrid  :-(
+        close(fid)
+    }
+
 
     if (length(flines) < 1) {
         stop("Empty file.")
@@ -3083,13 +3230,14 @@ pt.read <- function(fileNamePitchTier) {
 
 #' pt.write
 #'
-#' Saves PitchTier to file (spread sheet file format).
+#' Saves PitchTier to file (in UTF-8 encoding).
 #' pt is list with at least $t and $f vectors (of the same length).
 #' If there are no $tmin and $tmax values, there are
 #' set as min and max of $t vector.
 #'
 #' @param pt PitchTier object
 #' @param fileNamePitchTier file name to be created
+#' @param format Output file format ("short" (short text format), "text" (a.k.a. full text format), "spreadsheet" (default), "headerless" (not recommended, it does not contain tmin and tmax info))
 #'
 #' @export
 #' @seealso \code{\link{pt.read}}, \code{\link{tg.write}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}
@@ -3101,9 +3249,17 @@ pt.read <- function(fileNamePitchTier) {
 #' pt.plot(pt)
 #' pt.write(pt, "demo/H_st.PitchTier")
 #' }
-pt.write <- function(pt, fileNamePitchTier) {
+pt.write <- function(pt, fileNamePitchTier, format = "spreadsheet") {
     if (!isString(fileNamePitchTier)) {
         stop("Invalid 'fileNamePitchTier' parameter.")
+    }
+
+    if (!isString(format)) {
+        stop("Invalid 'format' parameter.")
+    }
+
+    if (format != "short" && format != "text" && format != "spreadsheet" && format != "headerless") {
+        stop("Unsupported format (supported: short, text, spreadsheet [default], headerless)")
     }
 
     if (!("t" %in% names(pt))) {
@@ -3135,12 +3291,38 @@ pt.write <- function(pt, fileNamePitchTier) {
         stop(paste0("cannot open file [", fileNamePitchTier, "]"))
     }
 
-    writeLines('"ooTextFile"', fid)
-    writeLines('"PitchTier"', fid)
-    writeLines(paste0(as.character(round2(xmin, -20)), " ", as.character(round2(xmax, -20)), " ", as.character(N)), fid)
+    if (format == "spreadsheet") {
+        writeLines('"ooTextFile"', fid)
+        writeLines('"PitchTier"', fid)
+    } else if (format == "short" || format == "text") {
+        writeLines('File type = "ooTextFile"', fid)
+        writeLines('Object class = "PitchTier"', fid)
+        writeLines('', fid)
+    }
+
+    if (format == "spreadsheet") {
+        writeLines(paste0(as.character(round2(xmin, -15)), " ", as.character(round2(xmax, -15)), " ", as.character(N)), fid)
+    } else if (format == "short") {
+        writeLines(as.character(round2(xmin, -15)), fid)
+        writeLines(as.character(round2(xmax, -15)), fid)
+        writeLines(as.character(N), fid)
+    } else if (format == "text") {
+        writeLines(paste0("xmin = ", as.character(round2(xmin, -15)), " "), fid)
+        writeLines(paste0("xmax = ", as.character(round2(xmax, -15)), " "), fid)
+        writeLines(paste0("points: size = ", as.character(N), " "), fid)
+    }
 
     for (n in seqM(1, N)) {
-        writeLines(paste0(as.character(round2(pt$t[n], -20)), "\t", as.character(round2(pt$f[n], -20))), fid)
+        if (format == "spreadsheet" || format == "headerless") {
+            writeLines(paste0(as.character(round2(pt$t[n], -15)), "\t", as.character(round2(pt$f[n], -15))), fid)
+        } else if (format == "short") {
+            writeLines(as.character(round2(pt$t[n], -15)), fid)
+            writeLines(as.character(round2(pt$f[n], -15)), fid)
+        } else if (format == "text") {
+            writeLines(paste0("points [", as.character(n), "]:"), fid)
+            writeLines(paste0("    number = ", as.character(round2(pt$t[n], -15)), " "), fid)
+            writeLines(paste0("    value = ", as.character(round2(pt$f[n], -15)), " "), fid)
+        }
     }
 
     close(fid)

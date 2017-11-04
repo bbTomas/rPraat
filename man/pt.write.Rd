@@ -4,15 +4,17 @@
 \alias{pt.write}
 \title{pt.write}
 \usage{
-pt.write(pt, fileNamePitchTier)
+pt.write(pt, fileNamePitchTier, format = "spreadsheet")
 }
 \arguments{
 \item{pt}{PitchTier object}
 
 \item{fileNamePitchTier}{file name to be created}
+
+\item{format}{Output file format ("short" (short text format), "text" (a.k.a. full text format), "spreadsheet" (default), "headerless" (not recommended, it does not contain tmin and tmax info))}
 }
 \description{
-Saves PitchTier to file (spread sheet file format).
+Saves PitchTier to file (in UTF-8 encoding).
 pt is list with at least $t and $f vectors (of the same length).
 If there are no $tmin and $tmax values, there are
 set as min and max of $t vector.

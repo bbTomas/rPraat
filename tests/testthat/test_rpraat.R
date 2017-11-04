@@ -25,6 +25,10 @@ test_that("pt.read", {
         c(length(unique(pt$t)), pt$tmax)
         }, c(209, 3.617125))
     expect_equal({
+        pt <- pt.read("H_UTF16.PitchTier", encoding = "UTF-16")
+        c(length(unique(pt$t)), pt$tmax)
+    }, c(209, 3.617125))
+    expect_equal({
         pt <- pt.read("H_headerlessSpreadSheet.PitchTier")
         c(length(unique(pt$t)), pt$tmax)
         }, c(209, 3.4935625))
@@ -130,16 +134,24 @@ context("TextGrid")
 test_that("tg.read", {
     expect_equal({
         tg <- tg.read("H.TextGrid")
-        c(length(tg), length(unique(tg$word$t2)), tg[[1]]$label[[7]], tg[[2]]$type)
-        }, c("5", "13", "k", "interval"))
+        c(length(tg), length(unique(tg$word$t2)), tg[[1]]$label[[7]], tg[[2]]$type, tg$word$label[4], tg$word$label[6])
+        }, c("5", "13", "k", "interval", "\u0159eknu", "ud\u011bl\u00e1\u0161"))
     expect_equal({
         tg <- tg.read("H_short.TextGrid")
-        c(length(tg), length(unique(tg$word$t2)), tg[[1]]$label[[7]], tg[[2]]$type)
-        }, c("5", "13", "k", "interval"))
+        c(length(tg), length(unique(tg$word$t2)), tg[[1]]$label[[7]], tg[[2]]$type, tg$word$label[4], tg$word$label[6])
+        }, c("5", "13", "k", "interval", "\u0159eknu", "ud\u011bl\u00e1\u0161"))
     expect_equal({
         tg <- tg.read("utf8.TextGrid")
         tg$phone$label[2]
         }, "\u0294")
+    expect_equal({
+        tg <- tg.read("H_UTF16.TextGrid", "UTF-16")
+        c(length(tg), length(unique(tg$word$t2)), tg[[1]]$label[[7]], tg[[2]]$type, tg$word$label[4], tg$word$label[6])
+    }, c("5", "13", "k", "interval", "\u0159eknu", "ud\u011bl\u00e1\u0161"))
+    expect_equal({
+        tg <- tg.read("H_short_UTF16.TextGrid", "UTF-16")
+        c(length(tg), length(unique(tg$word$t2)), tg[[1]]$label[[7]], tg[[2]]$type, tg$word$label[4], tg$word$label[6])
+    }, c("5", "13", "k", "interval", "\u0159eknu", "ud\u011bl\u00e1\u0161"))
     expect_equal({
         tg <- tg.read("2pr.TextGrid")
         tg$ORT$label[4:6]
@@ -523,8 +535,9 @@ test_that("pitch.read", {
     expect_equal({
         p <- pitch.read("sound.Pitch")
         p2 <- pitch.read("sound_short.Pitch")
-        identical(p, p2)
-    }, TRUE)
+        p3 <- pitch.read("sound_UTF16.Pitch", encoding = "UTF-16")
+        c(identical(p, p2), identical(p, p3))
+    }, c(TRUE, TRUE))
 })
 
 context("strings")

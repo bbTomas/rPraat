@@ -4,19 +4,21 @@
 \alias{tg.write}
 \title{tg.write}
 \usage{
-tg.write(tg, fileNameTextGrid)
+tg.write(tg, fileNameTextGrid, format = "short")
 }
 \arguments{
 \item{tg}{TextGrid object}
 
 \item{fileNameTextGrid}{Output file name}
+
+\item{format}{Output file format ("short" (default, short text format) or "text" (a.k.a. full text format))}
 }
 \description{
 Saves TextGrid to the file. TextGrid may contain both interval and point
 tiers (tg[[1]], tg[[2]], tg[[3]], etc.). If tier type is not specified in $type,
 is is assumed to be "interval". If specified, $type have to be "interval" or "point".
 If there is no class(tg)["tmin"] and class(tg)["tmax"], they are calculated as min and max of
-all tiers. The file is saved in Short text file, UTF-8 format.
+all tiers. The file is saved in UTF-8 encoding.
 }
 \examples{
 \dontrun{

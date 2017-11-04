@@ -4,10 +4,12 @@
 \alias{tg.read}
 \title{tg.read}
 \usage{
-tg.read(fileNameTextGrid)
+tg.read(fileNameTextGrid, encoding = "UTF-8")
 }
 \arguments{
 \item{fileNameTextGrid}{Input file name}
+
+\item{encoding}{File encoding (default: "UTF-8"), "auto" for auto-detect of Unicode encoding}
 }
 \value{
 TextGrid object
