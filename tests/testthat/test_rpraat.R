@@ -450,6 +450,11 @@ test_that("tg.findLabels", {
 })
 
 test_that("tg.duplicateTierMergeSegments", {
+    expect_equal(
+        unlist(stringr::str_split('-a--a-', stringr::coll('-'))),
+        c("", "a", "", "a", "")
+    )
+
     expect_error({
         tg <- tg.read("H3.TextGrid")   # prázdné segmenty uvnitř slabiky vadí
         pattern <- "ja:-ci-P\\ek-nu-t_so-?u-J\\e-la:S- -nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"

@@ -1128,7 +1128,8 @@ tg.duplicateTierMergeSegments <- function(tg, originalInd, newInd = Inf, newTier
                     "actual labels: [", collapsed, "]"))
     }
 
-    parts <- unlist(strsplit(pattern, split = sep, fixed = TRUE))
+    # parts <- unlist(strsplit(pattern, split = sep, fixed = TRUE))   #  ('-a--a-', '-')   ->  ""  "a" "" "a"
+    parts <- unlist(stringr::str_split(pattern, stringr::coll(sep)))  #  ('-a--a-', '-')   ->  ""  "a" "" "a" ""
 
     t1 <- numeric(0)  #
     t2 <- numeric(0)  #
