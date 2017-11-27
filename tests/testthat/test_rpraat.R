@@ -201,12 +201,12 @@ test_that("tg.write", {
     expect_equal({
         tg <- tg.createNewTextGrid(0, 3)
         tg <- tg.insertNewIntervalTier(tg, 1, "word")
-        tg <- tg.insertInterval(tg, 1, 0.8, 1.5, "s\u0105")
+        tg <- tg.insertInterval(tg, 1, 0.8, 1.5, "s\u0105\u0123")
         f <- tempfile()
         tg.write(tg, f, format = "text")
         tg2 <- tg.read(f)
         unlink(f)
-        tg2[[1]]$label[2] == "s\u0105"
+        tg2[[1]]$label[2] == "s\u0105\u0123"
     }, TRUE)
     expect_equal({
         tg <- tg.read("2pr.TextGrid")
