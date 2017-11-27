@@ -401,6 +401,20 @@ tg.read <- function(fileNameTextGrid, encoding = "UTF-8") {
 }
 
 
+#' wrLine
+#'
+#' Write text line to a connection in binary mode.
+#'
+#' @param string Text line.
+#' @param fid A connection object.
+#'
+#' @return a raw vector (if fid is a raw vector) or invisibly NULL.
+#' @export
+#'
+#' @examples
+wrLine <- function(string, fid) {
+    writeBin(c(charToRaw(string), as.raw(c(13, 10))), fid, endian = "little")
+}
 
 
 #' tg.write
@@ -475,123 +489,123 @@ tg.write <- function(tg, fileNameTextGrid, format = "short") {
         }
     }
 
-    fid <- file(fileNameTextGrid, open = "w", encoding = "UTF-8")
+    fid <- file(fileNameTextGrid, open = "wb", encoding = "UTF-8")
     if (!isOpen(fid)) {
         stop(paste0("cannot open file [", fileNameTextGrid, "]"))
     }
 
-    writeLines('File type = "ooTextFile"', fid)
-    writeLines('Object class = "TextGrid"', fid)
-    writeLines("", fid)
+    wrLine('File type = "ooTextFile"', fid)
+    wrLine('Object class = "TextGrid"', fid)
+    wrLine("", fid)
     if (format == "short") {
-        writeLines(as.character(round2(minTimeTotal, -15)), fid)  # min time from all tiers
-        writeLines(as.character(round2(maxTimeTotal, -15)), fid)  # max time from all tiers
-        writeLines("<exists>", fid)
-        writeLines(as.character(nTiers), fid)
+        wrLine(as.character(round2(minTimeTotal, -15)), fid)  # min time from all tiers
+        wrLine(as.character(round2(maxTimeTotal, -15)), fid)  # max time from all tiers
+        wrLine("<exists>", fid)
+        wrLine(as.character(nTiers), fid)
     } else if (format == "text") {
-        writeLines(paste0("xmin = ", as.character(round2(minTimeTotal, -15)), " "), fid)  # min time from all tiers
-        writeLines(paste0("xmax = ", as.character(round2(maxTimeTotal, -15)), " "), fid)  # max time from all tiers
-        writeLines("tiers? <exists> ", fid)
-        writeLines(paste0("size = ", as.character(nTiers), " "), fid)
-        writeLines("item []: ", fid)
+        wrLine(paste0("xmin = ", as.character(round2(minTimeTotal, -15)), " "), fid)  # min time from all tiers
+        wrLine(paste0("xmax = ", as.character(round2(maxTimeTotal, -15)), " "), fid)  # max time from all tiers
+        wrLine("tiers? <exists> ", fid)
+        wrLine(paste0("size = ", as.character(nTiers), " "), fid)
+        wrLine("item []: ", fid)
     }
 
     for (N in seqM(1, nTiers)) {
         if (format == "text") {
-            writeLines(paste0("    item [", as.character(N), "]:"), fid)
+            wrLine(paste0("    item [", as.character(N), "]:"), fid)
         }
 
         if (tg[[N]]$typInt == TRUE) {  # interval tier
             if (format == "short") {
-                writeLines('"IntervalTier"', fid)
-                writeLines(paste0('"', tg[[N]]$name, '"'), fid)
+                wrLine('"IntervalTier"', fid)
+                wrLine(paste0('"', tg[[N]]$name, '"'), fid)
             } else if (format == "text") {
-                writeLines('        class = "IntervalTier" ', fid)
-                writeLines(paste0('        name = "', tg[[N]]$name, '" '), fid)
+                wrLine('        class = "IntervalTier" ', fid)
+                wrLine(paste0('        name = "', tg[[N]]$name, '" '), fid)
             }
 
             nInt <- length(tg[[N]]$t1)  # number of intervals
             if (nInt > 0) {
                 if (format == "short") {
-                    writeLines(as.character(round2(tg[[N]]$t1[1], -15)), fid)  # start time of the tier
-                    writeLines(as.character(round2(tg[[N]]$t2[length(tg[[N]]$t2)], -15)), fid)  # end time of the tier
-                    writeLines(as.character(nInt), fid)  # pocet intervalu textgrid
+                    wrLine(as.character(round2(tg[[N]]$t1[1], -15)), fid)  # start time of the tier
+                    wrLine(as.character(round2(tg[[N]]$t2[length(tg[[N]]$t2)], -15)), fid)  # end time of the tier
+                    wrLine(as.character(nInt), fid)  # pocet intervalu textgrid
                 } else if (format == "text") {
-                    writeLines(paste0("        xmin = ", as.character(round2(tg[[N]]$t1[1], -15)), " "), fid)  # start time of the tier
-                    writeLines(paste0("        xmax = ", as.character(round2(tg[[N]]$t2[length(tg[[N]]$t2)], -15)), " "), fid)  # end time of the tier
-                    writeLines(paste0("        intervals: size = ", as.character(nInt), " "), fid)  # pocet intervalu textgrid
+                    wrLine(paste0("        xmin = ", as.character(round2(tg[[N]]$t1[1], -15)), " "), fid)  # start time of the tier
+                    wrLine(paste0("        xmax = ", as.character(round2(tg[[N]]$t2[length(tg[[N]]$t2)], -15)), " "), fid)  # end time of the tier
+                    wrLine(paste0("        intervals: size = ", as.character(nInt), " "), fid)  # pocet intervalu textgrid
                 }
 
                 for (I in seqM(1, nInt)) {
                     if (format == "short") {
-                        writeLines(as.character(round2(tg[[N]]$t1[I], -15)), fid)
-                        writeLines(as.character(round2(tg[[N]]$t2[I], -15)), fid)
-                        writeLines(paste0('"', tg[[N]]$label[I], '"'), fid)
+                        wrLine(as.character(round2(tg[[N]]$t1[I], -15)), fid)
+                        wrLine(as.character(round2(tg[[N]]$t2[I], -15)), fid)
+                        wrLine(paste0('"', tg[[N]]$label[I], '"'), fid)
                     } else if (format == "text") {
-                        writeLines(paste0("        intervals [", as.character(I), "]:"), fid)
-                        writeLines(paste0("            xmin = ", as.character(round2(tg[[N]]$t1[I], -15)), " "), fid)
-                        writeLines(paste0("            xmax = ", as.character(round2(tg[[N]]$t2[I], -15)), " "), fid)
-                        writeLines(paste0('            text = "', tg[[N]]$label[I], '" '), fid)
+                        wrLine(paste0("        intervals [", as.character(I), "]:"), fid)
+                        wrLine(paste0("            xmin = ", as.character(round2(tg[[N]]$t1[I], -15)), " "), fid)
+                        wrLine(paste0("            xmax = ", as.character(round2(tg[[N]]$t2[I], -15)), " "), fid)
+                        wrLine(paste0('            text = "', tg[[N]]$label[I], '" '), fid)
                     }
                 }
             } else {   # create one empty interval
                 if (format == "short") {
-                    writeLines(as.character(round2(minTimeTotal, -15)), fid)  # start time of the tier
-                    writeLines(as.character(round2(maxTimeTotal, -15)), fid)  # end time of the tier
-                    writeLines("1", fid)  # number of intervals
-                    writeLines(as.character(round2(minTimeTotal, -15)), fid)
-                    writeLines(as.character(round2(maxTimeTotal, -15)), fid)
-                    writeLines('""', fid)
+                    wrLine(as.character(round2(minTimeTotal, -15)), fid)  # start time of the tier
+                    wrLine(as.character(round2(maxTimeTotal, -15)), fid)  # end time of the tier
+                    wrLine("1", fid)  # number of intervals
+                    wrLine(as.character(round2(minTimeTotal, -15)), fid)
+                    wrLine(as.character(round2(maxTimeTotal, -15)), fid)
+                    wrLine('""', fid)
                 } else if (format == "text") {
-                    writeLines(paste0("        xmin = ", as.character(round2(minTimeTotal, -15)), " "), fid)  # start time of the tier
-                    writeLines(paste0("        xmax = ", as.character(round2(maxTimeTotal, -15)), " "), fid)  # end time of the tier
-                    writeLines("        intervals: size = 1 ", fid)  # pocet intervalu textgrid
-                    writeLines("        intervals [1]:", fid)
-                    writeLines(paste0("            xmin = ", as.character(round2(minTimeTotal, -15)), " "), fid)
-                    writeLines(paste0("            xmax = ", as.character(round2(maxTimeTotal, -15)), " "), fid)
-                    writeLines('            text = "" ', fid)
+                    wrLine(paste0("        xmin = ", as.character(round2(minTimeTotal, -15)), " "), fid)  # start time of the tier
+                    wrLine(paste0("        xmax = ", as.character(round2(maxTimeTotal, -15)), " "), fid)  # end time of the tier
+                    wrLine("        intervals: size = 1 ", fid)  # pocet intervalu textgrid
+                    wrLine("        intervals [1]:", fid)
+                    wrLine(paste0("            xmin = ", as.character(round2(minTimeTotal, -15)), " "), fid)
+                    wrLine(paste0("            xmax = ", as.character(round2(maxTimeTotal, -15)), " "), fid)
+                    wrLine('            text = "" ', fid)
                 }
             }
         } else { # pointTier
             if (format == "short") {
-                writeLines('"TextTier"', fid)
-                writeLines(paste0('"', tg[[N]]$name, '"'), fid)
+                wrLine('"TextTier"', fid)
+                wrLine(paste0('"', tg[[N]]$name, '"'), fid)
             } else if (format == "text") {
-                writeLines('        class = "TextTier" ', fid)
-                writeLines(paste0('        name = "', tg[[N]]$name, '" '), fid)
+                wrLine('        class = "TextTier" ', fid)
+                wrLine(paste0('        name = "', tg[[N]]$name, '" '), fid)
             }
 
             nInt <- length(tg[[N]]$t)  # number of points
             if (nInt > 0) {
                 if (format == "short") {
-                    writeLines(as.character(round2(tg[[N]]$t[1], -15)), fid)  # start time of the tier
-                    writeLines(as.character(round2(tg[[N]]$t[length(tg[[N]]$t)], -15)), fid)  # end time of the tier
-                    writeLines(as.character(nInt), fid)  # number of points
+                    wrLine(as.character(round2(tg[[N]]$t[1], -15)), fid)  # start time of the tier
+                    wrLine(as.character(round2(tg[[N]]$t[length(tg[[N]]$t)], -15)), fid)  # end time of the tier
+                    wrLine(as.character(nInt), fid)  # number of points
                 } else if (format == "text") {
-                    writeLines(paste0("        xmin = ", as.character(round2(tg[[N]]$t[1], -15)), " "), fid)  # start time of the tier
-                    writeLines(paste0("        xmax = ", as.character(round2(tg[[N]]$t[length(tg[[N]]$t)], -15)), " "), fid)  # end time of the tier
-                    writeLines(paste0("        points: size = ", as.character(nInt), " "), fid)  # number of points
+                    wrLine(paste0("        xmin = ", as.character(round2(tg[[N]]$t[1], -15)), " "), fid)  # start time of the tier
+                    wrLine(paste0("        xmax = ", as.character(round2(tg[[N]]$t[length(tg[[N]]$t)], -15)), " "), fid)  # end time of the tier
+                    wrLine(paste0("        points: size = ", as.character(nInt), " "), fid)  # number of points
                 }
 
                 for (I in seqM(1, nInt)) {
                     if (format == "short") {
-                        writeLines(as.character(round2(tg[[N]]$t[I], -15)), fid)
-                        writeLines(paste0('"', tg[[N]]$label[I], '"'), fid)
+                        wrLine(as.character(round2(tg[[N]]$t[I], -15)), fid)
+                        wrLine(paste0('"', tg[[N]]$label[I], '"'), fid)
                     } else if (format == "text") {
-                        writeLines(paste0("        points [", as.character(I), "]:"), fid)
-                        writeLines(paste0("            number = ", as.character(round2(tg[[N]]$t[I], -15)), " "), fid)
-                        writeLines(paste0('            mark = "', tg[[N]]$label[I], '" '), fid)
+                        wrLine(paste0("        points [", as.character(I), "]:"), fid)
+                        wrLine(paste0("            number = ", as.character(round2(tg[[N]]$t[I], -15)), " "), fid)
+                        wrLine(paste0('            mark = "', tg[[N]]$label[I], '" '), fid)
                     }
                 }
             } else { # empty pointtier
                 if (format == "short") {
-                    writeLines(as.character(round2(minTimeTotal, -15)), fid)  # start time of the tier
-                    writeLines(as.character(round2(maxTimeTotal, -15)), fid)  # end time of the tier
-                    writeLines("0", fid)  # number of points
+                    wrLine(as.character(round2(minTimeTotal, -15)), fid)  # start time of the tier
+                    wrLine(as.character(round2(maxTimeTotal, -15)), fid)  # end time of the tier
+                    wrLine("0", fid)  # number of points
                 } else if (format == "text") {
-                    writeLines(paste0("        xmin = ", as.character(round2(minTimeTotal, -15)), " "), fid)  # start time of the tier
-                    writeLines(paste0("        xmax = ", as.character(round2(maxTimeTotal, -15)), " "), fid)  # end time of the tier
-                    writeLines("        points: size = 0 ", fid)  # number of points
+                    wrLine(paste0("        xmin = ", as.character(round2(minTimeTotal, -15)), " "), fid)  # start time of the tier
+                    wrLine(paste0("        xmax = ", as.character(round2(maxTimeTotal, -15)), " "), fid)  # end time of the tier
+                    wrLine("        points: size = 0 ", fid)  # number of points
                 }
             }
         }
@@ -3287,42 +3301,42 @@ pt.write <- function(pt, fileNamePitchTier, format = "spreadsheet") {
     }
 
 
-    fid <- file(fileNamePitchTier, open = "w", encoding = "UTF-8")
+    fid <- file(fileNamePitchTier, open = "wb", encoding = "UTF-8")
     if (!isOpen(fid)) {
         stop(paste0("cannot open file [", fileNamePitchTier, "]"))
     }
 
     if (format == "spreadsheet") {
-        writeLines('"ooTextFile"', fid)
-        writeLines('"PitchTier"', fid)
+        wrLine('"ooTextFile"', fid)
+        wrLine('"PitchTier"', fid)
     } else if (format == "short" || format == "text") {
-        writeLines('File type = "ooTextFile"', fid)
-        writeLines('Object class = "PitchTier"', fid)
-        writeLines('', fid)
+        wrLine('File type = "ooTextFile"', fid)
+        wrLine('Object class = "PitchTier"', fid)
+        wrLine('', fid)
     }
 
     if (format == "spreadsheet") {
-        writeLines(paste0(as.character(round2(xmin, -15)), " ", as.character(round2(xmax, -15)), " ", as.character(N)), fid)
+        wrLine(paste0(as.character(round2(xmin, -15)), " ", as.character(round2(xmax, -15)), " ", as.character(N)), fid)
     } else if (format == "short") {
-        writeLines(as.character(round2(xmin, -15)), fid)
-        writeLines(as.character(round2(xmax, -15)), fid)
-        writeLines(as.character(N), fid)
+        wrLine(as.character(round2(xmin, -15)), fid)
+        wrLine(as.character(round2(xmax, -15)), fid)
+        wrLine(as.character(N), fid)
     } else if (format == "text") {
-        writeLines(paste0("xmin = ", as.character(round2(xmin, -15)), " "), fid)
-        writeLines(paste0("xmax = ", as.character(round2(xmax, -15)), " "), fid)
-        writeLines(paste0("points: size = ", as.character(N), " "), fid)
+        wrLine(paste0("xmin = ", as.character(round2(xmin, -15)), " "), fid)
+        wrLine(paste0("xmax = ", as.character(round2(xmax, -15)), " "), fid)
+        wrLine(paste0("points: size = ", as.character(N), " "), fid)
     }
 
     for (n in seqM(1, N)) {
         if (format == "spreadsheet" || format == "headerless") {
-            writeLines(paste0(as.character(round2(pt$t[n], -15)), "\t", as.character(round2(pt$f[n], -15))), fid)
+            wrLine(paste0(as.character(round2(pt$t[n], -15)), "\t", as.character(round2(pt$f[n], -15))), fid)
         } else if (format == "short") {
-            writeLines(as.character(round2(pt$t[n], -15)), fid)
-            writeLines(as.character(round2(pt$f[n], -15)), fid)
+            wrLine(as.character(round2(pt$t[n], -15)), fid)
+            wrLine(as.character(round2(pt$f[n], -15)), fid)
         } else if (format == "text") {
-            writeLines(paste0("points [", as.character(n), "]:"), fid)
-            writeLines(paste0("    number = ", as.character(round2(pt$t[n], -15)), " "), fid)
-            writeLines(paste0("    value = ", as.character(round2(pt$f[n], -15)), " "), fid)
+            wrLine(paste0("points [", as.character(n), "]:"), fid)
+            wrLine(paste0("    number = ", as.character(round2(pt$t[n], -15)), " "), fid)
+            wrLine(paste0("    value = ", as.character(round2(pt$f[n], -15)), " "), fid)
         }
     }
 

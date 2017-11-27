@@ -1,0 +1,633 @@
+File type = "ooTextFile"
+Object class = "PitchTier"
+
+xmin = 0 
+xmax = 3.617125 
+points: size = 209 
+points [1]:
+    number = 0.09356 
+    value = 210.06273 
+points [2]:
+    number = 0.10356 
+    value = 216.0002 
+points [3]:
+    number = 0.11356 
+    value = 219.49307 
+points [4]:
+    number = 0.12356 
+    value = 221.28594 
+points [5]:
+    number = 0.13356 
+    value = 224.36499 
+points [6]:
+    number = 0.14356 
+    value = 230.29472 
+points [7]:
+    number = 0.15356 
+    value = 215.38493 
+points [8]:
+    number = 0.16356 
+    value = 203.8227 
+points [9]:
+    number = 0.17356 
+    value = 192.48736 
+points [10]:
+    number = 0.18356 
+    value = 189.58034 
+points [11]:
+    number = 0.19356 
+    value = 192.01043 
+points [12]:
+    number = 0.20356 
+    value = 195.54695 
+points [13]:
+    number = 0.21356 
+    value = 195.8509 
+points [14]:
+    number = 0.22356 
+    value = 194.15508 
+points [15]:
+    number = 0.23356 
+    value = 196.71851 
+points [16]:
+    number = 0.29356 
+    value = 263.36085 
+points [17]:
+    number = 0.30356 
+    value = 270.8391 
+points [18]:
+    number = 0.31356 
+    value = 273.78121 
+points [19]:
+    number = 0.32356 
+    value = 274.47705 
+points [20]:
+    number = 0.33356 
+    value = 273.73142 
+points [21]:
+    number = 0.34356 
+    value = 269.11688 
+points [22]:
+    number = 0.35356 
+    value = 255.93834 
+points [23]:
+    number = 0.36356 
+    value = 249.02074 
+points [24]:
+    number = 0.37356 
+    value = 253.60568 
+points [25]:
+    number = 0.38356 
+    value = 255.08118 
+points [26]:
+    number = 0.39356 
+    value = 257.62695 
+points [27]:
+    number = 0.40356 
+    value = 261.54241 
+points [28]:
+    number = 0.41356 
+    value = 263.87497 
+points [29]:
+    number = 0.42356 
+    value = 259.3763 
+points [30]:
+    number = 0.43356 
+    value = 249.87405 
+points [31]:
+    number = 0.44356 
+    value = 244.3463 
+points [32]:
+    number = 0.45356 
+    value = 238.95577 
+points [33]:
+    number = 0.46356 
+    value = 233.33417 
+points [34]:
+    number = 0.47356 
+    value = 228.2594 
+points [35]:
+    number = 0.48356 
+    value = 238.6009 
+points [36]:
+    number = 0.53356 
+    value = 256.70435 
+points [37]:
+    number = 0.54356 
+    value = 250.5053 
+points [38]:
+    number = 0.55356 
+    value = 245.87157 
+points [39]:
+    number = 0.56356 
+    value = 240.46777 
+points [40]:
+    number = 0.57356 
+    value = 231.73973 
+points [41]:
+    number = 0.58356 
+    value = 224.09682 
+points [42]:
+    number = 0.59356 
+    value = 218.3142 
+points [43]:
+    number = 0.60356 
+    value = 208.5711 
+points [44]:
+    number = 0.61356 
+    value = 202.60559 
+points [45]:
+    number = 0.62356 
+    value = 196.42453 
+points [46]:
+    number = 0.63356 
+    value = 188.12495 
+points [47]:
+    number = 0.64356 
+    value = 190.2554 
+points [48]:
+    number = 0.76356 
+    value = 130.33983 
+points [49]:
+    number = 0.77356 
+    value = 131.42228 
+points [50]:
+    number = 0.78356 
+    value = 130.37524 
+points [51]:
+    number = 0.79356 
+    value = 131.80846 
+points [52]:
+    number = 0.80356 
+    value = 142.99321 
+points [53]:
+    number = 0.81356 
+    value = 163.08631 
+points [54]:
+    number = 0.82356 
+    value = 170.93 
+points [55]:
+    number = 0.83356 
+    value = 179.10396 
+points [56]:
+    number = 0.84356 
+    value = 183.92571 
+points [57]:
+    number = 0.85356 
+    value = 183.70872 
+points [58]:
+    number = 0.86356 
+    value = 179.32428 
+points [59]:
+    number = 0.87356 
+    value = 179.81534 
+points [60]:
+    number = 0.88356 
+    value = 180.89163 
+points [61]:
+    number = 0.89356 
+    value = 180.1525 
+points [62]:
+    number = 0.90356 
+    value = 174.61549 
+points [63]:
+    number = 0.91356 
+    value = 170.05191 
+points [64]:
+    number = 0.92356 
+    value = 168.28697 
+points [65]:
+    number = 0.93356 
+    value = 161.6908 
+points [66]:
+    number = 0.94356 
+    value = 157.24872 
+points [67]:
+    number = 0.95356 
+    value = 153.43139 
+points [68]:
+    number = 0.96356 
+    value = 150.0186 
+points [69]:
+    number = 0.97356 
+    value = 149.29403 
+points [70]:
+    number = 0.98356 
+    value = 150.659 
+points [71]:
+    number = 0.99356 
+    value = 150.03651 
+points [72]:
+    number = 1.00356 
+    value = 145.59759 
+points [73]:
+    number = 1.01356 
+    value = 144.09674 
+points [74]:
+    number = 1.02356 
+    value = 138.38989 
+points [75]:
+    number = 1.03356 
+    value = 135.05873 
+points [76]:
+    number = 1.04356 
+    value = 139.94764 
+points [77]:
+    number = 1.05356 
+    value = 139.8011 
+points [78]:
+    number = 1.06356 
+    value = 125.00169 
+points [79]:
+    number = 1.07356 
+    value = 132.86361 
+points [80]:
+    number = 1.88356 
+    value = 209.63973 
+points [81]:
+    number = 1.89356 
+    value = 212.65177 
+points [82]:
+    number = 1.90356 
+    value = 214.26371 
+points [83]:
+    number = 1.91356 
+    value = 208.59684 
+points [84]:
+    number = 1.92356 
+    value = 207.41702 
+points [85]:
+    number = 1.93356 
+    value = 205.89616 
+points [86]:
+    number = 1.94356 
+    value = 204.23763 
+points [87]:
+    number = 1.95356 
+    value = 203.95877 
+points [88]:
+    number = 1.96356 
+    value = 206.17781 
+points [89]:
+    number = 1.97356 
+    value = 209.02429 
+points [90]:
+    number = 1.98356 
+    value = 211.17651 
+points [91]:
+    number = 1.99356 
+    value = 208.61157 
+points [92]:
+    number = 2.00356 
+    value = 198.8186 
+points [93]:
+    number = 2.01356 
+    value = 192.23273 
+points [94]:
+    number = 2.02356 
+    value = 190.45409 
+points [95]:
+    number = 2.03356 
+    value = 196.59104 
+points [96]:
+    number = 2.04356 
+    value = 209.64764 
+points [97]:
+    number = 2.05356 
+    value = 217.91409 
+points [98]:
+    number = 2.06356 
+    value = 229.34489 
+points [99]:
+    number = 2.07356 
+    value = 241.96102 
+points [100]:
+    number = 2.08356 
+    value = 245.34126 
+points [101]:
+    number = 2.09356 
+    value = 258.40466 
+points [102]:
+    number = 2.10356 
+    value = 264.49786 
+points [103]:
+    number = 2.11356 
+    value = 267.89718 
+points [104]:
+    number = 2.12356 
+    value = 269.5446 
+points [105]:
+    number = 2.13356 
+    value = 272.40118 
+points [106]:
+    number = 2.14356 
+    value = 275.22475 
+points [107]:
+    number = 2.15356 
+    value = 268.33222 
+points [108]:
+    number = 2.16356 
+    value = 257.35414 
+points [109]:
+    number = 2.17356 
+    value = 263.15217 
+points [110]:
+    number = 2.18356 
+    value = 270.18244 
+points [111]:
+    number = 2.19356 
+    value = 282.52657 
+points [112]:
+    number = 2.20356 
+    value = 290.81763 
+points [113]:
+    number = 2.21356 
+    value = 290.30941 
+points [114]:
+    number = 2.22356 
+    value = 287.47016 
+points [115]:
+    number = 2.23356 
+    value = 281.21109 
+points [116]:
+    number = 2.24356 
+    value = 274.59581 
+points [117]:
+    number = 2.25356 
+    value = 262.78065 
+points [118]:
+    number = 2.26356 
+    value = 262.42635 
+points [119]:
+    number = 2.27356 
+    value = 263.82605 
+points [120]:
+    number = 2.28356 
+    value = 266.04013 
+points [121]:
+    number = 2.29356 
+    value = 267.39565 
+points [122]:
+    number = 2.30356 
+    value = 268.39018 
+points [123]:
+    number = 2.31356 
+    value = 268.82702 
+points [124]:
+    number = 2.32356 
+    value = 267.13912 
+points [125]:
+    number = 2.33356 
+    value = 262.16115 
+points [126]:
+    number = 2.34356 
+    value = 247.81725 
+points [127]:
+    number = 2.35356 
+    value = 239.29923 
+points [128]:
+    number = 2.36356 
+    value = 239.99781 
+points [129]:
+    number = 2.37356 
+    value = 245.40197 
+points [130]:
+    number = 2.38356 
+    value = 247.60482 
+points [131]:
+    number = 2.39356 
+    value = 248.01603 
+points [132]:
+    number = 2.40356 
+    value = 248.19358 
+points [133]:
+    number = 2.41356 
+    value = 247.122 
+points [134]:
+    number = 2.42356 
+    value = 238.64669 
+points [135]:
+    number = 2.43356 
+    value = 231.58631 
+points [136]:
+    number = 2.44356 
+    value = 220.20769 
+points [137]:
+    number = 2.45356 
+    value = 218.73612 
+points [138]:
+    number = 2.46356 
+    value = 191.99915 
+points [139]:
+    number = 2.47356 
+    value = 192.65826 
+points [140]:
+    number = 2.48356 
+    value = 193.53736 
+points [141]:
+    number = 2.49356 
+    value = 190.55561 
+points [142]:
+    number = 2.50356 
+    value = 190.5841 
+points [143]:
+    number = 2.51356 
+    value = 190.3822 
+points [144]:
+    number = 2.52356 
+    value = 200.87628 
+points [145]:
+    number = 2.53356 
+    value = 204.67346 
+points [146]:
+    number = 2.54356 
+    value = 215.54918 
+points [147]:
+    number = 2.55356 
+    value = 217.28573 
+points [148]:
+    number = 2.56356 
+    value = 216.115 
+points [149]:
+    number = 2.57356 
+    value = 207.03341 
+points [150]:
+    number = 2.58356 
+    value = 201.07801 
+points [151]:
+    number = 2.59356 
+    value = 199.75675 
+points [152]:
+    number = 2.60356 
+    value = 194.63062 
+points [153]:
+    number = 2.61356 
+    value = 193.28701 
+points [154]:
+    number = 2.62356 
+    value = 202.38722 
+points [155]:
+    number = 2.77356 
+    value = 214.76577 
+points [156]:
+    number = 2.78356 
+    value = 211.42435 
+points [157]:
+    number = 2.79356 
+    value = 215.49598 
+points [158]:
+    number = 2.80356 
+    value = 217.81157 
+points [159]:
+    number = 2.81356 
+    value = 217.39364 
+points [160]:
+    number = 2.82356 
+    value = 218.61249 
+points [161]:
+    number = 2.83356 
+    value = 220.20823 
+points [162]:
+    number = 2.84356 
+    value = 220.63229 
+points [163]:
+    number = 2.85356 
+    value = 220.25536 
+points [164]:
+    number = 2.86356 
+    value = 221.08183 
+points [165]:
+    number = 2.87356 
+    value = 220.97955 
+points [166]:
+    number = 2.88356 
+    value = 215.84269 
+points [167]:
+    number = 2.89356 
+    value = 205.91814 
+points [168]:
+    number = 2.90356 
+    value = 200.42995 
+points [169]:
+    number = 2.91356 
+    value = 185.19105 
+points [170]:
+    number = 2.97356 
+    value = 199.51589 
+points [171]:
+    number = 2.98356 
+    value = 199.79982 
+points [172]:
+    number = 2.99356 
+    value = 196.1526 
+points [173]:
+    number = 3.08356 
+    value = 199.41769 
+points [174]:
+    number = 3.09356 
+    value = 202.25194 
+points [175]:
+    number = 3.10356 
+    value = 198.40645 
+points [176]:
+    number = 3.11356 
+    value = 198.54629 
+points [177]:
+    number = 3.12356 
+    value = 201.46882 
+points [178]:
+    number = 3.18356 
+    value = 207.16774 
+points [179]:
+    number = 3.19356 
+    value = 197.24236 
+points [180]:
+    number = 3.20356 
+    value = 192.67202 
+points [181]:
+    number = 3.21356 
+    value = 193.0145 
+points [182]:
+    number = 3.22356 
+    value = 194.80734 
+points [183]:
+    number = 3.23356 
+    value = 195.02821 
+points [184]:
+    number = 3.24356 
+    value = 200.82583 
+points [185]:
+    number = 3.25356 
+    value = 206.00362 
+points [186]:
+    number = 3.26356 
+    value = 204.86735 
+points [187]:
+    number = 3.27356 
+    value = 203.41338 
+points [188]:
+    number = 3.28356 
+    value = 201.75281 
+points [189]:
+    number = 3.29356 
+    value = 200.59331 
+points [190]:
+    number = 3.30356 
+    value = 195.14057 
+points [191]:
+    number = 3.31356 
+    value = 189.15006 
+points [192]:
+    number = 3.32356 
+    value = 185.32658 
+points [193]:
+    number = 3.33356 
+    value = 179.68854 
+points [194]:
+    number = 3.34356 
+    value = 174.90531 
+points [195]:
+    number = 3.35356 
+    value = 171.53492 
+points [196]:
+    number = 3.36356 
+    value = 166.59464 
+points [197]:
+    number = 3.37356 
+    value = 165.82695 
+points [198]:
+    number = 3.38356 
+    value = 162.72414 
+points [199]:
+    number = 3.39356 
+    value = 160.70603 
+points [200]:
+    number = 3.40356 
+    value = 160.87078 
+points [201]:
+    number = 3.41356 
+    value = 159.57253 
+points [202]:
+    number = 3.42356 
+    value = 154.14529 
+points [203]:
+    number = 3.43356 
+    value = 152.69942 
+points [204]:
+    number = 3.44356 
+    value = 153.02385 
+points [205]:
+    number = 3.45356 
+    value = 157.12895 
+points [206]:
+    number = 3.46356 
+    value = 160.50566 
+points [207]:
+    number = 3.47356 
+    value = 161.46857 
+points [208]:
+    number = 3.48356 
+    value = 162.42251 
+points [209]:
+    number = 3.49356 
+    value = 161.70258 

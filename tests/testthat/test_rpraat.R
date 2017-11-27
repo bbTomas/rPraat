@@ -42,6 +42,33 @@ test_that("pt.read", {
         }, c(209, 3.617125))
 })
 
+test_that("pt.write", {
+    expect_equal({
+        pt <- pt.read("Hround.PitchTier")
+        f <- tempfile()
+        pt.write(pt, f, "short")
+        pt2 <- pt.read(f)
+        unlink(f)
+        identical(pt, pt2)
+    }, TRUE)
+    expect_equal({
+        pt <- pt.read("Hround.PitchTier")
+        f <- tempfile()
+        pt.write(pt, f, "text")
+        pt2 <- pt.read(f)
+        unlink(f)
+        identical(pt, pt2)
+    }, TRUE)
+    expect_equal({
+        pt <- pt.read("Hround.PitchTier")
+        f <- tempfile()
+        pt.write(pt, f, "spreadsheet")
+        pt2 <- pt.read(f)
+        unlink(f)
+        identical(pt, pt2)
+    }, TRUE)
+})
+
 test_that("pt.Hz2ST", {
     expect_equal({
         pt <- pt.sample()
@@ -160,6 +187,35 @@ test_that("tg.read", {
         tg <- tg.read("sppas.TextGrid")
         tg$ORT$label[4:6]
     }, c("wracal\npokus", "siebe\"\"\nah\"\"\na", "siebie\"\"\na\"\"h\"\"\na"))
+})
+
+test_that("tg.write", {
+    expect_equal({
+        tg <- tg.read("2pr.TextGrid")
+        f <- tempfile()
+        tg.write(tg, f, format = "text")
+        tg2 <- tg.read(f)
+        unlink(f)
+        identical(tg, tg2)
+    }, TRUE)
+    expect_equal({
+        tg <- tg.createNewTextGrid(0, 3)
+        tg <- tg.insertNewIntervalTier(tg, 1, "word")
+        tg <- tg.insertInterval(tg, 1, 0.8, 1.5, "s\u0105")
+        f <- tempfile()
+        tg.write(tg, f, format = "text")
+        tg2 <- tg.read(f)
+        unlink(f)
+        tg2[[1]]$label[2] == "s\u0105"
+    }, TRUE)
+    expect_equal({
+        tg <- tg.read("2pr.TextGrid")
+        f <- tempfile()
+        tg.write(tg, f, format = "short")
+        tg2 <- tg.read(f)
+        unlink(f)
+        identical(tg, tg2)
+    }, TRUE)
 })
 
 
