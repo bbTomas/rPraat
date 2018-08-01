@@ -5,18 +5,18 @@ Version: 1.1.0
 Encoding: UTF-8
 Authors@R: person("Tomas", "Boril", email = "borilt@gmail.com", role = c("aut", "cre"))
 Maintainer: Tomas Boril <borilt@gmail.com>
-Description: Read, write and manipulate 'Praat' TextGrid, PitchTier, Pitch and Intensity files <http://www.fon.hum.uva.nl/praat/>.
+Description: Read, write and manipulate 'Praat' TextGrid, PitchTier and Pitch files <http://www.fon.hum.uva.nl/praat/>.
 URL: https://github.com/bbTomas/rPraat/
 BugReports: https://github.com/bbTomas/rPraat/issues
 License: MIT + file LICENSE
 LazyData: TRUE
 Depends:
-    R (>= 3.4.0)
+    R (>= 3.4.1)
 Imports:
     graphics (>= 3.1.0),
     dplyr (>= 0.7.1),
     stringr (>= 1.2.0),
     readr(>= 1.1.1),
     dygraphs (>= 1.1.1.4),
-RoxygenNote: 6.1.0
+RoxygenNote: 6.0.1
 Suggests: testthat

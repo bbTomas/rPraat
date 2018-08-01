@@ -128,6 +128,7 @@ test_that("pt.cut", {
         pt <- pt.cut(pt.sample(),  tStart = -1, tEnd = 1)
         c(pt$tmin, pt$tmax, length(pt$t), length(pt$f), pt$t[1], pt$t[10], pt$t[71], pt$f[1], pt$f[10], pt$f[71])},
         c(-1, 1, 71, 71, 0.0935625, 0.1835625, 0.9935625, 210.0627306, 189.5803367, 150.0365144))
+    expect_error(pt.cut(pt.sample(), 3, 2))
 })
 
 test_that("pt.cut0", {
@@ -152,6 +153,7 @@ test_that("pt.cut0", {
         pt <- pt.cut0(pt.sample(),  tStart = -1, tEnd = 1)
         c(pt$tmin, pt$tmax, length(pt$t), length(pt$f), pt$t[1], pt$t[10], pt$t[71], pt$f[1], pt$f[10], pt$f[71])},
         c(0, 2, 71, 71, 1.0935625, 1.1835625, 1.9935625, 210.0627306, 189.5803367, 150.0365144))
+    expect_error(pt.cut0(pt.sample(), 3, 2))
 })
 
 

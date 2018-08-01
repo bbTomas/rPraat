@@ -1,3 +1,120 @@
+#' col.read
+#'
+#' Loads Collection from Praat in Text or Short text format.
+#' Collection may contain combination of TextGrids, PitchTiers and Pitch objects.
+#'
+#' @param fileName Input file name
+#' @param encoding File encoding (default: "UTF-8"), "auto" for auto-detect of Unicode encoding
+#'
+#' @return Collection object
+#' @export
+#'
+#' @seealso \code{\link{tg.read}}, \code{\link{pt.read}}, \code{\link{pitch.read}}
+#'
+#' @examples
+#' \dontrun{
+#' coll <- col.read("short_textgrid+pitchtier.Collection")
+#' length(coll)  # number of objects in collection
+#' class(coll[[1]])["type"]  # 1st object type
+#' class(coll[[1]])["name"]  # 1st object name
+#' tg1 <- coll[[1]]  # 1st object
+#' tg.plot(tg1)
+#' length(tg1)  # number of tiers in TextGrid
+#' tg1$word$label
+#'
+#' class(coll[[2]])["type"]  # 2nd object type
+#' class(coll[[2]])["name"]  # 2nd object type
+#' pt1 <- coll[[2]]  # 2nd object
+#' pt.plot(pt1)
+#' }
+col.read <- function(fileName, encoding = "UTF-8") {
+    # inspired by Pol van Rijn's function from mPraat toolbox
+
+    if (!isString(fileName)) {
+        stop("Invalid 'fileName' parameter.")
+    }
+
+    if (!isString(encoding)) {
+        stop("Invalid 'encoding' parameter.")
+    }
+
+    if (encoding == "auto") {
+        encoding <- detectEncoding(fileName)
+    }
+
+    if (encoding == "UTF-8") {
+        flines <- readr::read_lines(fileName, locale = readr::locale(encoding = "UTF-8"))  # Does not support UTF-16 at this point :-(
+    } else {
+        fid <- file(fileName, open = "r", encoding = encoding)
+        flines <- readLines(fid)
+        close(fid)
+    }
+
+    if (length(flines) < 3) {
+        stop("This is not a Collection file!")
+    }
+
+    if (flines[2] != "Object class = \"Collection\"") {
+        stop("This is not a Collection file!")
+    }
+
+    r <- flines[4]
+    if (str_contains(r, 'size = ')) {
+        shortFormat <- FALSE
+    } else {
+        shortFormat <- TRUE
+    }
+    nobjects <- getNumberInLine(r, shortFormat) # Read the size, remove eventual spaces
+    collection <- vector("list", nobjects)
+
+    if (!shortFormat) {
+        find <- 6   # ignore "item []: "
+    } else {
+        find <- 5
+    }
+
+    for (s in seqM(1, nobjects)) {
+        if (!shortFormat) {
+            find <- find + 1  # discard item [1]:
+        }
+
+        r <- flines[find]; find <- find + 1
+        if (str_contains(r, "TextGrid")) {
+            objClass <- "TextGrid"
+        } else if (str_contains(r, "PitchTier")) {
+            objClass <- "PitchTier"
+        } else if (str_contains(r, "Pitch 1")) {
+            objClass <- "Pitch 1"
+        } else if (str_contains(r, "Sound")) {
+            stop("Sound files are currently not supported, because of their inefficient loading and saving duration, rather use WAVE files")
+        } else {
+            stop(paste0("Class not recognized! Line: ", r))
+        }
+
+        name <- getTextInQuotes(flines[find]); find <- find + 1
+
+        if (objClass == "TextGrid") {
+            tg_ind <- tg.read_lines(flines, find)
+            object <- tg_ind[[1]]
+            find <- tg_ind[[2]]
+        } else if (objClass == "PitchTier") {
+            pt_ind <- pt.read_lines(flines, find, collection = TRUE)
+            object <- pt_ind[[1]]
+            find <- pt_ind[[2]]
+        } else if (objClass == "Pitch 1") {
+            pitch_ind <- pitch.read_lines(flines, find, collection = TRUE)
+            object <- pitch_ind[[1]]
+            find <- pitch_ind[[2]]
+        }
+
+        class(object)["type"] <- objClass
+        class(object)["name"] <- name
+        collection[[s]] <- object
+    }
+
+    return(collection)
+}
+
 #' tg.checkTierInd
 #'
 #' Returns tier index. Input can be either index (number) or tier name (character string).
@@ -102,7 +219,7 @@ detectEncoding <- function(fileName) {
 #'
 #' @return TextGrid object
 #' @export
-#' @seealso \code{\link{tg.write}}, \code{\link{tg.plot}}, \code{\link{tg.repairContinuity}}, \code{\link{tg.createNewTextGrid}}, \code{\link{tg.findLabels}}, \code{\link{tg.duplicateTierMergeSegments}}, \code{\link{pt.read}}, \code{\link{pitch.read}}
+#' @seealso \code{\link{tg.write}}, \code{\link{tg.plot}}, \code{\link{tg.repairContinuity}}, \code{\link{tg.createNewTextGrid}}, \code{\link{tg.findLabels}}, \code{\link{tg.duplicateTierMergeSegments}}, \code{\link{pt.read}}, \code{\link{pitch.read}}, \code{\link{col.read}}
 #'
 #' @examples
 #' \dontrun{
@@ -118,8 +235,6 @@ tg.read <- function(fileNameTextGrid, encoding = "UTF-8") {
         stop("Invalid 'encoding' parameter.")
     }
 
-    tg <- list()  # new textgrid
-
     if (encoding == "auto") {
         encoding <- detectEncoding(fileNameTextGrid)
     }
@@ -134,15 +249,23 @@ tg.read <- function(fileNameTextGrid, encoding = "UTF-8") {
 
     find <- 4   # index of line to read, we ignore the first three
 
+    tg_ind <- tg.read_lines(flines, find)
+    return(tg_ind[[1]])
+}
+
+
+tg.read_lines <- function(flines, find) {
+    tg <- list()  # new textgrid
+
     xminStr <- flines[find]; find <- find + 1 # xmin
     xmaxStr <- flines[find]; find <- find + 1; # xmax
 
     r <- flines[find]; find <- find + 1; # either "<exists>" -> shorttext or "tiers? <exists> " -> full text format
 
-    if (r == "<exists>") {
-        shortFormat <- TRUE
-    } else if (substr(r, 1, 6) == "tiers?") {
+    if (str_contains(r, "tiers?")) {
         shortFormat <- FALSE
+    } else if (str_contains(r, '<exists>')) {
+        shortFormat <- TRUE
     } else {
         stop("Unknown textgrid format.")
     }
@@ -151,8 +274,8 @@ tg.read <- function(fileNameTextGrid, encoding = "UTF-8") {
         xmin <- as.numeric(xminStr) # xmin
         xmax <- as.numeric(xmaxStr) # xmax
     } else {
-        xmin <- as.numeric(substr(xminStr, 8, nchar(xminStr))) # xmin
-        xmax <- as.numeric(substr(xmaxStr, 8, nchar(xmaxStr))) # xmax
+        xmin <- as.numeric(substr(strTrim(xminStr), 8, nchar(xminStr))) # xmin
+        xmax <- as.numeric(substr(strTrim(xmaxStr), 8, nchar(xmaxStr))) # xmax
     }
 
     if (shortFormat) {
@@ -280,9 +403,9 @@ tg.read <- function(fileNameTextGrid, encoding = "UTF-8") {
                                        t1 = tierT1, t2 = tierT2, label = tierLabel)
             actNames <- names(tg)
             proposedName <- tierName
-#             while (proposedName %in% actNames) {
-#                 proposedName <- paste0(proposedName, "2")  # modify already existing name by adding 2 at the end
-#             }
+            #             while (proposedName %in% actNames) {
+            #                 proposedName <- paste0(proposedName, "2")  # modify already existing name by adding 2 at the end
+            #             }
             if (proposedName %in% actNames) {
                 warning(paste0("TextGrid has a duplicate tier name [", proposedName, "]. You should not use the name for indexing to avoid ambiguity."))
             }
@@ -397,21 +520,19 @@ tg.read <- function(fileNameTextGrid, encoding = "UTF-8") {
     class(tg)["tmin"] <- xmin
     class(tg)["tmax"] <- xmax
 
-    return(tg)
+    return(list(tg, find))
 }
 
 
-#' wrLine
-#'
-#' Write text line to a connection in binary mode.
-#'
-#' @param string Text line.
-#' @param fid A connection object.
-#'
-#' @return a raw vector (if fid is a raw vector) or invisibly NULL.
-#' @export
-#'
-#' @examples
+
+# wrLine
+#
+# Write text line to a connection in binary mode.
+#
+# @param string Text line.
+# @param fid A connection object.
+#
+# @return a raw vector (if fid is a raw vector) or invisibly NULL.
 wrLine <- function(string, fid) {
     writeBin(c(charToRaw(string), as.raw(c(13, 10))), fid, endian = "little")
 }
@@ -559,7 +680,7 @@ tg.write <- function(tg, fileNameTextGrid, format = "short") {
                 } else if (format == "text") {
                     wrLine(paste0("        xmin = ", as.character(round2(minTimeTotal, -15)), " "), fid)  # start time of the tier
                     wrLine(paste0("        xmax = ", as.character(round2(maxTimeTotal, -15)), " "), fid)  # end time of the tier
-                    wrLine("        intervals: size = 1 ", fid)  # pocet intervalu textgrid
+                    wrLine("        intervals: size = 1 ", fid)  # number of intervals
                     wrLine("        intervals [1]:", fid)
                     wrLine(paste0("            xmin = ", as.character(round2(minTimeTotal, -15)), " "), fid)
                     wrLine(paste0("            xmax = ", as.character(round2(maxTimeTotal, -15)), " "), fid)
@@ -2939,7 +3060,7 @@ tg.findLabels <- function(tg, tierInd, labelVector, returnTime = FALSE) {
 #' @return                               (for a voiced candidate), or 0 (for an unvoiced candidate)
 #' @return      p$frame[[1]]$strength  ... vector of degrees of periodicity of candidates (between 0 and 1)
 #' @export
-#' @seealso \code{\link{pt.read}}, \code{\link{tg.read}}
+#' @seealso \code{\link{pt.read}}, \code{\link{tg.read}}, \code{\link{col.read}}
 #'
 #' @examples
 #' \dontrun{
@@ -2976,50 +3097,60 @@ pitch.read <- function(fileNamePitch, encoding = "UTF-8") {
         stop("Empty file.")
     }
 
-    if (flines[1] == "File type = \"ooTextFile\"") {    # TextFile or shortTextFile
-        if (length(flines) < 11) {
-            stop("Unknown Pitch format.")
-        }
+    pitch_ind <- pitch.read_lines(flines)
+    return(pitch_ind[[1]])
+}
 
-        if (flines[2] != "Object class = \"Pitch 1\"") {
-            stop("Unknown Pitch format.")
-        }
 
-        if (flines[3] != "") {
-            stop("Unknown Pitch format.")
-        }
-
-        if (nchar(flines[4]) < 1) {
-            stop("Unknown Pitch format.")
-        }
-
-        if (stringr::str_sub(flines[4], 1, 1) == "x") {  # TextFile
-            xmin <- as.numeric(substr(flines[4], 8, nchar(flines[4])))
-            xmax <- as.numeric(substr(flines[5], 8, nchar(flines[5])))
-            nx <- as.numeric(substr(flines[6], 6, nchar(flines[6])))
-            dx <- as.numeric(substr(flines[7], 6, nchar(flines[7])))
-            x1 <- as.numeric(substr(flines[8], 6, nchar(flines[8])))
-            ceil <- as.numeric(substr(flines[9], 11, nchar(flines[9])))
-            maxnCandidates <- as.numeric(substr(flines[10], 18, nchar(flines[10])))
-
-            frame <- vector("list", nx)
-
-            if (flines[11] != "frame []: ") {
+pitch.read_lines <- function(flines, find = 1, collection = FALSE) {
+    if (collection  ||  flines[find-1+ 1] == "File type = \"ooTextFile\"") {    # TextFile or shortTextFile
+        if (!collection) {
+            if (length(flines)-find+1 < 11) {
                 stop("Unknown Pitch format.")
             }
 
-            iline <- 12  # index of line to read
+            if (flines[find-1+ 2] != "Object class = \"Pitch 1\"") {
+                stop("Unknown Pitch format.")
+            }
+
+            if (flines[find-1+ 3] != "") {
+                stop("Unknown Pitch format.")
+            }
+
+            if (nchar(flines[find-1+ 4]) < 1) {
+                stop("Unknown Pitch format.")
+            }
+        } else {
+            find <- find - 3
+        }
+
+        if (str_contains(flines[find-1+ 4], "xmin")) {  # TextFile
+            xmin <- as.numeric(          substr(strTrim(flines[find-1+ 4]),   8, nchar(strTrim(flines[find-1+ 4]))))
+            xmax <- as.numeric(          substr(strTrim(flines[find-1+ 5]),   8, nchar(strTrim(flines[find-1+ 5]))))
+            nx <- as.numeric(            substr(strTrim(flines[find-1+ 6]),   6, nchar(strTrim(flines[find-1+ 6]))))
+            dx <- as.numeric(            substr(strTrim(flines[find-1+ 7]),   6, nchar(strTrim(flines[find-1+ 7]))))
+            x1 <- as.numeric(            substr(strTrim(flines[find-1+ 8]),   6, nchar(strTrim(flines[find-1+ 8]))))
+            ceil <- as.numeric(          substr(strTrim(flines[find-1+ 9]),  11, nchar(strTrim(flines[find-1+ 9]))))
+            maxnCandidates <- as.numeric(substr(strTrim(flines[find-1+ 10]), 18, nchar(strTrim(flines[find-1+ 10]))))
+
+            frame <- vector("list", nx)
+
+            if (!str_contains(flines[find-1+ 11], "frame []: ")) {
+                stop("Unknown Pitch format.")
+            }
+
+            iline <- find-1+ 12  # index of line to read
 
             for (I in seqM(1, nx)) {
-                if (flines[iline] != paste0("    frame [", I, "]:")) {
+                if (strTrim(flines[iline]) != paste0("frame [", I, "]:")) {
                     stop(paste0("Unknown Pitch format, wrong frame id (", I, "')."))
                 }
                 iline <- iline + 1
 
-                intensity <- as.numeric(substr(flines[iline], 21, nchar(flines[iline]))); iline <- iline + 1
-                nCandidates <- as.numeric(substr(flines[iline], 23, nchar(flines[iline]))); iline <- iline + 1
+                intensity <- as.numeric(substr(strTrim(flines[iline]), 13, nchar(strTrim(flines[iline])))); iline <- iline + 1
+                nCandidates <- as.numeric(substr(strTrim(flines[iline]), 15, nchar(strTrim(flines[iline])))); iline <- iline + 1
 
-                if (flines[iline] != "        candidate []: ") {
+                if (!str_contains(flines[iline], "candidate []:")) {
                     stop("Unknown Pitch format.")
                 }
                 iline <- iline + 1
@@ -3028,13 +3159,13 @@ pitch.read <- function(fileNamePitch, encoding = "UTF-8") {
                 strength <- numeric(nCandidates)
 
                 for (Ic in seqM(1, nCandidates)) {
-                    if (flines[iline] != paste0("            candidate [", Ic, "]:")) {
+                    if (strTrim(flines[iline]) != paste0("candidate [", Ic, "]:")) {
                         stop(paste0("Unknown Pitch format, wrong candidate nr. (", Ic, ") in frame id (", I, "')."))
                     }
                     iline <- iline + 1
 
-                    frequency[Ic] <- as.numeric(substr(flines[iline], 29, nchar(flines[iline]))); iline <- iline + 1
-                    strength[Ic] <-  as.numeric(substr(flines[iline], 28, nchar(flines[iline]))); iline <- iline + 1
+                    frequency[Ic] <- as.numeric(substr(strTrim(flines[iline]), 13, nchar(strTrim(flines[iline])))); iline <- iline + 1
+                    strength[Ic] <-  as.numeric(substr(strTrim(flines[iline]), 12, nchar(strTrim(flines[iline])))); iline <- iline + 1
                 }
 
                 frame[[I]] <- list(intensity = intensity, nCandidates = nCandidates,
@@ -3042,17 +3173,17 @@ pitch.read <- function(fileNamePitch, encoding = "UTF-8") {
             }
 
         } else {   # shortTextFile
-            xmin <- as.numeric(flines[4])
-            xmax <- as.numeric(flines[5])
-            nx <- as.numeric(flines[6])
-            dx <- as.numeric(flines[7])
-            x1 <- as.numeric(flines[8])
-            ceil <- as.numeric(flines[9])
-            maxnCandidates <- as.numeric(flines[10])
+            xmin <- as.numeric(flines[find-1+ 4])
+            xmax <- as.numeric(flines[find-1+ 5])
+            nx <- as.numeric(flines[find-1+ 6])
+            dx <- as.numeric(flines[find-1+ 7])
+            x1 <- as.numeric(flines[find-1+ 8])
+            ceil <- as.numeric(flines[find-1+ 9])
+            maxnCandidates <- as.numeric(flines[find-1+ 10])
 
             frame <- vector("list", nx)
 
-            iline <- 11  # index of line to read
+            iline <- find-1+ 11  # index of line to read
 
             for (I in seqM(1, nx)) {
                 intensity <- as.numeric(flines[iline]); iline <- iline + 1
@@ -3080,9 +3211,8 @@ pitch.read <- function(fileNamePitch, encoding = "UTF-8") {
               ceiling = ceil, maxnCandidates = maxnCandidates,
               frame = frame)
 
-    return(p)
+    return(list(p, iline))
 }
-
 
 
 
@@ -3097,7 +3227,7 @@ pitch.read <- function(fileNamePitch, encoding = "UTF-8") {
 #'
 #' @return PitchTier object
 #' @export
-#' @seealso \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.interpolate}}, \code{\link{tg.read}}, \code{\link{pitch.read}}
+#' @seealso \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.interpolate}}, \code{\link{tg.read}}, \code{\link{pitch.read}}, \code{\link{col.read}}
 #'
 #' @examples
 #' \dontrun{
@@ -3130,16 +3260,25 @@ pt.read <- function(fileNamePitchTier, encoding = "UTF-8") {
         stop("Empty file.")
     }
 
-    if (flines[1] == "\"ooTextFile\"") {    # spreadSheet
-        if (length(flines) < 3) {
+    pt_ind <- pt.read_lines(flines)
+    return(pt_ind[[1]])
+}
+
+pt.read_lines <- function(flines, find = 1, collection = FALSE) {
+    if (flines[find-1+1] == "\"ooTextFile\"") {    # spreadSheet - cannot be in collection file
+        if (collection) {
+            stop("unsupported PitchTier format (SpreadSheet) in collection")
+        }
+
+        if (length(flines)-find+1 < 3) {
             stop("Unknown PitchTier format.")
         }
 
-        if (flines[2] != "\"PitchTier\"") {
+        if (flines[find-1+2] != "\"PitchTier\"") {
             stop("Unknown PitchTier format.")
         }
 
-        fromToN <- stringr::str_split(flines[3], " ")
+        fromToN <- stringr::str_split(flines[find-1+3], " ")
         if (length(fromToN[[1]]) != 3) {
             stop("Unknown PitchTier format.")
         }
@@ -3154,7 +3293,7 @@ pt.read <- function(fileNamePitchTier, encoding = "UTF-8") {
         f <- numeric(N)
 
         for (I in seqM(1, N, by = 1)) {
-            tf <- stringr::str_split(flines[I+3], "\\s")
+            tf <- stringr::str_split(flines[find-1+I+3], "\\s")
             if (length(tf[[1]]) != 2) {
                 stop("Unknown PitchTier format.")
             }
@@ -3163,59 +3302,70 @@ pt.read <- function(fileNamePitchTier, encoding = "UTF-8") {
         }
 
 
-    } else if (flines[1] == "File type = \"ooTextFile\"") {    # TextFile or shortTextFile
-        if (length(flines) < 6) {
-            stop("Unknown PitchTier format.")
-        }
-
-        if (flines[2] != "Object class = \"PitchTier\"") {
-            stop("Unknown PitchTier format.")
-        }
-
-        if (flines[3] != "") {
-            stop("Unknown PitchTier format.")
-        }
-
-        if (nchar(flines[4]) < 1) {
-            stop("Unknown PitchTier format.")
-        }
-
-        if (stringr::str_sub(flines[4], 1, 1) == "x") {  # TextFile
-            xmin <- as.numeric(substr(flines[4], 8, nchar(flines[4])))
-            xmax <- as.numeric(substr(flines[5], 8, nchar(flines[5])))
-            N <-    as.numeric(substr(flines[6], 16, nchar(flines[6])))
-
-            if (N != (length(flines)-6)/3) {
-                stop("Wrong number of points in PitchTier format.")
+    } else if (collection  ||  flines[find-1+1] == "File type = \"ooTextFile\"") {    # TextFile or shortTextFile - only these 2 formats can be stored in collection file
+        if (!collection) {
+            if (length(flines)-find+1 < 6) {
+                stop("Unknown PitchTier format.")
             }
+
+            if (strTrim(flines[find-1+2]) != "Object class = \"PitchTier\"") {
+                stop("Unknown PitchTier format.")
+            }
+
+            if (strTrim(flines[find-1+3]) != "") {
+                stop("Unknown PitchTier format.")
+            }
+
+            if (strTrim(nchar(flines[find-1+4])) < 1) {
+                stop("Unknown PitchTier format.")
+            }
+        } else {
+            find <- find - 3
+        }
+
+        if (str_contains(flines[find-1+4], "xmin")) {  # TextFile
+            xmin <- as.numeric(substr(strTrim(flines[find-1+4]), 8,  nchar(strTrim(flines[find-1+4]))))
+            xmax <- as.numeric(substr(strTrim(flines[find-1+5]), 8,  nchar(strTrim(flines[find-1+5]))))
+            N <-    as.numeric(substr(strTrim(flines[find-1+6]), 16, nchar(strTrim(flines[find-1+6]))))
+
+            # if (N != (length(flines)-6)/3) {
+            #     stop("Wrong number of points in PitchTier format.")
+            # }
             t <- numeric(N)
             f <- numeric(N)
 
             for (I in seqM(1, N, by = 1)) {
-                t[I] <- as.numeric(substr(flines[8 + (I-1)*3], 14, nchar(flines[8 + (I-1)*3])))
-                f[I] <- as.numeric(substr(flines[9 + (I-1)*3], 13, nchar(flines[9 + (I-1)*3])))
+                t[I] <- as.numeric(substr(strTrim(flines[find-1+8 + (I-1)*3]), 10, nchar(strTrim(flines[find-1+8 + (I-1)*3]))))
+                f[I] <- as.numeric(substr(strTrim(flines[find-1+9 + (I-1)*3]), 9, nchar(strTrim(flines[find-1+9 + (I-1)*3]))))
             }
+
+            find <- find-1+9 + (N-1)*3 + 1
 
         } else {   # shortTextFile
 
-            xmin <- as.numeric(flines[4])
-            xmax <- as.numeric(flines[5])
-            N <- as.integer(flines[6])
+            xmin <- as.numeric(flines[find-1+4])
+            xmax <- as.numeric(flines[find-1+5])
+            N <- as.integer(flines[find-1+6])
 
-            if (N != (length(flines)-6)/2) {
-                stop("Wrong number of points in PitchTier format.")
-            }
+            # if (N != (length(flines)-6)/2) {
+            #     stop("Wrong number of points in PitchTier format.")
+            # }
             t <- numeric(N)
             f <- numeric(N)
 
             for (I in seqM(1, N, by = 1)) {
-                t[I] <- as.numeric(flines[7 + (I-1)*2])
-                f[I] <- as.numeric(flines[8 + (I-1)*2])
+                t[I] <- as.numeric(flines[find-1+7 + (I-1)*2])
+                f[I] <- as.numeric(flines[find-1+8 + (I-1)*2])
             }
+
+            find <- find-1+8 + (N-1)*2 + 1
         }
 
 
-    } else {   # headerless SpreadSheet
+    } else {   # headerless SpreadSheet - cannot be in collection file
+        if (collection) {
+            stop("unsupported PitchTier format (headerless SpreadSheet) in collection")
+        }
 
         N <- length(flines)
 
@@ -3238,7 +3388,7 @@ pt.read <- function(fileNamePitchTier, encoding = "UTF-8") {
 
     pt <- list(t = t, f = f, tmin = xmin, tmax = xmax)
 
-    return(pt)
+    return(list(pt, find))
 }
 
 
@@ -3679,6 +3829,9 @@ pt.cut <- function(pt, tStart = -Inf, tEnd = Inf) {
     if (is.infinite(tEnd) & tEnd<0) {
         stop("infinite tEnd can be positive only")
     }
+    if (tEnd < tStart) {
+        stop("tEnd must be >= tStart")
+    }
 
     pt2 <- pt
     pt2$t <- pt$t[pt$t >= tStart  &  pt$t <= tEnd]
@@ -3744,6 +3897,9 @@ pt.cut0 <- function(pt, tStart = -Inf, tEnd = Inf) {
     }
     if (is.infinite(tEnd) & tEnd<0) {
         stop("infinite tEnd can be positive only")
+    }
+    if (tEnd < tStart) {
+        stop("tEnd must be >= tStart")
     }
 
     pt2 <- pt
@@ -4159,7 +4315,7 @@ isLogical <- function(logical) {
 #'
 #' @return rounded number to the specified order
 #' @export
-#' @seealso \code{\link[base]{round}}, \code{\link[base]{trunc}}, \code{\link[base]{ceiling}}, \code{\link[base]{floor}}
+#' @seealso \code{\link{round}}, \code{\link{trunc}}, \code{\link{ceiling}}, \code{\link{floor}}
 #'
 #' @examples
 #' round2(23.5)   # = 24, compare: round(23.5) = 24
@@ -4251,6 +4407,27 @@ str_find1 <- function(string, patternNoRegex) {
     return(index)
 }
 
+# inspired by Pol van Rijn's function from mPraat toolbox
+getNumberInLine <- function(str, shortFormat = FALSE) {
+    if (!shortFormat) {
+        numberIndex <- str_find1(str, " = ") + 3  # 3 because nchar(' = ') == 3
+        return(as.numeric(stringr::str_sub(str, numberIndex)))
+    } else {
+        return(as.numeric(str))
+    }
+}
+
+# inspired by Pol van Rijn's function from mPraat toolbox
+getTextInQuotes <- function(str) {
+    m <- gregexpr('".*?"', str)  # find quoted text
+    text <- regmatches(str, m)
+    if (length(text[[1]]) != 1) {
+        stop("None or multiple texts in quotes found.")
+    }
+    return(stringr::str_sub(text[[1]][1], 2, -2)) # remove quotes
+}
+
+
 #' ifft
 #'
 #' Inverse Fast Fourier Transform (discrete FT), Matlab-like behavior.
@@ -4261,7 +4438,7 @@ str_find1 <- function(string, patternNoRegex) {
 #'
 #' @return output vector of the same length as the input vector
 #' @export
-#' @seealso \code{\link[stats]{fft}}, \code{\link[base]{Re}}, \code{\link[base]{Im}}, \code{\link[base]{Mod}}, \code{\link[base]{Conj}}
+#' @seealso \code{\link[stats]{fft}}, \code{\link{Re}}, \code{\link{Im}}, \code{\link{Mod}}, \code{\link{Conj}}
 #'
 #' @examples
 #' ifft(fft(1:5))

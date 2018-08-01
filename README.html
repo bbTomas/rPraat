@@ -90,6 +90,9 @@ img {
 .tabbed-pane {
   padding-top: 12px;
 }
+.html-widget {
+  margin-bottom: 20px;
+}
 button.code-folding-btn:focus {
   outline: none;
 }
@@ -124,7 +127,7 @@ $(document).ready(function () {
 <div id="rpraat-package-for-r" class="section level1">
 <h1>rPraat package for R</h1>
 <p>rPraat package for R constitutes an interface between the most popular software for phonetic analyses, Praat, and R.</p>
-<p>Version 1.0.8-3.</p>
+<p>Version 1.1.0.</p>
 <p>For demonstration, see <a href="http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html">html/rDemo.html</a></p>
 <p>Package documentation <a href="https://github.com/bbTomas/rPraat/blob/master/rPraat.pdf" class="uri">https://github.com/bbTomas/rPraat/blob/master/rPraat.pdf</a></p>
 <p>CRAN link: <a href="https://CRAN.R-project.org/package=rPraat" class="uri">https://CRAN.R-project.org/package=rPraat</a></p>
@@ -163,6 +166,7 @@ tg.sample() %&gt;% tg.plot()  # demo test</code></pre>
 </div>
 <div id="what-is-new" class="section level2">
 <h2>What is new</h2>
+<p>v1.1.0 (2018/08/01): col.read() to read Collection in Text and Short-text format (Collection may store many objects in one file – TextGrids, PitchTiers, Pitch objects). Big thanks to Pol van Rijn for initiating this and making the major portion of the new code in mPraat toolbox. Supports for file encodings in all read functions (thanks to Weirong Chen for his DetectEncoding idea in mPraat toolbox).</p>
 <p>v1.0.8-3 (2017/11/27): tg.write(): fix for possible UTF-8 encoding and Windows OS locale mismatch</p>
 <p>v1.0.8-2 (2017/11/04): tg.write() and pt.write() format support: “text” (full text format), “short” (short text format), and in addition for pt: “spreadsheet” and “headerless”; tg.read(), pt.read() and pitch.read(): optional file encoding parameter (default: “UTF-8”)</p>
 <p>v1.0.8-1 (2017/09/01): bugfix, short-text TextGrid with multiple lines in a label no longer produces “missing sppasFormat variable” error</p>

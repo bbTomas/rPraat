@@ -60,5 +60,5 @@ p$frame[[4]]$strength[2]
 }
 }
 \seealso{
-\code{\link{pt.read}}, \code{\link{tg.read}}
+\code{\link{pt.read}}, \code{\link{tg.read}}, \code{\link{col.read}}
 }
