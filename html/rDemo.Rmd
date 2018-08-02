@@ -392,7 +392,7 @@ lines(itLeg$t, itLeg$i, col = "blue")
 
 ## Collection
 
-Witch col.read() function, it is convenient to read a lot of objects stored in one Praat .Collection file.
+With col.read() function, it is convenient to read a lot of objects stored in one Praat .Collection file.
 
 ```{r}
 coll <- col.read("demo/coll_text.Collection")
