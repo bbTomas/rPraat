@@ -1,7 +1,7 @@
 #' col.read
 #'
 #' Loads Collection from Praat in Text or Short text format.
-#' Collection may contain combination of TextGrids, PitchTiers and Pitch objects.
+#' Collection may contain combination of TextGrids, PitchTiers, Pitch objects, and IntensityTiers.
 #'
 #' @param fileName Input file name
 #' @param encoding File encoding (default: "UTF-8"), "auto" for auto-detect of Unicode encoding
@@ -9,23 +9,38 @@
 #' @return Collection object
 #' @export
 #'
-#' @seealso \code{\link{tg.read}}, \code{\link{pt.read}}, \code{\link{pitch.read}}
+#' @seealso \code{\link{tg.read}}, \code{\link{pt.read}}, \code{\link{pitch.read}}, \code{\link{it.read}}
 #'
 #' @examples
 #' \dontrun{
-#' coll <- col.read("short_textgrid+pitchtier.Collection")
+#' coll <- col.read("coll_text.Collection")
 #' length(coll)  # number of objects in collection
 #' class(coll[[1]])["type"]  # 1st object type
 #' class(coll[[1]])["name"]  # 1st object name
-#' tg1 <- coll[[1]]  # 1st object
-#' tg.plot(tg1)
-#' length(tg1)  # number of tiers in TextGrid
-#' tg1$word$label
+#' it <- coll[[1]]  # 1st object
+#' it.plot(it)
 #'
 #' class(coll[[2]])["type"]  # 2nd object type
-#' class(coll[[2]])["name"]  # 2nd object type
-#' pt1 <- coll[[2]]  # 2nd object
-#' pt.plot(pt1)
+#' class(coll[[2]])["name"]  # 2nd object name
+#' tg <- coll[[2]]  # 2nd object
+#' tg.plot(tg)
+#' length(tg)  # number of tiers in TextGrid
+#' tg$word$label
+#'
+#' class(coll[[3]])["type"]  # 3rd object type
+#' class(coll[[3]])["name"]  # 3rd object type
+#' pitch <- coll[[3]]  # 3rd object
+#' names(pitch)
+#' pitch$nx  # number of frames
+#' pitch$t[4]        # time instance of the 4th frame
+#' pitch$frame[[4]]  # 4th frame: pitch candidates
+#' pitch$frame[[4]]$frequency[2]
+#' pitch$frame[[4]]$strength[2]
+#'
+#' class(coll[[4]])["type"]  # 4th object type
+#' class(coll[[4]])["name"]  # 4th object name
+#' pt <- coll[[4]]  # 2nd object
+#' pt.plot(pt)
 #' }
 col.read <- function(fileName, encoding = "UTF-8") {
     # inspired by Pol van Rijn's function from mPraat toolbox
@@ -83,6 +98,8 @@ col.read <- function(fileName, encoding = "UTF-8") {
             objClass <- "TextGrid"
         } else if (str_contains(r, "PitchTier")) {
             objClass <- "PitchTier"
+        } else if (str_contains(r, "IntensityTier")) {
+            objClass <- "IntensityTier"
         } else if (str_contains(r, "Pitch 1")) {
             objClass <- "Pitch 1"
         } else if (str_contains(r, "Sound")) {
@@ -101,6 +118,10 @@ col.read <- function(fileName, encoding = "UTF-8") {
             pt_ind <- pt.read_lines(flines, find, collection = TRUE)
             object <- pt_ind[[1]]
             find <- pt_ind[[2]]
+        } else if (objClass == "IntensityTier") {
+            it_ind <- it.read_lines(flines, find, collection = TRUE)
+            object <- it_ind[[1]]
+            find <- it_ind[[2]]
         } else if (objClass == "Pitch 1") {
             pitch_ind <- pitch.read_lines(flines, find, collection = TRUE)
             object <- pitch_ind[[1]]
@@ -219,7 +240,7 @@ detectEncoding <- function(fileName) {
 #'
 #' @return TextGrid object
 #' @export
-#' @seealso \code{\link{tg.write}}, \code{\link{tg.plot}}, \code{\link{tg.repairContinuity}}, \code{\link{tg.createNewTextGrid}}, \code{\link{tg.findLabels}}, \code{\link{tg.duplicateTierMergeSegments}}, \code{\link{pt.read}}, \code{\link{pitch.read}}, \code{\link{col.read}}
+#' @seealso \code{\link{tg.write}}, \code{\link{tg.plot}}, \code{\link{tg.repairContinuity}}, \code{\link{tg.createNewTextGrid}}, \code{\link{tg.findLabels}}, \code{\link{tg.duplicateTierMergeSegments}}, \code{\link{pt.read}}, \code{\link{pitch.read}}, \code{\link{it.read}}, \code{\link{col.read}}
 #'
 #' @examples
 #' \dontrun{
@@ -3060,7 +3081,7 @@ tg.findLabels <- function(tg, tierInd, labelVector, returnTime = FALSE) {
 #' @return                               (for a voiced candidate), or 0 (for an unvoiced candidate)
 #' @return      p$frame[[1]]$strength  ... vector of degrees of periodicity of candidates (between 0 and 1)
 #' @export
-#' @seealso \code{\link{pt.read}}, \code{\link{tg.read}}, \code{\link{col.read}}
+#' @seealso \code{\link{pt.read}}, \code{\link{tg.read}}, \code{\link{it.read}}, \code{\link{col.read}}
 #'
 #' @examples
 #' \dontrun{
@@ -3227,7 +3248,7 @@ pitch.read_lines <- function(flines, find = 1, collection = FALSE) {
 #'
 #' @return PitchTier object
 #' @export
-#' @seealso \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.interpolate}}, \code{\link{tg.read}}, \code{\link{pitch.read}}, \code{\link{col.read}}
+#' @seealso \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.interpolate}}, \code{\link{pt.legendre}}, \code{\link{tg.read}}, \code{\link{pitch.read}}, \code{\link{it.read}}, \code{\link{col.read}}
 #'
 #' @examples
 #' \dontrun{
@@ -3925,6 +3946,608 @@ pt.cut0 <- function(pt, tStart = -Inf, tEnd = Inf) {
     return(pt2)
 }
 
+
+
+
+
+#' it.read
+#'
+#' Reads IntensityTier from Praat. Supported formats: text file, short text file.
+#'
+#' @param fileNameIntensityTier file name of IntensityTier
+#' @param encoding File encoding (default: "UTF-8"), "auto" for auto-detect of Unicode encoding
+#'
+#' @return IntensityTier object
+#' @export
+#' @seealso \code{\link{it.write}}, \code{\link{it.plot}}, \code{\link{it.cut}}, \code{\link{it.cut0}}, \code{\link{it.interpolate}}, \code{\link{tg.read}}, \code{\link{pt.read}}, \code{\link{pitch.read}}, \code{\link{col.read}}
+#'
+#' @examples
+#' \dontrun{
+#' it <- it.read("demo/maminka.IntensityTier")
+#' it.plot(it)
+#' }
+it.read <- function(fileNameIntensityTier, encoding = "UTF-8") {
+    if (!isString(fileNameIntensityTier)) {
+        stop("Invalid 'fileNameIntensityTier' parameter.")
+    }
+
+    if (!isString(encoding)) {
+        stop("Invalid 'encoding' parameter.")
+    }
+
+    if (encoding == "auto") {
+        encoding <- detectEncoding(fileNameIntensityTier)
+    }
+
+    if (encoding == "UTF-8") {
+        flines <- readr::read_lines(fileNameIntensityTier, locale = readr::locale(encoding = "UTF-8"))  # Does not support UTF-16 at this point :-(
+    } else {
+        fid <- file(fileNameIntensityTier, open = "r", encoding = encoding)
+        flines <- readLines(fid)
+        close(fid)
+    }
+
+
+    if (length(flines) < 1) {
+        stop("Empty file.")
+    }
+
+    it_ind <- it.read_lines(flines)
+    return(it_ind[[1]])
+}
+
+it.read_lines <- function(flines, find = 1, collection = FALSE) {
+    if (collection  ||  flines[find-1+1] == "File type = \"ooTextFile\"") {    # TextFile or shortTextFile - only these 2 formats can be stored in collection file
+        if (!collection) {
+            if (length(flines)-find+1 < 6) {
+                stop("Unknown IntensityTier format.")
+            }
+
+            if (strTrim(flines[find-1+2]) != "Object class = \"IntensityTier\"") {
+                stop("Unknown IntensityTier format.")
+            }
+
+            if (strTrim(flines[find-1+3]) != "") {
+                stop("Unknown IntensityTier format.")
+            }
+
+            if (strTrim(nchar(flines[find-1+4])) < 1) {
+                stop("Unknown IntensityTier format.")
+            }
+        } else {
+            find <- find - 3
+        }
+
+        if (str_contains(flines[find-1+4], "xmin")) {  # TextFile
+            xmin <- as.numeric(substr(strTrim(flines[find-1+4]), 8,  nchar(strTrim(flines[find-1+4]))))
+            xmax <- as.numeric(substr(strTrim(flines[find-1+5]), 8,  nchar(strTrim(flines[find-1+5]))))
+            N <-    as.numeric(substr(strTrim(flines[find-1+6]), 16, nchar(strTrim(flines[find-1+6]))))
+
+            t <- numeric(N)
+            i <- numeric(N)
+
+            for (I in seqM(1, N, by = 1)) {
+                t[I] <- as.numeric(substr(strTrim(flines[find-1+8 + (I-1)*3]), 10, nchar(strTrim(flines[find-1+8 + (I-1)*3]))))
+                i[I] <- as.numeric(substr(strTrim(flines[find-1+9 + (I-1)*3]), 9, nchar(strTrim(flines[find-1+9 + (I-1)*3]))))
+            }
+
+            find <- find-1+9 + (N-1)*3 + 1
+
+        } else {   # shortTextFile
+
+            xmin <- as.numeric(flines[find-1+4])
+            xmax <- as.numeric(flines[find-1+5])
+            N <- as.integer(flines[find-1+6])
+
+            t <- numeric(N)
+            i <- numeric(N)
+
+            for (I in seqM(1, N, by = 1)) {
+                t[I] <- as.numeric(flines[find-1+7 + (I-1)*2])
+                i[I] <- as.numeric(flines[find-1+8 + (I-1)*2])
+            }
+
+            find <- find-1+8 + (N-1)*2 + 1
+        }
+
+
+    } else {
+        stop("unsupported IntensityTier format")
+    }
+
+
+    it <- list(t = t, i = i, tmin = xmin, tmax = xmax)
+
+    return(list(it, find))
+}
+
+#' it.write
+#'
+#' Saves IntensityTier to file (in UTF-8 encoding).
+#' it is list with at least $t and $i vectors (of the same length).
+#' If there are no $tmin and $tmax values, there are
+#' set as min and max of $t vector.
+#'
+#' @param it IntensityTier object
+#' @param fileNameIntensityTier file name to be created
+#' @param format Output file format ("short" (short text format - default), "text" (a.k.a. full text format))
+#'
+#' @export
+#' @seealso \code{\link{it.read}}, \code{\link{tg.write}}, \code{\link{it.interpolate}}
+#'
+#' @examples
+#' \dontrun{
+#' it <- it.sample()
+#' it.plot(pt)
+#' it.write(it, "demo/intensity.IntensityTier")
+#' }
+it.write <- function(it, fileNameIntensityTier, format = "short") {
+    if (!isString(fileNameIntensityTier)) {
+        stop("Invalid 'fileNameIntensityTier' parameter.")
+    }
+
+    if (!isString(format)) {
+        stop("Invalid 'format' parameter.")
+    }
+
+    if (format != "short" && format != "text") {
+        stop("Unsupported format (supported: short [default], text)")
+    }
+
+    if (!("t" %in% names(it))) {
+        stop("it must be a list with 't' and 'i' and optionally 'tmin' and 'tmax'")
+    }
+    if (!("i" %in% names(it))) {
+        stop("it must be a list with 't' and 'i' and optionally 'tmin' and 'tmax'")
+    }
+    if (length(it$t) != length(it$i)) {
+        stop("t and i lengths mismatched.")
+    }
+    N <- length(it$t)
+
+
+    if (!("tmin" %in% names(it))) {
+        xmin <- min(it$t)
+    } else {
+        xmin <- it$tmin
+    }
+    if (!("tmax" %in% names(it))) {
+        xmax <- max(it$t)
+    } else {
+        xmax <- it$tmax
+    }
+
+
+    fid <- file(fileNameIntensityTier, open = "wb", encoding = "UTF-8")
+    if (!isOpen(fid)) {
+        stop(paste0("cannot open file [", fileNameIntensityTier, "]"))
+    }
+
+    if (format == "short" || format == "text") {
+        wrLine('File type = "ooTextFile"', fid)
+        wrLine('Object class = "IntensityTier"', fid)
+        wrLine('', fid)
+    }
+
+    if (format == "short") {
+        wrLine(as.character(round2(xmin, -15)), fid)
+        wrLine(as.character(round2(xmax, -15)), fid)
+        wrLine(as.character(N), fid)
+    } else if (format == "text") {
+        wrLine(paste0("xmin = ", as.character(round2(xmin, -15)), " "), fid)
+        wrLine(paste0("xmax = ", as.character(round2(xmax, -15)), " "), fid)
+        wrLine(paste0("points: size = ", as.character(N), " "), fid)
+    }
+
+    for (n in seqM(1, N)) {
+        if (format == "short") {
+            wrLine(as.character(round2(it$t[n], -15)), fid)
+            wrLine(as.character(round2(it$i[n], -15)), fid)
+        } else if (format == "text") {
+            wrLine(paste0("points [", as.character(n), "]:"), fid)
+            wrLine(paste0("    number = ", as.character(round2(it$t[n], -15)), " "), fid)
+            wrLine(paste0("    value = ", as.character(round2(it$i[n], -15)), " "), fid)
+        }
+    }
+
+    close(fid)
+}
+
+
+#' it.plot
+#'
+#' Plots interactive IntensityTier using dygraphs package.
+#'
+#' @param it IntensityTier object
+#' @param group [optional] character string, name of group for dygraphs synchronization
+#'
+#' @export
+#' @seealso \code{\link{it.read}}, \code{\link{tg.plot}}, \code{\link{it.cut}}, \code{\link{it.cut0}}, \code{\link{it.interpolate}}, \code{\link{it.write}}
+#'
+#' @examples
+#' \dontrun{
+#' it <- it.sample()
+#' it.plot(it)
+#' }
+it.plot <- function(it, group = "") {
+    data <- list(t = it$t, i = it$i)
+
+    if (group != "") {  # dygraphs plot-synchronization group
+        g <- dygraphs::dygraph(data, group = group, xlab = "Time (sec)")
+    } else {
+        g <- dygraphs::dygraph(data, xlab = "Time (sec)")
+    }
+
+    g <- dygraphs::dyOptions(g, drawPoints = TRUE, pointSize = 2, strokeWidth = 0)
+    g <- dygraphs::dyRangeSelector(g, dateWindow = c(it$tmin, it$tmax))
+
+    g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
+    g
+}
+
+
+#' it.interpolate
+#'
+#' Interpolates IntensityTier contour in given time instances.
+#'
+#'  a) If t < min(it$t) (or t > max(it$t)), returns the first (or the last) value of it$i.
+#'  b) If t is existing point in it$t, returns the respective it$f.
+#'  c) If t is Between two existing points, returns linear interpolation of these two points.
+#'
+#' @param it IntensityTier object
+#' @param t vector of time instances of interest
+#'
+#' @return IntensityTier object
+#' @export
+#' @seealso \code{\link{it.read}}, \code{\link{it.write}}, \code{\link{it.plot}}, \code{\link{it.cut}}, \code{\link{it.cut0}}, \code{\link{it.legendre}}
+#'
+#' @examples
+#' it <- it.sample()
+#' it2 <- it.interpolate(it, seq(it$t[1], it$t[length(it$t)], by = 0.001))
+#' \dontrun{
+#' it.plot(it)
+#' it.plot(it2)
+#' }
+it.interpolate <- function(it, t) {
+    if (class(t) != "numeric"  &  class(t) != "integer") {
+        stop("t must be numeric vector")
+    }
+
+    if (length(it$t) != length(it$i))
+        stop("IntensityTier does not have equal length vectors $t and $i")
+
+    if (length(it$t) < 1)
+        return(NA)
+
+    if (!identical(sort(it$t), it$t)) {
+        stop("time instances $t in IntensityTier are not increasingly sorted")
+    }
+
+    if (!identical(unique(it$t), it$t)) {
+        stop("duplicated time instances in $t vector of the IntensityTier")
+    }
+
+    it2 <- it
+    it2$t <- t
+
+    i <- numeric(length(t))
+    for (I in seq_along(t)) {
+        if (length(it$t) == 1) {
+            i[I] <- it$i[1]
+        } else if (t[I] < it$t[1]) {   # a)
+            i[I] <- it$i[1]
+        } else if (t[I] > it$t[length(it$t)]) {   # a)
+            i[I] <- it$i[length(it$t)]
+        } else {
+            # b)
+            ind <- which(it$t == t[I])
+            if (length(ind) == 1) {
+                i[I] <- it$i[ind]
+            } else {
+                # c)
+                ind2 <- which(it$t > t[I]); ind2 <- ind2[1]
+                ind1 <- ind2 - 1
+                # y = ax + b;  a = (y2-y1)/(x2-x1);  b = y1 - ax1
+                a <- (it$i[ind2] - it$i[ind1]) / (it$t[ind2] - it$t[ind1])
+                b <- it$i[ind1] - a*it$t[ind1]
+                i[I] <- a*t[I] + b
+            }
+        }
+    }
+
+    it2$i <- i
+    return(it2)
+}
+
+
+#' it.legendre
+#'
+#' Interpolate the IntensityTier in 'npoints' equidistant points and approximate it by Legendre polynomials
+#'
+#' @param it IntensityTier object
+#' @param npoints Number of points of IntensityTier interpolation
+#' @param npolynomials Number of polynomials to be used for Legendre modelling
+#'
+#' @return Vector of Legendre polynomials coefficients
+#' @export
+#' @seealso \code{\link{it.legendreSynth}}, \code{\link{it.legendreDemo}}, \code{\link{it.cut}}, \code{\link{it.cut0}}, \code{\link{it.read}}, \code{\link{it.plot}}, \code{\link{it.interpolate}}
+#'
+#' @examples
+#' it <- it.sample()
+#' it <- it.cut(it, tStart = 0.2, tEnd = 0.4)  # cut IntensityTier from t = 0.2 to 0.4 sec and preserve time
+#' c <- it.legendre(it)
+#' print(c)
+#' leg <- it.legendreSynth(c)
+#' itLeg <- it
+#' itLeg$t <- seq(itLeg$tmin, itLeg$tmax, length.out = length(leg))
+#' itLeg$i <- leg
+#' \dontrun{
+#' plot(it$t, it$i, xlab = "Time (sec)", ylab = "Intensity (dB)")
+#' lines(itLeg$t, itLeg$i, col = "blue")
+#' }
+it.legendre <- function(it, npoints = 1000, npolynomials = 4) {
+    if (!isInt(npoints) | npoints < 0) {
+        stop("npoints must be integer >= 0.")
+    }
+
+    if (!isInt(npolynomials) | npolynomials <= 0) {
+        stop("npolynomials must be integer > 0.")
+    }
+
+    it <- it.interpolate(it, seq(it$tmin, it$tmax, length.out = npoints))
+
+    y <- it$i
+
+
+    lP <- npoints # počet vzorků polynomu
+    nP <- npolynomials
+
+    B <- matrix(nrow = nP, ncol = lP)  # báze
+    x <- seq(-1, 1, length.out = lP)
+
+    for (i in seqM(1, nP)) {
+        n <- i - 1
+        p <- numeric(lP)
+        for (k in seqM(0, n)) {
+            p <- p + x^k*choose(n, k)*choose((n+k-1)/2, n)
+        }
+        p <- p*2^n
+
+        B[i, ] <- p
+    }
+
+    c <- numeric(nP)
+    for (I in 1: nP) {
+        c[I] <- t(matrix(y)) %*% matrix(B[I, ], nrow = lP, ncol = 1) / lP * ((I-1)*2+1)
+        # koeficient ((I-1)*2+1) odpovídá výkonům komponent, které lze spočítat i takto: mean((P.^2).')
+    }
+
+    return(c)
+}
+
+#' it.legendreSynth
+#'
+#' Synthetize the contour from vector of Legendre polynomials 'c' in 'npoints' equidistant points
+#'
+#' @param c Vector of Legendre polynomials coefficients
+#' @param npoints Number of points of IntensityTier interpolation
+#'
+#' @return Vector of values of synthetized contour
+#' @export
+#' @seealso \code{\link{it.legendre}}, \code{\link{it.legendreDemo}}, \code{\link{it.read}}, \code{\link{it.plot}}, \code{\link{it.interpolate}}
+#'
+#' @examples
+#' it <- it.sample()
+#' it <- it.cut(it, tStart = 0.2, tEnd = 0.4)  # cut IntensityTier from t = 0.2 to 0.4 sec and preserve time
+#' c <- it.legendre(it)
+#' print(c)
+#' leg <- it.legendreSynth(c)
+#' itLeg <- it
+#' itLeg$t <- seq(itLeg$tmin, itLeg$tmax, length.out = length(leg))
+#' itLeg$i <- leg
+#' \dontrun{
+#' plot(it$t, it$i, xlab = "Time (sec)", ylab = "Intensity (dB)")
+#' lines(itLeg$t, itLeg$i, col = "blue")
+#' }
+it.legendreSynth <- function(c, npoints = 1000) {
+    if (class(c) != "numeric"  &  class(c) != "integer") {
+        stop("c must be numeric vector")
+    }
+
+    if (!isInt(npoints) | npoints < 0) {
+        stop("npoints must be integer >= 0.")
+    }
+
+    lP <- npoints # počet vzorků polynomu
+    nP <- length(c)
+
+    B <- matrix(nrow = nP, ncol = lP)  # báze
+    x <- seq(-1, 1, length.out = lP)
+
+    for (i in seqM(1, nP)) {
+        n <- i - 1
+        p <- numeric(lP)
+        for (k in seqM(0, n)) {
+            p <- p + x^k*choose(n, k)*choose((n+k-1)/2, n)
+        }
+        p <- p*2^n
+
+        B[i, ] <- p
+    }
+
+    if (nP > 0) {
+        yModelovane <- t(matrix(c)) %*% B
+    }
+    else {
+        yModelovane <- rep(NA, npoints)
+    }
+
+    return(as.numeric(yModelovane))
+}
+
+#' it.legendreDemo
+#'
+#' Plots first four Legendre polynomials
+#'
+#' @export
+#' @seealso \code{\link{it.legendre}}, \code{\link{it.legendreSynth}}, \code{\link{it.read}}, \code{\link{it.plot}}, \code{\link{it.interpolate}}
+#'
+#' @examples
+#' \dontrun{
+#' it.legendreDemo()
+#' }
+it.legendreDemo <- function() {
+    graphics::par(mfrow = c(2, 2))
+    graphics::plot(it.legendreSynth(c(1, 0, 0, 0), 1024))
+    graphics::plot(it.legendreSynth(c(0, 1, 0, 0), 1024))
+    graphics::plot(it.legendreSynth(c(0, 0, 1, 0), 1024))
+    graphics::plot(it.legendreSynth(c(0, 0, 0, 1), 1024))
+    graphics::par(mfrow = c(1, 1))
+}
+
+
+
+#' it.cut
+#'
+#' Cut the specified interval from the IntensityTier and preserve time
+#'
+#' @param it IntensityTier object
+#' @param tStart beginning time of interval to be cut (default -Inf = cut from the tMin of the IntensityTier)
+#' @param tEnd final time of interval to be cut (default Inf = cut to the tMax of the IntensityTier)
+#'
+#' @return IntensityTier object
+#' @export
+#' @seealso \code{\link{it.cut0}}, \code{\link{it.read}}, \code{\link{it.plot}}, \code{\link{it.interpolate}}, \code{\link{it.legendre}}, \code{\link{it.legendreSynth}}, \code{\link{it.legendreDemo}}
+#'
+#' @examples
+#' it <- it.sample()
+#' it2 <-   it.cut(it,  tStart = 0.3)
+#' it2_0 <- it.cut0(it, tStart = 0.3)
+#' it3 <-   it.cut(it,  tStart = 0.2, tEnd = 0.3)
+#' it3_0 <- it.cut0(it, tStart = 0.2, tEnd = 0.3)
+#' it4 <-   it.cut(it,  tEnd = 0.3)
+#' it4_0 <- it.cut0(it, tEnd = 0.3)
+#' it5 <-   it.cut(it,  tStart = -1, tEnd = 1)
+#' it5_0 <- it.cut0(it, tStart = -1, tEnd = 1)
+#' \dontrun{
+#' it.plot(it)
+#' it.plot(it2)
+#' it.plot(it2_0)
+#' it.plot(it3)
+#' it.plot(it3_0)
+#' it.plot(it4)
+#' it.plot(it4_0)
+#' it.plot(it5)
+#' it.plot(it5_0)
+#' }
+it.cut <- function(it, tStart = -Inf, tEnd = Inf) {
+    if (!isNum(tStart)) {
+        stop("tStart must be a number.")
+    }
+    if (!isNum(tEnd)) {
+        stop("tEnd must be a number.")
+    }
+    if (is.infinite(tStart) & tStart>0) {
+        stop("infinite tStart can be negative only")
+    }
+    if (is.infinite(tEnd) & tEnd<0) {
+        stop("infinite tEnd can be positive only")
+    }
+    if (tEnd < tStart) {
+        stop("tEnd must be >= tStart")
+    }
+
+    it2 <- it
+    it2$t <- it$t[it$t >= tStart  &  it$t <= tEnd]
+    it2$i <- it$i[it$t >= tStart  &  it$t <= tEnd]
+
+    if (is.infinite(tStart)) {
+        it2$tmin <- it$tmin
+    } else {
+        it2$tmin <- tStart
+    }
+
+    if (is.infinite(tEnd)) {
+        it2$tmax <- it$tmax
+    } else {
+        it2$tmax <- tEnd
+    }
+
+    return(it2)
+}
+
+#' it.cut0
+#'
+#' Cut the specified interval from the IntensityTier and shift time so that the new tmin = 0
+#'
+#' @param it IntensityTier object
+#' @param tStart beginning time of interval to be cut (default -Inf = cut from the tMin of the IntensityTier)
+#' @param tEnd final time of interval to be cut (default Inf = cut to the tMax of the IntensityTier)
+#'
+#' @return IntensityTier object
+#' @export
+#' @seealso \code{\link{it.cut}}, \code{\link{it.read}}, \code{\link{it.plot}}, \code{\link{it.interpolate}}, \code{\link{it.legendre}}, \code{\link{it.legendreSynth}}, \code{\link{it.legendreDemo}}
+#'
+#' @examples
+#' it <- it.sample()
+#' it2 <-   it.cut(it,  tStart = 0.3)
+#' it2_0 <- it.cut0(it, tStart = 0.3)
+#' it3 <-   it.cut(it,  tStart = 0.2, tEnd = 0.3)
+#' it3_0 <- it.cut0(it, tStart = 0.2, tEnd = 0.3)
+#' it4 <-   it.cut(it,  tEnd = 0.3)
+#' it4_0 <- it.cut0(it, tEnd = 0.3)
+#' it5 <-   it.cut(it,  tStart = -1, tEnd = 1)
+#' it5_0 <- it.cut0(it, tStart = -1, tEnd = 1)
+#' \dontrun{
+#' it.plot(it)
+#' it.plot(it2)
+#' it.plot(it2_0)
+#' it.plot(it3)
+#' it.plot(it3_0)
+#' it.plot(it4)
+#' it.plot(it4_0)
+#' it.plot(it5)
+#' it.plot(it5_0)
+#' }
+it.cut0 <- function(it, tStart = -Inf, tEnd = Inf) {
+    if (!isNum(tStart)) {
+        stop("tStart must be a number.")
+    }
+    if (!isNum(tEnd)) {
+        stop("tEnd must be a number.")
+    }
+    if (is.infinite(tStart) & tStart>0) {
+        stop("infinite tStart can be negative only")
+    }
+    if (is.infinite(tEnd) & tEnd<0) {
+        stop("infinite tEnd can be positive only")
+    }
+    if (tEnd < tStart) {
+        stop("tEnd must be >= tStart")
+    }
+
+    it2 <- it
+    it2$t <- it$t[it$t >= tStart  &  it$t <= tEnd]
+    it2$i <- it$i[it$t >= tStart  &  it$t <= tEnd]
+
+    if (is.infinite(tStart)) {
+        it2$tmin <- it$tmin
+    } else {
+        it2$tmin <- tStart
+    }
+
+    if (is.infinite(tEnd)) {
+        it2$tmax <- it$tmax
+    } else {
+        it2$tmax <- tEnd
+    }
+
+    it2$t <- it2$t - it2$tmin
+    it2$tmax <- it2$tmax - it2$tmin
+    it2$tmin <- 0
+
+    return(it2)
+}
 
 
 

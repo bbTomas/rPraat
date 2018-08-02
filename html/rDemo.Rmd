@@ -372,6 +372,61 @@ p$frame[[4]]$strength[2]
 ```
 
 
+## IntensityTier
+
+Intensity tier files have very similar structure to PitchTiers. Using this package, you can also interpolate, cut or model Intensity tiers with Legendre polynomials.
+
+```{r}
+it <- it.read('demo/maminka.IntensityTier')
+it <- it.cut(it, tStart = 0.2, tEnd = 0.4)  # cut IntensityTier from t = 0.2 to 0.4 sec and preserve time
+c <- it.legendre(it)
+print(c)
+leg <- it.legendreSynth(c)
+itLeg <- it
+itLeg$t <- seq(itLeg$tmin, itLeg$tmax, length.out = length(leg))
+itLeg$i <- leg
+plot(it$t, it$i, xlab = "Time (sec)", ylab = "Intensity (dB)")
+lines(itLeg$t, itLeg$i, col = "blue")
+```
+
+
+## Collection
+
+Witch col.read() function, it is convenient to read a lot of objects stored in one Praat .Collection file.
+
+```{r}
+coll <- col.read("demo/coll_text.Collection")
+length(coll)  # number of objects in collection
+class(coll[[1]])["type"]  # 1st object type
+class(coll[[1]])["name"]  # 1st object name
+it <- coll[[1]]  # 1st object
+it.plot(it)
+
+class(coll[[2]])["type"]  # 2nd object type
+class(coll[[2]])["name"]  # 2nd object name
+tg <- coll[[2]]  # 2nd object
+tg.plot(tg)
+length(tg)  # number of tiers in TextGrid
+tg$word$label
+
+class(coll[[3]])["type"]  # 3rd object type
+class(coll[[3]])["name"]  # 3rd object type
+pitch <- coll[[3]]  # 3rd object
+names(pitch)
+pitch$nx  # number of frames
+pitch$t[4]        # time instance of the 4th frame
+pitch$frame[[4]]  # 4th frame: pitch candidates
+pitch$frame[[4]]$frequency[2]
+pitch$frame[[4]]$strength[2]
+
+class(coll[[4]])["type"]  # 4th object type
+class(coll[[4]])["name"]  # 4th object name
+pt <- coll[[4]]  # 2nd object
+pt.plot(pt)
+```
+
+
+
 
 ## Process all files in folder
 
@@ -384,10 +439,12 @@ for (I in seq_along(listFiles)) {
     fileName <- substr(file, 1, nchar(file)-9)
     fileTextGrid <- paste0(inputFolder, "/", fileName, ".TextGrid")
     filePitchTier <- paste0(inputFolder, "/", fileName, ".PitchTier")
+    fileIntensityTier <- paste0(inputFolder, "/", fileName, ".IntensityTier")
     fileSound <- paste0(inputFolder, "/", fileName, ".wav")
     
     tg <- tg.read(fileTextGrid)
     pt <- pt.read(filePitchTier)
+    it <- it.read(fileIntensityTier)
     # ...
 }
 

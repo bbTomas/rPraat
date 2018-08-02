@@ -16,7 +16,7 @@ Collection object
 }
 \description{
 Loads Collection from Praat in Text or Short text format.
-Collection may contain combination of TextGrids, PitchTiers and Pitch objects.
+Collection may contain combination of TextGrids, PitchTiers, Pitch objects, and IntensityTiers.
 }
 \examples{
 \dontrun{
@@ -36,5 +36,5 @@ pt.plot(pt1)
 }
 }
 \seealso{
-\code{\link{tg.read}}, \code{\link{pt.read}}, \code{\link{pitch.read}}
+\code{\link{tg.read}}, \code{\link{pt.read}}, \code{\link{pitch.read}}, \code{\link{it.read}}
 }

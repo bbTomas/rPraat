@@ -22,24 +22,29 @@ context("PitchTier")
 test_that("pt.read", {
     expect_equal({
         pt <- pt.read("H.PitchTier")
-        c(length(unique(pt$t)), pt$tmax)
-        }, c(209, 3.617125))
+        c(length(unique(pt$t)), pt$tmin, pt$tmax, length(pt$t), pt$t[1], pt$t[16], pt$t[29], pt$t[209], pt$f[1], pt$f[16], pt$f[29], pt$f[209])
+        }, c(209, 0, 3.617125, 209, 0.09356250000000005, 0.29356250000000006, 0.42356250000000006, 3.4935625000000003,
+             210.06273060415666, 263.3608508907508, 259.37630326892423, 161.7025770872298))
     expect_equal({
         pt <- pt.read("H_UTF16.PitchTier", encoding = "UTF-16")
-        c(length(unique(pt$t)), pt$tmax)
-    }, c(209, 3.617125))
+        c(length(unique(pt$t)), pt$tmin, pt$tmax, length(pt$t), pt$t[1], pt$t[16], pt$t[29], pt$t[209], pt$f[1], pt$f[16], pt$f[29], pt$f[209])
+    }, c(209, 0, 3.617125, 209, 0.09356250000000005, 0.29356250000000006, 0.42356250000000006, 3.4935625000000003,
+         210.06273060415666, 263.3608508907508, 259.37630326892423, 161.7025770872298))
     expect_equal({
         pt <- pt.read("H_headerlessSpreadSheet.PitchTier")
-        c(length(unique(pt$t)), pt$tmax)
-        }, c(209, 3.4935625))
+        c(length(unique(pt$t)), pt$tmin, pt$tmax, length(pt$t), pt$t[1], pt$t[16], pt$t[29], pt$t[209], pt$f[1], pt$f[16], pt$f[29], pt$f[209])
+    }, c(209, 0.09356250000000005, 3.4935625000000003, 209, 0.09356250000000005, 0.29356250000000006, 0.42356250000000006, 3.4935625000000003,
+         210.06273060415666, 263.3608508907508, 259.37630326892423, 161.7025770872298))
     expect_equal({
         pt <- pt.read("H_shortTextFile.PitchTier")
-        c(length(unique(pt$t)), pt$tmax)
-        }, c(209, 3.617125))
+        c(length(unique(pt$t)), pt$tmin, pt$tmax, length(pt$t), pt$t[1], pt$t[16], pt$t[29], pt$t[209], pt$f[1], pt$f[16], pt$f[29], pt$f[209])
+    }, c(209, 0, 3.617125, 209, 0.09356250000000005, 0.29356250000000006, 0.42356250000000006, 3.4935625000000003,
+         210.06273060415666, 263.3608508907508, 259.37630326892423, 161.7025770872298))
     expect_equal({
         pt <- pt.read("H_spreadSheet.PitchTier")
-        c(length(unique(pt$t)), pt$tmax)
-        }, c(209, 3.617125))
+        c(length(unique(pt$t)), pt$tmin, pt$tmax, length(pt$t), pt$t[1], pt$t[16], pt$t[29], pt$t[209], pt$f[1], pt$f[16], pt$f[29], pt$f[209])
+    }, c(209, 0, 3.617125, 209, 0.09356250000000005, 0.29356250000000006, 0.42356250000000006, 3.4935625000000003,
+         210.06273060415666, 263.3608508907508, 259.37630326892423, 161.7025770872298))
 })
 
 test_that("pt.write", {
@@ -154,6 +159,125 @@ test_that("pt.cut0", {
         c(pt$tmin, pt$tmax, length(pt$t), length(pt$f), pt$t[1], pt$t[10], pt$t[71], pt$f[1], pt$f[10], pt$f[71])},
         c(0, 2, 71, 71, 1.0935625, 1.1835625, 1.9935625, 210.0627306, 189.5803367, 150.0365144))
     expect_error(pt.cut0(pt.sample(), 3, 2))
+})
+
+
+context("IntensityTier")
+
+test_that("it.read", {
+    expect_equal({
+        it <- it.read("maminka.IntensityTier")
+        c(length(unique(it$t)), it$tmin, it$tmax, length(it$t), it$t[1], it$t[16], it$t[29], it$t[40], it$i[1], it$i[16], it$i[29], it$i[40])
+    }, c(40, 0, 0.5460770975056689, 40, 0.0501814058956916, 0.22160997732426302, 0.3701814058956916, 0.4958956916099773, 59.5715903919772, 71.63843325188716, 64.17176220056767, 64.98963270408825))
+    expect_equal({
+        it <- it.read("maminka_short.IntensityTier")
+        c(length(unique(it$t)), it$tmin, it$tmax, length(it$t), it$t[1], it$t[16], it$t[29], it$t[40], it$i[1], it$i[16], it$i[29], it$i[40])
+    }, c(40, 0, 0.5460770975056689, 40, 0.0501814058956916, 0.22160997732426302, 0.3701814058956916, 0.4958956916099773, 59.5715903919772, 71.63843325188716, 64.17176220056767, 64.98963270408825))
+})
+
+test_that("it.write", {
+    expect_equal({
+        it <- it.read("maminka.IntensityTier")
+        f <- tempfile()
+        it.write(it, f, "short")
+        it2 <- it.read(f)
+        unlink(f)
+        c(length(it), it$t, it$i, it$tmin, it$tmax)
+    }, c(length(it2), it2$t, it2$i, it2$tmin, it2$tmax))
+    expect_equal({
+        it <- it.read("maminka.IntensityTier")
+        f <- tempfile()
+        it.write(it, f)
+        it2 <- it.read(f)
+        unlink(f)
+        c(length(it), it$t, it$i, it$tmin, it$tmax)
+    }, c(length(it2), it2$t, it2$i, it2$tmin, it2$tmax))
+    expect_equal({
+        it <- it.read("maminka.IntensityTier")
+        f <- tempfile()
+        it.write(it, f, "text")
+        it2 <- it.read(f)
+        unlink(f)
+        c(length(it), it$t, it$i, it$tmin, it$tmax)
+    }, c(length(it2), it2$t, it2$i, it2$tmin, it2$tmax))
+})
+
+test_that("it.interpolate", {
+    expect_equal({
+        it <- it.sample()
+        t <- c(-1, 0, 0.1, it$t[3], it$t[length(it$t)], it$t[length(it$t)]+1)
+        it2 <- it.interpolate(it, t)
+        c(it2$tmin, it2$tmax, length(it2$t), length(it2$i), it2$t, it2$i)
+    }, c(it$tmin, it$tmax, length(t), length(t), t, 59.57159039, 59.57159039, 69.76859026, 66.73070258, 64.98963270, 64.98963270))
+})
+
+test_that("it.legendre", {
+    expect_error(it.legendre(it.sample(), -1))
+    expect_error(it.legendre(it.sample(), npoints = 0, npolynomials = 0))
+    expect_error(it.legendre(it.sample(), npoints = -1, npolynomials = 1))
+    expect_error(it.legendreSynth(1, NA))
+    expect_error(it.legendreSynth(1, numeric(0)))
+    expect_equal({sum(is.nan(it.legendre(it.sample(), 0)))}, 4)
+    expect_equal({is.nan(it.legendre(it.sample(), npoints = 0, npolynomials = 1))}, TRUE)
+    expect_equal({it.legendre(list(tmin=0, tmax=0.4, t=c(0, 0.1, 0.2, 0.3, 0.4), i=c(1, 2, 3, 6, -1)))}, c(2.7472472, 0.8711174, -2.2633733, -2.4655033))
+    expect_equal({it.legendre(list(tmin=0, tmax=0.4, t=c(0, 0.1, 0.2, 0.3, 0.4), i=c(1, 2, 3, 6, -1)), npolynomials = 1)}, 2.7472472472472)
+    expect_equal({it.legendre(list(tmin=0, tmax=0.4, t=c(0, 0.1, 0.2, 0.3, 0.4), i=c(1, 2, 3, 6, -1)), npoints = 2)}, c(0, -3,  0, -7))
+    expect_equal({length(it.legendreSynth(5, 0))}, 0)
+    expect_equal({it.legendreSynth(5, 1)}, 5)
+    expect_equal({it.legendreSynth(5, 3)}, c(5, 5, 5))
+    expect_equal({it.legendreSynth(c(1, 2, 3), 1)}, 2)
+    expect_equal({it.legendreSynth(c(1, 2, 3), 2)}, c(2, 6))
+    expect_equal({it.legendreSynth(c(1, 2, 3), 5)}, c(2, -0.375, -0.5, 1.625, 6))
+})
+
+test_that("it.cut", {
+    expect_error(it.cut(it.sample(), numeric(0)))
+    expect_error(it.cut(it.sample(), NA))
+    expect_equal({
+        it <- it.cut(it.sample(),  tStart = 0.3)
+        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[10], it$t[18], it$i[1], it$i[10], it$i[18])},
+        c(0.3, 0.5460771, 18, 18, 0.3016100, 0.4044671, 0.4958957, 70.8841436, 58.2129565, 64.9896327))
+
+    expect_equal({
+        it <- it.cut(it.sample(),  tStart = .2, tEnd = .3)
+        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[4], it$t[8], it$i[1], it$i[4], it$i[8])},
+        c(0.2, 0.3, 8, 8, 0.2101814, 0.2444671, 0.2901814, 71.6253944, 71.1700598, 69.5956455))
+
+    expect_equal({
+        it <- it.cut(it.sample(),  tEnd = 1)
+        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[35], it$t[40], it$i[1], it$i[35], it$i[40])},
+        c(0, 1, 40, 40, 0.05018141, 0.43875283, 0.49589569, 59.57159039, 64.97294548, 64.98963270))
+
+    expect_equal({
+        it <- it.cut(it.sample(),  tStart = -1, tEnd = 1)
+        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[35], it$t[40], it$i[1], it$i[35], it$i[40])},
+        c(-1, 1, 40, 40, 0.05018141, 0.43875283, 0.49589569, 59.57159039, 64.97294548, 64.98963270))
+    expect_error(it.cut(it.sample(), 0.3, 0.2))
+})
+
+test_that("it.cut0", {
+    expect_error(it.cut0(it.sample(), numeric(0)))
+    expect_error(it.cut0(it.sample(), NA))
+    expect_equal({
+        it <- it.cut0(it.sample(),  tStart = 0.3)
+        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[10], it$t[18], it$i[1], it$i[10], it$i[18])},
+        c(0, 0.2460771, 18, 18, 0.001609977, 0.104467120, 0.195895692, 70.8841436, 58.2129565, 64.9896327))
+
+    expect_equal({
+        it <- it.cut0(it.sample(),  tStart = .2, tEnd = .3)
+        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[4], it$t[8], it$i[1], it$i[4], it$i[8])},
+        c(0, 0.1, 8, 8, 0.01018141, 0.04446712, 0.09018141, 71.62539439, 71.17005977, 69.59564547))
+
+    expect_equal({
+        it <- it.cut0(it.sample(),  tEnd = 1)
+        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[35], it$t[40], it$i[1], it$i[35], it$i[40])},
+        c(0, 1, 40, 40, 0.05018141, 0.43875283, 0.49589569, 59.57159039, 64.97294548, 64.98963270))
+
+    expect_equal({
+        it <- it.cut0(it.sample(),  tStart = -1, tEnd = 1)
+        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[35], it$t[40], it$i[1], it$i[35], it$i[40])},
+        c(0, 2, 40, 40, 1.050181, 1.438753, 1.495896, 59.57159039, 64.97294548, 64.98963270))
+    expect_error(it.cut0(it.sample(), 0.3, 0.2))
 })
 
 

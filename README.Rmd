@@ -2,7 +2,7 @@
 
 rPraat package for R constitutes an interface between the most popular software for phonetic analyses, Praat, and R.
 
-Version 1.1.0.
+Version 1.1.1.
 
 For demonstration, see [html/rDemo.html](http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html)
 
@@ -57,6 +57,8 @@ The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-
 [Download BibTeX reference mpraatrpraat2016.bib](http://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
 
 ## What is new
+
+v1.1.1 (2018/08/02): IntensityTiers: it.read(), it.write(), it.plot(), it.sample(), it.interpolate(), it.cut(), it.cut0(), it.legendre(), it.legendreDemo(), it.legendreSynth(), col.read() supports IntensityTiers
 
 v1.1.0 (2018/08/01): col.read() to read Collection in Text and Short-text format (Collection may store many objects in one file – TextGrids, PitchTiers, Pitch objects). Big thanks to Pol van Rijn for initiating this and making the major portion of the new code in mPraat toolbox. Supports for file encodings in all read functions (thanks to Weirong Chen for his DetectEncoding idea in mPraat toolbox).
 
