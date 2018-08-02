@@ -4274,7 +4274,7 @@ it.interpolate <- function(it, t) {
 #'
 #' @examples
 #' it <- it.sample()
-#' it <- it.cut(it, tStart = 0.2, tEnd = 0.4)  # cut IntensityTier from t = 0.2 to 0.4 sec and preserve time
+#' it <- it.cut(it, tStart = 0.2, tEnd = 0.4)  # cut IntensityTier and preserve time
 #' c <- it.legendre(it)
 #' print(c)
 #' leg <- it.legendreSynth(c)
@@ -4338,7 +4338,7 @@ it.legendre <- function(it, npoints = 1000, npolynomials = 4) {
 #'
 #' @examples
 #' it <- it.sample()
-#' it <- it.cut(it, tStart = 0.2, tEnd = 0.4)  # cut IntensityTier from t = 0.2 to 0.4 sec and preserve time
+#' it <- it.cut(it, tStart = 0.2, tEnd = 0.4)  # cut IntensityTier and preserve time
 #' c <- it.legendre(it)
 #' print(c)
 #' leg <- it.legendreSynth(c)

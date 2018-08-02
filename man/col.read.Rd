@@ -20,19 +20,34 @@ Collection may contain combination of TextGrids, PitchTiers, Pitch objects, and 
 }
 \examples{
 \dontrun{
-coll <- col.read("short_textgrid+pitchtier.Collection")
+coll <- col.read("coll_text.Collection")
 length(coll)  # number of objects in collection
 class(coll[[1]])["type"]  # 1st object type
 class(coll[[1]])["name"]  # 1st object name
-tg1 <- coll[[1]]  # 1st object
-tg.plot(tg1)
-length(tg1)  # number of tiers in TextGrid
-tg1$word$label
+it <- coll[[1]]  # 1st object
+it.plot(it)
 
 class(coll[[2]])["type"]  # 2nd object type
-class(coll[[2]])["name"]  # 2nd object type
-pt1 <- coll[[2]]  # 2nd object
-pt.plot(pt1)
+class(coll[[2]])["name"]  # 2nd object name
+tg <- coll[[2]]  # 2nd object
+tg.plot(tg)
+length(tg)  # number of tiers in TextGrid
+tg$word$label
+
+class(coll[[3]])["type"]  # 3rd object type
+class(coll[[3]])["name"]  # 3rd object type
+pitch <- coll[[3]]  # 3rd object
+names(pitch)
+pitch$nx  # number of frames
+pitch$t[4]        # time instance of the 4th frame
+pitch$frame[[4]]  # 4th frame: pitch candidates
+pitch$frame[[4]]$frequency[2]
+pitch$frame[[4]]$strength[2]
+
+class(coll[[4]])["type"]  # 4th object type
+class(coll[[4]])["name"]  # 4th object name
+pt <- coll[[4]]  # 2nd object
+pt.plot(pt)
 }
 }
 \seealso{

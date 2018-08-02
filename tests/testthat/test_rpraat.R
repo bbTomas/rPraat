@@ -727,6 +727,33 @@ test_that("pitch.read", {
     }, c(TRUE, TRUE))
 })
 
+
+context("Collection")
+
+test_that("col.read", {
+    expect_equal({
+        c1 <- col.read("coll_short.Collection")
+        it <- it.read("1.IntensityTier")
+        pitch <- pitch.read("sound.Pitch")
+        pt <- pt.read("H.PitchTier")
+        tg <- tg.read("HC101bA.TextGrid")
+        c(length(c1), class(c1[[1]])[["type"]], class(c1[[1]])[["name"]], class(c1[[2]])[["type"]], class(c1[[2]])[["name"]],
+          class(c1[[3]])[["type"]], class(c1[[3]])[["name"]], class(c1[[4]])[["type"]], class(c1[[4]])[["name"]],
+          identical(length(c1[[1]]), length(it)), identical(c1[[1]]$t, it$t), identical(c1[[1]]$i, it$i), identical(c1[[1]]$tmin, it$tmin), identical(c1[[1]]$tmax, it$tmax),
+          identical(length(c1[[2]]), length(tg)), identical(c1[[2]]$phone, tg$phone), identical(c1[[2]]$word, tg$word), identical(c1[[2]]$points, tg$points), identical(c1[[2]]$phrase, tg$phrase),
+          identical(length(c1[[3]]), length(pitch)), identical(c1[[3]]$xmin, pitch$xmin), identical(c1[[3]]$xmax, pitch$xmax), identical(c1[[3]]$nx, pitch$nx), identical(c1[[3]]$dx, pitch$dx),
+                   identical(c1[[3]]$x1, pitch$x1), identical(c1[[3]]$t, pitch$t), identical(c1[[3]]$ceiling, pitch$ceiling), identical(c1[[3]]$maxnCandidates, pitch$maxnCandidates), identical(c1[[3]]$frame, pitch$frame),
+          identical(length(c1[[4]]), length(pt)), identical(c1[[4]]$t, pt$t), identical(c1[[4]]$f, pt$f), identical(c1[[4]]$tmin, pt$tmin), identical(c1[[4]]$tmax, pt$tmax)
+          )
+    }, c("4", "IntensityTier", "1", "TextGrid", "HC101bA", "Pitch 1", "sound_short", "PitchTier", "H_shortTextFile", rep("TRUE", 25)))
+    expect_equal({
+        c1 <- col.read("coll_short.Collection")
+        c2 <- col.read("coll_text.Collection")
+        identical(c1, c2)
+    }, TRUE)
+})
+
+
 context("strings")
 
 test_that("strtrim works", {
