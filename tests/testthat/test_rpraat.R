@@ -707,6 +707,139 @@ test_that("tg.duplicateTierMergeSegments", {
         c(6, "syll", 0, 21, TRUE, 0.008, TRUE, "interval"))
 })
 
+test_that("tg.cut", {
+    expect_error({tg.cut(tg.sample(), 3, 2)})
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg1 <- tg.read("0.5-4p.TextGrid")
+        tg2 <- tg.cut(tg, 0.5, 4)
+        identical(tg1, tg2)
+    }, TRUE)
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg1 <- tg.read("1.25-3.75p.TextGrid")
+        tg2 <- tg.cut(tg, 1.25, 3.75)
+        identical(tg1, tg2)
+    }, TRUE)
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg1 <- tg.read("1.5-3.5p.TextGrid")
+        tg2 <- tg.cut(tg, 1.5, 3.5)
+        identical(tg1, tg2)
+    }, TRUE)
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg1 <- tg.read("1-4p.TextGrid")
+        tg2 <- tg.cut(tg, 1, 4)
+        identical(tg1, tg2)
+    }, TRUE)
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg1 <- tg.read("-1-6p.TextGrid")
+        tg2 <- tg.cut(tg, -1, 6)
+        identical(tg1, tg2)
+    }, TRUE)
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg1 <- tg.read("0-3p.TextGrid")
+        tg2 <- tg.cut(tg, tEnd = 3)
+        identical(tg1, tg2)
+    }, TRUE)
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg1 <- tg.read("3-5p.TextGrid")
+        tg2 <- tg.cut(tg, tStart = 3)
+        identical(tg1, tg2)
+    }, TRUE)
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg2 <- tg.cut(tg, tEnd = -1)
+        c(tg.getStartTime(tg2), tg.getEndTime(tg2))
+    }, c(-1, -1))
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg2 <- tg.cut(tg, tStart = 6)
+        c(tg.getStartTime(tg2), tg.getEndTime(tg2))
+    }, c(6, 6))
+
+})
+
+test_that("tg.cut0", {
+    expect_error({tg.cut0(tg.sample(), 3, 2)})
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg1 <- tg.read("0.5-4.TextGrid")
+        tg2 <- tg.cut0(tg, 0.5, 4)
+        identical(tg1, tg2)
+    }, TRUE)
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg1 <- tg.read("1.25-3.75.TextGrid")
+        tg2 <- tg.cut0(tg, 1.25, 3.75)
+        identical(tg1, tg2)
+    }, TRUE)
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg1 <- tg.read("1.5-3.5.TextGrid")
+        tg2 <- tg.cut0(tg, 1.5, 3.5)
+        identical(tg1, tg2)
+    }, TRUE)
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg1 <- tg.read("1-4.TextGrid")
+        tg2 <- tg.cut0(tg, 1, 4)
+        identical(tg1, tg2)
+    }, TRUE)
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg1 <- tg.read("-1-6.TextGrid")
+        tg2 <- tg.cut0(tg, -1, 6)
+        identical(tg1, tg2)
+    }, TRUE)
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg1 <- tg.read("0-3.TextGrid")
+        tg2 <- tg.cut0(tg, tEnd = 3)
+        identical(tg1, tg2)
+    }, TRUE)
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg1 <- tg.read("3-5.TextGrid")
+        tg2 <- tg.cut0(tg, tStart = 3)
+        identical(tg1, tg2)
+    }, TRUE)
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg2 <- tg.cut0(tg, tEnd = -1)
+        c(tg.getStartTime(tg2), tg.getEndTime(tg2))
+    }, c(0, 0))
+
+    expect_equal({
+        tg <- tg.read("cut.TextGrid")
+        tg2 <- tg.cut0(tg, tStart = 6)
+        c(tg.getStartTime(tg2), tg.getEndTime(tg2))
+    }, c(0, 0))
+
+})
+
+
 context("Pitch")
 
 test_that("pitch.read", {

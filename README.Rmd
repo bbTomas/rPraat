@@ -2,7 +2,7 @@
 
 rPraat package for R constitutes an interface between the most popular software for phonetic analyses, Praat, and R.
 
-Version 1.1.1.
+Version 1.1.2.
 
 For demonstration, see [html/rDemo.html](http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html)
 
@@ -57,6 +57,8 @@ The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-
 [Download BibTeX reference mpraatrpraat2016.bib](http://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
 
 ## What is new
+
+v1.1.2 (2018/08/04): tg.cut(), tg.cut0()
 
 v1.1.1 (2018/08/02): IntensityTiers: it.read(), it.write(), it.plot(), it.sample(), it.interpolate(), it.cut(), it.cut0(), it.legendre(), it.legendreDemo(), it.legendreSynth(), col.read() supports IntensityTiers
 

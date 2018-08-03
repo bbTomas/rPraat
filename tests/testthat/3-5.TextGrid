@@ -1,0 +1,59 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 2 
+tiers? <exists> 
+size = 3 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "slovo" 
+        xmin = 0 
+        xmax = 2 
+        intervals: size = 2 
+        intervals [1]:
+            xmin = 0 
+            xmax = 1 
+            text = "maminka" 
+        intervals [2]:
+            xmin = 1 
+            xmax = 2 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "segment" 
+        xmin = 0 
+        xmax = 2 
+        intervals: size = 4 
+        intervals [1]:
+            xmin = 0 
+            xmax = 0.5 
+            text = "n" 
+        intervals [2]:
+            xmin = 0.5 
+            xmax = 1 
+            text = "k" 
+        intervals [3]:
+            xmin = 1 
+            xmax = 1.5 
+            text = "a" 
+        intervals [4]:
+            xmin = 1.5 
+            xmax = 2 
+            text = "" 
+    item [3]:
+        class = "TextTier" 
+        name = "point" 
+        xmin = 0 
+        xmax = 2 
+        points: size = 3 
+        points [1]:
+            number = 0 
+            mark = "tři" 
+        points [2]:
+            number = 1 
+            mark = "čtyři" 
+        points [3]:
+            number = 2 
+            mark = "pět" 

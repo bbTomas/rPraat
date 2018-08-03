@@ -3054,6 +3054,198 @@ tg.findLabels <- function(tg, tierInd, labelVector, returnTime = FALSE) {
 }
 
 
+#' tg.cut
+#'
+#' Cut the specified time frame from the TextGrid and preserve time
+#'
+#' @param tg TextGrid object
+#' @param tStart beginning time of time frame to be cut (default -Inf = cut from the tmin of the TextGrid)
+#' @param tEnd final time of time frame to be cut (default Inf = cut to the tmax of the TextGrid)
+#'
+#' @return TextGrid object
+#' @export
+#' @seealso \code{\link{tg.cut0}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{tg.read}}, \code{\link{tg.plot}}, \code{\link{tg.write}}, \code{\link{tg.insertInterval}}
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg2 <-   tg.cut(tg,  tStart = 3)
+#' tg2_0 <- tg.cut0(tg, tStart = 3)
+#' tg3 <-   tg.cut(tg,  tStart = 2, tEnd = 3)
+#' tg3_0 <- tg.cut0(tg, tStart = 2, tEnd = 3)
+#' tg4 <-   tg.cut(tg,  tEnd = 1)
+#' tg4_0 <- tg.cut0(tg, tEnd = 1)
+#' tg5 <-   tg.cut(tg,  tStart = -1, tEnd = 5)
+#' tg5_0 <- tg.cut0(tg, tStart = -1, tEnd = 5)
+#' \dontrun{
+#' tg.plot(tg)
+#' tg.plot(tg2)
+#' tg.plot(tg2_0)
+#' tg.plot(tg3)
+#' tg.plot(tg3_0)
+#' tg.plot(tg4)
+#' tg.plot(tg4_0)
+#' tg.plot(tg5)
+#' tg.plot(tg5_0)
+#' }
+tg.cut <- function(tg, tStart = -Inf, tEnd = Inf) {
+    if (!isNum(tStart)) {
+        stop("tStart must be a number.")
+    }
+    if (!isNum(tEnd)) {
+        stop("tEnd must be a number.")
+    }
+    if (is.infinite(tStart) & tStart>0) {
+        stop("infinite tStart can be negative only")
+    }
+    if (is.infinite(tEnd) & tEnd<0) {
+        stop("infinite tEnd can be positive only")
+    }
+    if (tEnd < tStart) {
+        stop("tEnd must be >= tStart")
+    }
+
+    ntiers <- length(tg)
+    tmin <- as.numeric(class(tg)["tmin"])
+    tmax <- as.numeric(class(tg)["tmax"])
+
+    tgNew <- tg
+
+    for (I in rPraat::seqM(1, ntiers)) {
+        if (tgNew[[I]]$type == "point") {
+            sel <- tg[[I]]$t >= tStart  &  tg[[I]]$t <= tEnd
+            tgNew[[I]]$t     <-     tg[[I]]$t[sel]
+            tgNew[[I]]$label <- tg[[I]]$label[sel]
+        } else if (tgNew[[I]]$type == "interval") {
+            sel <- (tg[[I]]$t1 >= tStart & tg[[I]]$t2 <= tEnd) | (tStart >= tg[[I]]$t1 & tEnd <= tg[[I]]$t2) | (tg[[I]]$t2 > tStart & tg[[I]]$t2 <= tEnd) | (tg[[I]]$t1 >= tStart & tg[[I]]$t1 < tEnd)
+            tgNew[[I]]$t1    <-    tg[[I]]$t1[sel]
+            tgNew[[I]]$t2    <-    tg[[I]]$t2[sel]
+            tgNew[[I]]$label <- tg[[I]]$label[sel]
+
+            tgNew[[I]]$t1[tgNew[[I]]$t1 < tStart] <- tStart
+            tgNew[[I]]$t2[tgNew[[I]]$t2 > tEnd] <- tEnd
+        } else {
+            stop(paste0("unknown tier type:", tgNew[[I]]$type))
+        }
+    }
+
+    if (is.infinite(tStart)) {
+        class(tgNew)["tmin"] <- min(tmin, tEnd)
+    } else {
+        class(tgNew)["tmin"] <- tStart
+    }
+
+    if (is.infinite(tEnd)) {
+        class(tgNew)["tmax"] <- max(tmax, tStart)
+    } else {
+        class(tgNew)["tmax"] <- tEnd
+    }
+
+
+
+    return(tgNew)
+}
+
+
+#' tg.cut0
+#'
+#' Cut the specified time frame from the TextGrid and shift time so that the new tmin = 0
+#'
+#' @param tg TextGrid object
+#' @param tStart beginning time of time frame to be cut (default -Inf = cut from the tmin of the TextGrid)
+#' @param tEnd final time of time frame to be cut (default Inf = cut to the tmax of the TextGrid)
+#'
+#' @return TextGrid object
+#' @export
+#' @seealso \code{\link{tg.cut}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{tg.read}}, \code{\link{tg.plot}}, \code{\link{tg.write}}, \code{\link{tg.insertInterval}}
+#'
+#' @examples
+#' tg <- tg.sample()
+#' tg2 <-   tg.cut(tg,  tStart = 3)
+#' tg2_0 <- tg.cut0(tg, tStart = 3)
+#' tg3 <-   tg.cut(tg,  tStart = 2, tEnd = 3)
+#' tg3_0 <- tg.cut0(tg, tStart = 2, tEnd = 3)
+#' tg4 <-   tg.cut(tg,  tEnd = 1)
+#' tg4_0 <- tg.cut0(tg, tEnd = 1)
+#' tg5 <-   tg.cut(tg,  tStart = -1, tEnd = 5)
+#' tg5_0 <- tg.cut0(tg, tStart = -1, tEnd = 5)
+#' \dontrun{
+#' tg.plot(tg)
+#' tg.plot(tg2)
+#' tg.plot(tg2_0)
+#' tg.plot(tg3)
+#' tg.plot(tg3_0)
+#' tg.plot(tg4)
+#' tg.plot(tg4_0)
+#' tg.plot(tg5)
+#' tg.plot(tg5_0)
+#' }
+tg.cut0 <- function(tg, tStart = -Inf, tEnd = Inf) {
+    if (!isNum(tStart)) {
+        stop("tStart must be a number.")
+    }
+    if (!isNum(tEnd)) {
+        stop("tEnd must be a number.")
+    }
+    if (is.infinite(tStart) & tStart>0) {
+        stop("infinite tStart can be negative only")
+    }
+    if (is.infinite(tEnd) & tEnd<0) {
+        stop("infinite tEnd can be positive only")
+    }
+    if (tEnd < tStart) {
+        stop("tEnd must be >= tStart")
+    }
+
+    ntiers <- length(tg)
+    tmin <- as.numeric(class(tg)["tmin"])
+    tmax <- as.numeric(class(tg)["tmax"])
+
+    tgNew <- tg
+
+    if (is.infinite(tStart)) {
+        class(tgNew)["tmin"] <- min(tmin, tEnd)
+    } else {
+        class(tgNew)["tmin"] <- tStart
+    }
+
+    if (is.infinite(tEnd)) {
+        class(tgNew)["tmax"] <- max(tmax, tStart)
+    } else {
+        class(tgNew)["tmax"] <- tEnd
+    }
+
+    tNewMin <- tg.getStartTime(tgNew)
+    tNewMax <- tg.getEndTime(tgNew)
+
+    for (I in rPraat::seqM(1, ntiers)) {
+        if (tgNew[[I]]$type == "point") {
+            sel <- tg[[I]]$t >= tStart  &  tg[[I]]$t <= tEnd
+            tgNew[[I]]$t     <-     tg[[I]]$t[sel] - tNewMin
+            tgNew[[I]]$label <- tg[[I]]$label[sel]
+        } else if (tgNew[[I]]$type == "interval") {
+            sel <- (tg[[I]]$t1 >= tStart & tg[[I]]$t2 <= tEnd) | (tStart >= tg[[I]]$t1 & tEnd <= tg[[I]]$t2) | (tg[[I]]$t2 > tStart & tg[[I]]$t2 <= tEnd) | (tg[[I]]$t1 >= tStart & tg[[I]]$t1 < tEnd)
+            tgNew[[I]]$t1    <-    tg[[I]]$t1[sel]
+            tgNew[[I]]$t2    <-    tg[[I]]$t2[sel]
+            tgNew[[I]]$label <- tg[[I]]$label[sel]
+
+            tgNew[[I]]$t1[tgNew[[I]]$t1 < tStart] <- tStart
+            tgNew[[I]]$t2[tgNew[[I]]$t2 > tEnd] <- tEnd
+
+            tgNew[[I]]$t1 <- tgNew[[I]]$t1 - tNewMin
+            tgNew[[I]]$t2 <- tgNew[[I]]$t2 - tNewMin
+        } else {
+            stop(paste0("unknown tier type:", tgNew[[I]]$type))
+        }
+    }
+
+    class(tgNew)["tmin"] <- 0
+    class(tgNew)["tmax"] <- tNewMax - tNewMin
+
+    return(tgNew)
+}
+
+
+
 
 
 #' pitch.read
@@ -3809,12 +4001,12 @@ pt.legendreDemo <- function() {
 #' Cut the specified interval from the PitchTier and preserve time
 #'
 #' @param pt PitchTier object
-#' @param tStart beginning time of interval to be cut (default -Inf = cut from the tMin of the PitchTier)
-#' @param tEnd final time of interval to be cut (default Inf = cut to the tMax of the PitchTier)
+#' @param tStart beginning time of interval to be cut (default -Inf = cut from the tmin of the PitchTier)
+#' @param tEnd final time of interval to be cut (default Inf = cut to the tmax of the PitchTier)
 #'
 #' @return PitchTier object
 #' @export
-#' @seealso \code{\link{pt.cut0}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}, \code{\link{pt.legendre}}, \code{\link{pt.legendreSynth}}, \code{\link{pt.legendreDemo}}
+#' @seealso \code{\link{pt.cut0}}, \code{\link{tg.cut}}, \code{\link{tg.cut0}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}, \code{\link{pt.legendre}}, \code{\link{pt.legendreSynth}}, \code{\link{pt.legendreDemo}}
 #'
 #' @examples
 #' pt <- pt.sample()

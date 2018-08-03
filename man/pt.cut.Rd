@@ -9,9 +9,9 @@ pt.cut(pt, tStart = -Inf, tEnd = Inf)
 \arguments{
 \item{pt}{PitchTier object}
 
-\item{tStart}{beginning time of interval to be cut (default -Inf = cut from the tMin of the PitchTier)}
+\item{tStart}{beginning time of interval to be cut (default -Inf = cut from the tmin of the PitchTier)}
 
-\item{tEnd}{final time of interval to be cut (default Inf = cut to the tMax of the PitchTier)}
+\item{tEnd}{final time of interval to be cut (default Inf = cut to the tmax of the PitchTier)}
 }
 \value{
 PitchTier object
@@ -42,5 +42,5 @@ pt.plot(pt5_0)
 }
 }
 \seealso{
-\code{\link{pt.cut0}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}, \code{\link{pt.legendre}}, \code{\link{pt.legendreSynth}}, \code{\link{pt.legendreDemo}}
+\code{\link{pt.cut0}}, \code{\link{tg.cut}}, \code{\link{tg.cut0}}, \code{\link{pt.read}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.interpolate}}, \code{\link{pt.legendre}}, \code{\link{pt.legendreSynth}}, \code{\link{pt.legendreDemo}}
 }

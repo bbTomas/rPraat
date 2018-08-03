@@ -175,6 +175,14 @@ mean(dur)
 hist(dur)
 ```
 
+### Cut TextGrid
+```{r}
+tg.plot(tg.cut(tg.sample(), 2, 2.2)) # preserve times
+tg.plot(tg.cut0(tg.sample(), 2, 2.2)) # time from 0
+```
+
+
+
 ### Find labels in TextGrid
 
 ```{r}
