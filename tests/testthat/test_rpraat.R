@@ -16,6 +16,29 @@ test_that("pt.sample", {
     expect_equal(length(unique(pt.sample()$t)), 209)
 })
 
+test_that("it.sample", {
+    expect_equal(length(it.sample()$t), 40)
+    expect_equal(length(it.sample()$i), 40)
+    expect_equal(length(unique(it.sample()$t)), 40)
+})
+
+test_that("pitch.sample", {
+    expect_equal(length(pitch.sample()$t), 10)
+    expect_equal(pitch.sample()$ceiling, 600)
+    expect_equal(pitch.sample()$frame[[5]]$nCandidates, 5)
+    expect_equal(pitch.sample()$frame[[5]]$intensity, 7.777478353175910e-05)
+    expect_equal(pitch.sample()$frame[[5]]$frequency[4], 2248.97907136615)
+    expect_equal(pitch.sample()$frame[[5]]$strength[4], 0.264006571781677)
+})
+
+test_that("formant.sample", {
+    expect_equal(length(formant.sample()$t), 10)
+    expect_equal(formant.sample()$frame[[5]]$nFormants, 4)
+    expect_equal(formant.sample()$frame[[5]]$intensity, 1.572223747442e-05)
+    expect_equal(formant.sample()$frame[[5]]$frequency[4], 3923.29057579107)
+    expect_equal(formant.sample()$frame[[5]]$bandwidth[4], 726.595127875472)
+})
+
 
 context("PitchTier")
 
@@ -861,6 +884,30 @@ test_that("pitch.read", {
 })
 
 
+context("Formant")
+
+test_that("formant.read", {
+    expect_equal({
+        f <- formant.read("maminka.Formant")
+        c(f$xmin, f$xmax, f$nx, f$dx, f$x1, length(f$t), f$t[1], f$t[2], f$t[80], f$maxnFormants, length(f$frame), f$frame[[4]]$intensity,
+          f$frame[[4]]$nFormants, length(f$frame[[4]]$frequency), length(f$frame[[4]]$bandwidth), f$frame[[4]]$frequency[1], f$frame[[4]]$frequency[2],
+          f$frame[[4]]$frequency[3], f$frame[[4]]$frequency[4], f$frame[[4]]$frequency[5], f$frame[[4]]$bandwidth[1], f$frame[[4]]$bandwidth[2], f$frame[[4]]$bandwidth[3],
+          f$frame[[4]]$bandwidth[4], f$frame[[4]]$bandwidth[5], f$frame[[80]]$intensity, f$frame[[80]]$nFormants, length(f$frame[[80]]$frequency), length(f$frame[[80]]$bandwidth),
+          f$frame[[80]]$frequency[1], f$frame[[80]]$frequency[2], f$frame[[80]]$frequency[3], f$frame[[80]]$frequency[4],
+          f$frame[[80]]$bandwidth[1], f$frame[[80]]$bandwidth[2], f$frame[[80]]$bandwidth[3], f$frame[[80]]$bandwidth[4])
+    }, c(0, 0.5460770975056689, 80, 0.00625, 0.026163548752834397, 80, 0.026163548752834397, 0.032413548752834397, 0.5199135487528345, 5, 80, 1.033142541089274e-005,
+         5, 5, 5, 192.48696491636466, 1479.2446721696026, 2883.3496059581475, 3969.3756273121708, 5231.531927706885, 234.84667765707806, 295.1069753187278,
+         160.23124588560367, 452.2355186981254, 1242.9009292690093, 0.0017737676385123245, 4, 4, 4, 601.9084470780567, 1790.5091315894167,
+         2896.3679369463307, 4329.2993398040635, 147.158951399607, 272.26394394370794, 723.7529213211043, 361.80775918364697))
+    expect_equal({
+        f <- formant.read("maminka.Formant")
+        f2 <- as.formant(formant.read("maminka_short.Formant"), "maminka.Formant")
+        f3 <- as.formant(formant.read("maminka_UTF16.Formant", encoding = "UTF-16"), "maminka.Formant")
+        c(identical(f, f2), identical(f, f3))
+    }, c(TRUE, TRUE))
+})
+
+
 context("Collection")
 
 test_that("col.read", {
@@ -868,22 +915,28 @@ test_that("col.read", {
         c1 <- col.read("coll_short.Collection")
         it <- it.read("1.IntensityTier")
         pitch <- pitch.read("sound.Pitch")
+        formant <- formant.read("maminka.Formant")
         pt <- pt.read("H.PitchTier")
         tg <- tg.read("HC101bA.TextGrid")
         c(length(c1), class(c1[[1]])[["type"]], class(c1[[1]])[["name"]], class(c1[[2]])[["type"]], class(c1[[2]])[["name"]],
           class(c1[[3]])[["type"]], class(c1[[3]])[["name"]], class(c1[[4]])[["type"]], class(c1[[4]])[["name"]],
+          class(c1[[5]])[["type"]], class(c1[[5]])[["name"]],
           identical(length(c1[[1]]), length(it)), identical(c1[[1]]$t, it$t), identical(c1[[1]]$i, it$i), identical(c1[[1]]$tmin, it$tmin), identical(c1[[1]]$tmax, it$tmax),
           identical(length(c1[[2]]), length(tg)), identical(c1[[2]]$phone, tg$phone), identical(c1[[2]]$word, tg$word), identical(c1[[2]]$points, tg$points), identical(c1[[2]]$phrase, tg$phrase),
           identical(length(c1[[3]]), length(pitch)), identical(c1[[3]]$xmin, pitch$xmin), identical(c1[[3]]$xmax, pitch$xmax), identical(c1[[3]]$nx, pitch$nx), identical(c1[[3]]$dx, pitch$dx),
                    identical(c1[[3]]$x1, pitch$x1), identical(c1[[3]]$t, pitch$t), identical(c1[[3]]$ceiling, pitch$ceiling), identical(c1[[3]]$maxnCandidates, pitch$maxnCandidates), identical(c1[[3]]$frame, pitch$frame),
-          identical(length(c1[[4]]), length(pt)), identical(c1[[4]]$t, pt$t), identical(c1[[4]]$f, pt$f), identical(c1[[4]]$tmin, pt$tmin), identical(c1[[4]]$tmax, pt$tmax)
+          identical(length(c1[[4]]), length(pt)), identical(c1[[4]]$t, pt$t), identical(c1[[4]]$f, pt$f), identical(c1[[4]]$tmin, pt$tmin), identical(c1[[4]]$tmax, pt$tmax),
+          identical(c1[[5]]$x1, formant$x1), identical(c1[[5]]$t, formant$t), identical(c1[[5]]$maxnFormants, formant$maxnFormants), identical(c1[[5]]$frame, formant$frame)
           )
-    }, c("4", "IntensityTier", "1", "TextGrid", "HC101bA", "Pitch 1", "sound_short", "PitchTier", "H_shortTextFile", rep("TRUE", 25)))
+    }, c("5", "IntensityTier", "1", "TextGrid", "HC101bA", "Pitch 1", "sound_short", "PitchTier", "H_shortTextFile", "Formant 2", "maminka",
+         rep("TRUE", 29)))
     expect_equal({
         c1 <- col.read("coll_short.Collection")
         c2 <- col.read("coll_text.Collection")
-        identical(c1, c2)
-    }, TRUE)
+        c3 <- col.read("coll_text_UTF16.Collection", encoding = "UTF-16")
+        c(identical(c1, c2),
+          identical(c2, c3))
+    }, c(TRUE, TRUE))
 })
 
 

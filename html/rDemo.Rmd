@@ -381,6 +381,21 @@ p$frame[[4]]$strength[2]
 ```
 
 
+## Formant object
+
+A Formant object represents formant frequencies and bandwidths as a function of time.
+```{r}
+f <- formant.read('demo/maminka.Formant')
+names(f)
+f$nx
+f$t[4]        # time instance of the 4th frame
+f$frame[[4]]  # 4th frame: formants
+f$frame[[4]]$frequency[2]
+f$frame[[4]]$bandwidth[2]
+```
+
+
+
 ## IntensityTier
 
 Intensity tier files have very similar structure to PitchTiers. Using this package, you can also interpolate, cut or model Intensity tiers with Legendre polynomials.
@@ -432,6 +447,16 @@ class(coll[[4]])["type"]  # 4th object type
 class(coll[[4]])["name"]  # 4th object name
 pt <- coll[[4]]  # 2nd object
 pt.plot(pt)
+
+class(coll[[5]])["type"]  # 5th object type
+class(coll[[5]])["name"]  # 5th object type
+formant <- coll[[5]]  # 5th object
+names(formant)
+formant$nx  # number of frames
+formant$t[4]        # time instance of the 4th frame
+formant$frame[[4]]  # 4th frame: formants
+formant$frame[[4]]$frequency[2]
+formant$frame[[4]]$bandwidth[2]
 ```
 
 

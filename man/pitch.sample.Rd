@@ -16,5 +16,5 @@ Returns sample Pitch object.
 pitch <- pitch.sample()
 }
 \seealso{
-\code{\link{tg.sample}}, \code{\link{pt.sample}}, \code{\link{it.sample}}
+\code{\link{tg.sample}}, \code{\link{pt.sample}}, \code{\link{it.sample}}, \code{\link{formant.sample}}
 }

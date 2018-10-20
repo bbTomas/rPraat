@@ -26,5 +26,5 @@ pt.plot(pt)
 }
 }
 \seealso{
-\code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.interpolate}}, \code{\link{pt.legendre}}, \code{\link{tg.read}}, \code{\link{pitch.read}}, \code{\link{it.read}}, \code{\link{col.read}}
+\code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.interpolate}}, \code{\link{pt.legendre}}, \code{\link{tg.read}}, \code{\link{pitch.read}}, \code{\link{formant.read}}, \code{\link{it.read}}, \code{\link{col.read}}
 }

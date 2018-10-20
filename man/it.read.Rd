@@ -24,5 +24,5 @@ it.plot(it)
 }
 }
 \seealso{
-\code{\link{it.write}}, \code{\link{it.plot}}, \code{\link{it.cut}}, \code{\link{it.cut0}}, \code{\link{it.interpolate}}, \code{\link{tg.read}}, \code{\link{pt.read}}, \code{\link{pitch.read}}, \code{\link{col.read}}
+\code{\link{it.write}}, \code{\link{it.plot}}, \code{\link{it.cut}}, \code{\link{it.cut0}}, \code{\link{it.interpolate}}, \code{\link{tg.read}}, \code{\link{pt.read}}, \code{\link{pitch.read}}, \code{\link{formant.read}}, \code{\link{col.read}}
 }
