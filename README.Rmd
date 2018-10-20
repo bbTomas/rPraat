@@ -2,7 +2,7 @@
 
 rPraat package for R constitutes an interface between the most popular software for phonetic analyses, Praat, and R.
 
-Version 1.1.2.
+Version 1.1.2-1.
 
 For demonstration, see [html/rDemo.html](http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html)
 
@@ -57,6 +57,8 @@ The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-
 [Download BibTeX reference mpraatrpraat2016.bib](http://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
 
 ## What is new
+
+v1.1.2-1 (2018/10/20): tg.plot(): right-aligned labels; pitch.sample(), as.tg(), as.pt(), as.it(), as.pitch(); .read(), .sample() and tg.createNewTextGrid(): class(object)["type"] set to "TextGrid", "PitchTier" etc. and class(object)["name"] set according to fileName
 
 v1.1.2 (2018/08/04): tg.cut(), tg.cut0()
 

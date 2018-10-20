@@ -50,9 +50,10 @@ library(rPraat)
 library(dplyr)
 
 sndWav <- readWave("demo/H.wav"); fs <- sndWav@samp.rate; snd <- sndWav@left / (2^(sndWav@bit-1))
-t <- seqM(0, (length(snd)-1)/fs, by = 1/fs)
+t <- seqM(0, length(snd) - 1) / fs
 
-dygraph(data.frame(t, snd), xlab = "Time (sec)", group="group1") %>% dyRangeSelector() %>% dyAxis("y", label = "Amplitude")
+dygraph(data.frame(t, snd), xlab = "Time (sec)", group="group1") %>% dyRangeSelector(fillColor = "") %>%
+    dyAxis("y", label = "Amplitude")
 ```
 
 ```{r, fig.height=3}

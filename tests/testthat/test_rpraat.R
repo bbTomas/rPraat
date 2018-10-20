@@ -52,7 +52,7 @@ test_that("pt.write", {
         pt <- pt.read("Hround.PitchTier")
         f <- tempfile()
         pt.write(pt, f, "short")
-        pt2 <- pt.read(f)
+        pt2 <- as.pt(pt.read(f), "Hround.PitchTier")
         unlink(f)
         identical(pt, pt2)
     }, TRUE)
@@ -60,7 +60,7 @@ test_that("pt.write", {
         pt <- pt.read("Hround.PitchTier")
         f <- tempfile()
         pt.write(pt, f, "text")
-        pt2 <- pt.read(f)
+        pt2 <- as.pt(pt.read(f), "Hround.PitchTier")
         unlink(f)
         identical(pt, pt2)
     }, TRUE)
@@ -68,7 +68,7 @@ test_that("pt.write", {
         pt <- pt.read("Hround.PitchTier")
         f <- tempfile()
         pt.write(pt, f, "spreadsheet")
-        pt2 <- pt.read(f)
+        pt2 <- as.pt(pt.read(f), "Hround.PitchTier")
         unlink(f)
         identical(pt, pt2)
     }, TRUE)
@@ -320,7 +320,7 @@ test_that("tg.write", {
         tg <- tg.read("2pr.TextGrid")
         f <- tempfile()
         tg.write(tg, f, format = "text")
-        tg2 <- tg.read(f)
+        tg2 <- as.tg(tg.read(f), "2pr.TextGrid")
         unlink(f)
         identical(tg, tg2)
     }, TRUE)
@@ -338,7 +338,7 @@ test_that("tg.write", {
         tg <- tg.read("2pr.TextGrid")
         f <- tempfile()
         tg.write(tg, f, format = "short")
-        tg2 <- tg.read(f)
+        tg2 <- as.tg(tg.read(f), "2pr.TextGrid")
         unlink(f)
         identical(tg, tg2)
     }, TRUE)
@@ -713,49 +713,49 @@ test_that("tg.cut", {
     expect_equal({
         tg <- tg.read("cut.TextGrid")
         tg1 <- tg.read("0.5-4p.TextGrid")
-        tg2 <- tg.cut(tg, 0.5, 4)
+        tg2 <- as.tg(tg.cut(tg, 0.5, 4), "0.5-4p.TextGrid")
         identical(tg1, tg2)
     }, TRUE)
 
     expect_equal({
         tg <- tg.read("cut.TextGrid")
         tg1 <- tg.read("1.25-3.75p.TextGrid")
-        tg2 <- tg.cut(tg, 1.25, 3.75)
+        tg2 <- as.tg(tg.cut(tg, 1.25, 3.75), "1.25-3.75p.TextGrid")
         identical(tg1, tg2)
     }, TRUE)
 
     expect_equal({
         tg <- tg.read("cut.TextGrid")
         tg1 <- tg.read("1.5-3.5p.TextGrid")
-        tg2 <- tg.cut(tg, 1.5, 3.5)
+        tg2 <- as.tg(tg.cut(tg, 1.5, 3.5), "1.5-3.5p.TextGrid")
         identical(tg1, tg2)
     }, TRUE)
 
     expect_equal({
         tg <- tg.read("cut.TextGrid")
         tg1 <- tg.read("1-4p.TextGrid")
-        tg2 <- tg.cut(tg, 1, 4)
+        tg2 <- as.tg(tg.cut(tg, 1, 4), "1-4p.TextGrid")
         identical(tg1, tg2)
     }, TRUE)
 
     expect_equal({
         tg <- tg.read("cut.TextGrid")
         tg1 <- tg.read("-1-6p.TextGrid")
-        tg2 <- tg.cut(tg, -1, 6)
+        tg2 <- as.tg(tg.cut(tg, -1, 6), "-1-6p.TextGrid")
         identical(tg1, tg2)
     }, TRUE)
 
     expect_equal({
         tg <- tg.read("cut.TextGrid")
         tg1 <- tg.read("0-3p.TextGrid")
-        tg2 <- tg.cut(tg, tEnd = 3)
+        tg2 <- as.tg(tg.cut(tg, tEnd = 3), "0-3p.TextGrid")
         identical(tg1, tg2)
     }, TRUE)
 
     expect_equal({
         tg <- tg.read("cut.TextGrid")
         tg1 <- tg.read("3-5p.TextGrid")
-        tg2 <- tg.cut(tg, tStart = 3)
+        tg2 <- as.tg(tg.cut(tg, tStart = 3), "3-5p.TextGrid")
         identical(tg1, tg2)
     }, TRUE)
 
@@ -779,49 +779,49 @@ test_that("tg.cut0", {
     expect_equal({
         tg <- tg.read("cut.TextGrid")
         tg1 <- tg.read("0.5-4.TextGrid")
-        tg2 <- tg.cut0(tg, 0.5, 4)
+        tg2 <- as.tg(tg.cut0(tg, 0.5, 4), "0.5-4.TextGrid")
         identical(tg1, tg2)
     }, TRUE)
 
     expect_equal({
         tg <- tg.read("cut.TextGrid")
         tg1 <- tg.read("1.25-3.75.TextGrid")
-        tg2 <- tg.cut0(tg, 1.25, 3.75)
+        tg2 <- as.tg(tg.cut0(tg, 1.25, 3.75), "1.25-3.75.TextGrid")
         identical(tg1, tg2)
     }, TRUE)
 
     expect_equal({
         tg <- tg.read("cut.TextGrid")
         tg1 <- tg.read("1.5-3.5.TextGrid")
-        tg2 <- tg.cut0(tg, 1.5, 3.5)
+        tg2 <- as.tg(tg.cut0(tg, 1.5, 3.5), "1.5-3.5.TextGrid")
         identical(tg1, tg2)
     }, TRUE)
 
     expect_equal({
         tg <- tg.read("cut.TextGrid")
         tg1 <- tg.read("1-4.TextGrid")
-        tg2 <- tg.cut0(tg, 1, 4)
+        tg2 <- as.tg(tg.cut0(tg, 1, 4), "1-4.TextGrid")
         identical(tg1, tg2)
     }, TRUE)
 
     expect_equal({
         tg <- tg.read("cut.TextGrid")
         tg1 <- tg.read("-1-6.TextGrid")
-        tg2 <- tg.cut0(tg, -1, 6)
+        tg2 <- as.tg(tg.cut0(tg, -1, 6), "-1-6.TextGrid")
         identical(tg1, tg2)
     }, TRUE)
 
     expect_equal({
         tg <- tg.read("cut.TextGrid")
         tg1 <- tg.read("0-3.TextGrid")
-        tg2 <- tg.cut0(tg, tEnd = 3)
+        tg2 <- as.tg(tg.cut0(tg, tEnd = 3), "0-3.TextGrid")
         identical(tg1, tg2)
     }, TRUE)
 
     expect_equal({
         tg <- tg.read("cut.TextGrid")
         tg1 <- tg.read("3-5.TextGrid")
-        tg2 <- tg.cut0(tg, tStart = 3)
+        tg2 <- as.tg(tg.cut0(tg, tStart = 3), "3-5.TextGrid")
         identical(tg1, tg2)
     }, TRUE)
 
@@ -854,8 +854,8 @@ test_that("pitch.read", {
          4, 4, 4, 0, 6252.408223974137, 3392.821528656231, 1197.0707582170926, 0, 0.3169408893924507, 0.2917449063347636, 0.2758620333629818, 0, 1, 1, 1, 0, 0))
     expect_equal({
         p <- pitch.read("sound.Pitch")
-        p2 <- pitch.read("sound_short.Pitch")
-        p3 <- pitch.read("sound_UTF16.Pitch", encoding = "UTF-16")
+        p2 <- as.pitch(pitch.read("sound_short.Pitch"), "sound.Pitch")
+        p3 <- as.pitch(pitch.read("sound_UTF16.Pitch", encoding = "UTF-16"), "sound.Pitch")
         c(identical(p, p2), identical(p, p3))
     }, c(TRUE, TRUE))
 })

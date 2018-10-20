@@ -271,6 +271,8 @@ tg.read <- function(fileNameTextGrid, encoding = "UTF-8") {
     find <- 4   # index of line to read, we ignore the first three
 
     tg_ind <- tg.read_lines(flines, find)
+    class(tg_ind[[1]])["type"] <- "TextGrid"
+    class(tg_ind[[1]])["name"] <- basename(fileNameTextGrid)
     return(tg_ind[[1]])
 }
 
@@ -837,7 +839,7 @@ tg.plot <- function(tg, group = "") {
         g <- dygraphs::dyRangeSelector(g)
     } else {
         g <- dygraphs::dygraph(data, xlab = "Time (sec)")
-        g <- dygraphs::dyRangeSelector(g)
+        g <- dygraphs::dyRangeSelector(g, fillColor = "", strokeColor = "")
     }
 
     # Pridani popisku
@@ -845,12 +847,14 @@ tg.plot <- function(tg, group = "") {
 
         if (tg[[I]]$type == "point") {
             for (J in seqM(1, length(tg[[I]]$label))) {
-                g <- dygraphs::dyAnnotation(g, tg[[I]]$t[J], text = tg[[I]]$label[J], width = 10*max(1, nchar(tg[[I]]$label[J])), height = 25, series = tg[[I]]$name, tooltip = tg[[I]]$label[J])
+                g <- dygraphs::dyAnnotation(g, tg[[I]]$t[J], text = tg[[I]]$label[J], width = -0.1, height = 25, series = tg[[I]]$name, tooltip = tg[[I]]$label[J])
+                # width = -0.1: trick to get "right alignment". Original: width = 10*max(1, nchar(tg[[I]]$label[J]))
             }
 
         } else if (tg[[I]]$type == "interval") {
             for (J in seqM(1, length(tg[[I]]$label))) {
-                g <- dygraphs::dyAnnotation(g, tg[[I]]$t1[J], text = tg[[I]]$label[J], series = tg[[I]]$name, tooltip = tg[[I]]$label[J], width = 10*max(1, nchar(tg[[I]]$label[J])), height = 25, tickHeight = 10)
+                g <- dygraphs::dyAnnotation(g, tg[[I]]$t1[J], text = tg[[I]]$label[J], series = tg[[I]]$name, tooltip = tg[[I]]$label[J], width = -0.1, height = 25, tickHeight = 10)
+                # width = -0.1: trick to get "right alignment". Original: width = 10*max(1, nchar(tg[[I]]$label[J]))
             }
 
         } else {
@@ -959,6 +963,7 @@ tg.createNewTextGrid <- function(tMin, tMax) {
     tgNew <- list()
     class(tgNew)["tmin"] <- tMin
     class(tgNew)["tmax"] <- tMax
+    class(tgNew)["type"] <- "TextGrid"
 
     return(tgNew)
 }
@@ -3311,6 +3316,8 @@ pitch.read <- function(fileNamePitch, encoding = "UTF-8") {
     }
 
     pitch_ind <- pitch.read_lines(flines)
+    class(pitch_ind[[1]])["type"] <- "Pitch 1"
+    class(pitch_ind[[1]])["name"] <- basename(fileNamePitch)
     return(pitch_ind[[1]])
 }
 
@@ -3474,6 +3481,8 @@ pt.read <- function(fileNamePitchTier, encoding = "UTF-8") {
     }
 
     pt_ind <- pt.read_lines(flines)
+    class(pt_ind[[1]])["type"] <- "PitchTier"
+    class(pt_ind[[1]])["name"] <- basename(fileNamePitchTier)
     return(pt_ind[[1]])
 }
 
@@ -3732,7 +3741,7 @@ pt.plot <- function(pt, group = "") {
     }
 
     g <- dygraphs::dyOptions(g, drawPoints = TRUE, pointSize = 2, strokeWidth = 0)
-    g <- dygraphs::dyRangeSelector(g, dateWindow = c(pt$tmin, pt$tmax))
+    g <- dygraphs::dyRangeSelector(g, dateWindow = c(pt$tmin, pt$tmax), fillColor = "")
 
     g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
     g
@@ -4185,6 +4194,8 @@ it.read <- function(fileNameIntensityTier, encoding = "UTF-8") {
     }
 
     it_ind <- it.read_lines(flines)
+    class(it_ind[[1]])["type"] <- "IntensityTier"
+    class(it_ind[[1]])["name"] <- basename(fileNameIntensityTier)
     return(it_ind[[1]])
 }
 
@@ -4371,7 +4382,7 @@ it.plot <- function(it, group = "") {
     }
 
     g <- dygraphs::dyOptions(g, drawPoints = TRUE, pointSize = 2, strokeWidth = 0)
-    g <- dygraphs::dyRangeSelector(g, dateWindow = c(it$tmin, it$tmax))
+    g <- dygraphs::dyRangeSelector(g, dateWindow = c(it$tmin, it$tmax), fillColor = "")
 
     g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
     g
@@ -4739,6 +4750,83 @@ it.cut0 <- function(it, tStart = -Inf, tEnd = Inf) {
     it2$tmin <- 0
 
     return(it2)
+}
+
+
+#' as.tg
+#'
+#' Renames the class(tg)["name"] attribute and sets class(tg)["type"] <- "TextGrid" (if it is not already set)
+#'
+#' @param tg TextGrid object
+#' @param name New name
+#'
+#' @return TextGrid object
+#' @export
+#'
+#' @examples
+#' class(tg.sample())
+#' class(as.tg(tg.sample(), name = "New Name"))
+as.tg <- function(tg, name = "") {
+    class(tg)["type"] <- "TextGrid"
+    class(tg)["name"] <- name
+    return(tg)
+}
+
+#' as.pt
+#'
+#' Renames the class(pt)["name"] attribute and sets class(pt)["type"] <- "PitchTier" (if it is not already set)
+#'
+#' @param pt PitchTier object
+#' @param name New name
+#'
+#' @return PitchTier object
+#' @export
+#'
+#' @examples
+#' class(pt.sample())
+#' class(as.pt(pt.sample(), name = "New Name"))
+as.pt <- function(pt, name = "") {
+    class(pt)["type"] <- "PitchTier"
+    class(pt)["name"] <- name
+    return(pt)
+}
+
+#' as.it
+#'
+#' Renames the class(it)["name"] attribute and sets class(it)["type"] <- "IntensityTier" (if it is not already set)
+#'
+#' @param it IntensityTier object
+#' @param name New name
+#'
+#' @return IntensityTier object
+#' @export
+#'
+#' @examples
+#' class(it.sample())
+#' class(as.it(it.sample(), name = "New Name"))
+as.it <- function(it, name = "") {
+    class(it)["type"] <- "IntensityTier"
+    class(it)["name"] <- name
+    return(it)
+}
+
+#' as.pitch
+#'
+#' Renames the class(pitch)["name"] attribute and sets class(pitch)["type"] <- "Pitch 1" (if it is not already set)
+#'
+#' @param pitch Pitch 1 object
+#' @param name New name
+#'
+#' @return Pitch 1 object
+#' @export
+#'
+#' @examples
+#' class(pitch.sample())
+#' class(as.pitch(pitch.sample(), name = "New Name"))
+as.pitch <- function(pitch, name = "") {
+    class(pitch)["type"] <- "Pitch 1"
+    class(pitch)["name"] <- name
+    return(pitch)
 }
 
 

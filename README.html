@@ -127,7 +127,7 @@ $(document).ready(function () {
 <div id="rpraat-package-for-r" class="section level1">
 <h1>rPraat package for R</h1>
 <p>rPraat package for R constitutes an interface between the most popular software for phonetic analyses, Praat, and R.</p>
-<p>Version 1.1.2.</p>
+<p>Version 1.1.2-1.</p>
 <p>For demonstration, see <a href="http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html">html/rDemo.html</a></p>
 <p>Package documentation <a href="https://github.com/bbTomas/rPraat/blob/master/rPraat.pdf" class="uri">https://github.com/bbTomas/rPraat/blob/master/rPraat.pdf</a></p>
 <p>CRAN link: <a href="https://CRAN.R-project.org/package=rPraat" class="uri">https://CRAN.R-project.org/package=rPraat</a></p>
@@ -166,6 +166,7 @@ tg.sample() %&gt;% tg.plot()  # demo test</code></pre>
 </div>
 <div id="what-is-new" class="section level2">
 <h2>What is new</h2>
+<p>v1.1.2-1 (2018/10/20): tg.plot(): right-aligned labels; pitch.sample(), as.tg(), as.pt(), as.it(), as.pitch(); .read(), .sample() and tg.createNewTextGrid(): class(object)[“type”] set to “TextGrid”, “PitchTier” etc. and class(object)[“name”] set according to fileName</p>
 <p>v1.1.2 (2018/08/04): tg.cut(), tg.cut0()</p>
 <p>v1.1.1 (2018/08/02): IntensityTiers: it.read(), it.write(), it.plot(), it.sample(), it.interpolate(), it.cut(), it.cut0(), it.legendre(), it.legendreDemo(), it.legendreSynth(), col.read() supports IntensityTiers</p>
 <p>v1.1.0 (2018/08/01): col.read() to read Collection in Text and Short-text format (Collection may store many objects in one file – TextGrids, PitchTiers, Pitch objects). Big thanks to Pol van Rijn for initiating this and making the major portion of the new code in mPraat toolbox. Supports for file encodings in all read functions (thanks to Weirong Chen for his DetectEncoding idea in mPraat toolbox).</p>
