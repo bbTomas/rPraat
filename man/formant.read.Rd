@@ -12,7 +12,7 @@ formant.read(fileNameFormant, encoding = "UTF-8")
 \item{encoding}{File encoding (default: "UTF-8"), "auto" for auto-detect of Unicode encoding}
 }
 \value{
-A Formant object represents formant candidates as a function of time.
+A Formant object represents formants as a function of time.
 
 [ref: Praat help, http://www.fon.hum.uva.nl/praat/manual/Formant.html]
 
@@ -50,7 +50,7 @@ f <- formant.read('demo/maminka.Formant')
 names(f)
 f$nx
 f$t[4]        # time instance of the 4th frame
-f$frame[[4]]  # 4th frame: formant candidates
+f$frame[[4]]  # 4th frame: formants
 f$frame[[4]]$frequency[2]
 f$frame[[4]]$bandwidth[2]
 }

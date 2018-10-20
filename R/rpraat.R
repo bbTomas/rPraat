@@ -3450,7 +3450,7 @@ pitch.read_lines <- function(flines, find = 1, collection = FALSE) {
 #' @param fileNameFormant file name of Formant object
 #' @param encoding File encoding (default: "UTF-8"), "auto" for auto-detect of Unicode encoding
 #'
-#' @return A Formant object represents formant candidates as a function of time.
+#' @return A Formant object represents formants as a function of time.
 #' @return   [ref: Praat help, http://www.fon.hum.uva.nl/praat/manual/Formant.html]
 #' @return   f$xmin ... start time (seconds)
 #' @return   f$xmax ... end time (seconds)
@@ -3473,7 +3473,7 @@ pitch.read_lines <- function(flines, find = 1, collection = FALSE) {
 #' names(f)
 #' f$nx
 #' f$t[4]        # time instance of the 4th frame
-#' f$frame[[4]]  # 4th frame: formant candidates
+#' f$frame[[4]]  # 4th frame: formants
 #' f$frame[[4]]$frequency[2]
 #' f$frame[[4]]$bandwidth[2]
 #' }
