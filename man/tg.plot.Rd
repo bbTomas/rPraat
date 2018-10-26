@@ -4,12 +4,16 @@
 \alias{tg.plot}
 \title{tg.plot}
 \usage{
-tg.plot(tg, group = "")
+tg.plot(tg, group = "", pt = NULL, it = NULL)
 }
 \arguments{
 \item{tg}{TextGrid object}
 
 \item{group}{[optional] character string, name of group for dygraphs synchronization}
+
+\item{pt}{[optional] PitchTier object}
+
+\item{it}{[optional] IntensityTier object}
 }
 \description{
 Plots interactive TextGrid using dygraphs package.
@@ -18,6 +22,7 @@ Plots interactive TextGrid using dygraphs package.
 \dontrun{
 tg <- tg.sample()
 tg.plot(tg)
+tg.plot(tg.sample(), pt = pt.sample())
 }
 }
 \seealso{

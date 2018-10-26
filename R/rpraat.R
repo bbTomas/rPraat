@@ -772,6 +772,8 @@ tg.write <- function(tg, fileNameTextGrid, format = "short") {
 #'
 #' @param tg TextGrid object
 #' @param group [optional] character string, name of group for dygraphs synchronization
+#' @param pt [optional] PitchTier object
+#' @param it [optional] IntensityTier object
 #'
 #' @export
 #' @seealso \code{\link{tg.read}}, \code{\link{pt.plot}}
@@ -780,9 +782,12 @@ tg.write <- function(tg, fileNameTextGrid, format = "short") {
 #' \dontrun{
 #' tg <- tg.sample()
 #' tg.plot(tg)
+#' tg.plot(tg.sample(), pt = pt.sample())
 #' }
-tg.plot <- function(tg, group = "") {
-    ntiers <- length(tg)
+tg.plot <- function(tg, group = "", pt = NULL, it = NULL) {
+    ntiers <- tg.getNumberOfTiers(tg)
+
+    y2Axis <- !is.null(pt) | !is.null(it)
 
     if (ntiers == 0) {
         dygraphs::dygraph(list(x = 0, y = NA), main = "Empty TextGrid")
@@ -798,23 +803,45 @@ tg.plot <- function(tg, group = "") {
 
     tAll <- as.numeric(c(class(tg)["tmin"], class(tg)["tmax"]))
 
-    # find all time instances
+    # find all time instances in tg
     for (I in seqM(1, ntiers)) {
 
         if (tg[[I]]$type == "point") {
             tAll <- c(tAll, tg[[I]]$t)
 
         } else if (tg[[I]]$type == "interval") {
-            tAll <- c(tAll, tg[[I]]$t1, tg[[I]]$t1)
+            tAll <- c(tAll, tg[[I]]$t1, tg[[I]]$t2)
 
         } else {
             stop("Unknown tier type")
         }
 
     }
+
+    if (!is.null(pt)) {
+        tAll <- c(tAll, pt$t)
+    }
+    if (!is.null(it)) {
+        tAll <- c(tAll, it$t)
+    }
+
     tAll <- unique(sort(tAll))
 
+
     data <- list(t = tAll)
+
+    if (!is.null(pt)) {
+        y2 <- rep(as.numeric(NA), length(tAll))  ### pt
+        y2[tAll %in% pt$t] <- pt$f
+        data[[length(data)+1]] <- y2
+        names(data)[length(data)] <- "PitchTier"
+    }
+    if (!is.null(it)) {
+        y2 <- rep(as.numeric(NA), length(tAll))  ### it
+        y2[tAll %in% it$t] <- it$i
+        data[[length(data)+1]] <- y2
+        names(data)[length(data)] <- "IntensityTier"
+    }
 
     # create tiers
     for (I in seqM(1, ntiers)) {
@@ -848,7 +875,7 @@ tg.plot <- function(tg, group = "") {
         g <- dygraphs::dyRangeSelector(g, fillColor = "", strokeColor = "")
     }
 
-    # Pridani popisku
+    # Labels
     for (I in seqM(1, ntiers)) {
 
         if (tg[[I]]$type == "point") {
@@ -881,7 +908,37 @@ tg.plot <- function(tg, group = "") {
             stop("Unknown tier type")
         }
     }
-    g <- dygraphs::dyAxis(g, "y", valueRange = c(0, length(tg)+2))
+
+    if (!y2Axis) {
+        g <- dygraphs::dyAxis(g, "y", label = "TextGrid", valueRange = c(0, length(tg)+2))
+    } else {
+        g <- dygraphs::dyAxis(g, "y", label = "TextGrid", valueRange = c(0, length(tg)*2+2))  # *2
+
+        if (!is.null(pt) & !is.null(it)) {
+            y_min <- min(c(pt$f, it$i))
+            y_max <- max(c(pt$f, it$i))
+            delta <- (y_max - y_min)*4/3
+            yMin <- y_min - delta
+            yMax <- y_min + delta
+            g <- dygraphs::dyAxis(g, "y2", label = "PitchTier & IntensityTier", independentTicks = TRUE, valueRange = c(yMin, yMax))
+            g <- dygraphs::dySeries(g, "PitchTier", axis = "y2", drawPoints = TRUE, pointSize = 2, strokeWidth = 0)
+            g <- dygraphs::dySeries(g, "IntensityTier", axis = "y2", drawPoints = TRUE, pointSize = 2, strokeWidth = 0)
+        } else if (!is.null(pt)) {
+            delta <- (max(pt$f)-min(pt$f))*4/3
+            yMin <- min(pt$f) - delta
+            yMax <- min(pt$f) + delta
+            g <- dygraphs::dyAxis(g, "y2", label = "PitchTier", independentTicks = TRUE, valueRange = c(yMin, yMax))
+            g <- dygraphs::dySeries(g, "PitchTier", axis = "y2", drawPoints = TRUE, pointSize = 2, strokeWidth = 0)
+        } else if (!is.null(it)) {
+            delta <- (max(it$i)-min(it$i))*4/3
+            yMin <- min(it$i) - delta
+            yMax <- min(it$i) + delta
+            g <- dygraphs::dyAxis(g, "y2", label = "IntensityTier", independentTicks = TRUE, valueRange = c(yMin, yMax))
+            g <- dygraphs::dySeries(g, "IntensityTier", axis = "y2", drawPoints = TRUE, pointSize = 2, strokeWidth = 0)
+        }
+
+    }
+
     g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
     g
 }

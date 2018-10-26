@@ -17,9 +17,9 @@ test_that("pt.sample", {
 })
 
 test_that("it.sample", {
-    expect_equal(length(it.sample()$t), 40)
-    expect_equal(length(it.sample()$i), 40)
-    expect_equal(length(unique(it.sample()$t)), 40)
+    expect_equal(length(it.sample()$t), 264)
+    expect_equal(length(it.sample()$i), 264)
+    expect_equal(length(unique(it.sample()$t)), 264)
 })
 
 test_that("pitch.sample", {
@@ -231,7 +231,7 @@ test_that("it.interpolate", {
         t <- c(-1, 0, 0.1, it$t[3], it$t[length(it$t)], it$t[length(it$t)]+1)
         it2 <- it.interpolate(it, t)
         c(it2$tmin, it2$tmax, length(it2$t), length(it2$i), it2$t, it2$i)
-    }, c(it$tmin, it$tmax, length(t), length(t), t, 59.57159039, 59.57159039, 69.76859026, 66.73070258, 64.98963270, 64.98963270))
+    }, c(it$tmin, it$tmax, length(t), length(t), t, 40.85635685, 40.85635685, 69.94393210, 61.13001675, 39.57790479, 39.57790479))
 })
 
 test_that("it.legendre", {
@@ -258,23 +258,23 @@ test_that("it.cut", {
     expect_error(it.cut(it.sample(), NA))
     expect_equal({
         it <- it.cut(it.sample(),  tStart = 0.3)
-        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[10], it$t[18], it$i[1], it$i[10], it$i[18])},
-        c(0.3, 0.5460771, 18, 18, 0.3016100, 0.4044671, 0.4958957, 70.8841436, 58.2129565, 64.9896327))
+        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[10], it$t[245], it$i[1], it$i[10], it$i[245])},
+        c(0.3, 3.6171250, 245, 245, 0.3085625, 0.4285625, 3.5618958, 77.5888192, 79.3352420, 39.5779048))
 
     expect_equal({
         it <- it.cut(it.sample(),  tStart = .2, tEnd = .3)
         c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[4], it$t[8], it$i[1], it$i[4], it$i[8])},
-        c(0.2, 0.3, 8, 8, 0.2101814, 0.2444671, 0.2901814, 71.6253944, 71.1700598, 69.5956455))
+        c(0.2, 0.3, 8, 8, 0.2018958, 0.2418958, 0.2952292, 77.9335129, 58.7607129, 73.6365900))
 
     expect_equal({
         it <- it.cut(it.sample(),  tEnd = 1)
-        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[35], it$t[40], it$i[1], it$i[35], it$i[40])},
-        c(0, 1, 40, 40, 0.05018141, 0.43875283, 0.49589569, 59.57159039, 64.97294548, 64.98963270))
+        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[35], it$t[71], it$i[1], it$i[35], it$i[71])},
+        c(0, 1, 71, 71, 0.05522917, 0.50856250, 0.98856250, 40.85635685, 62.63965636, 67.69785165))
 
     expect_equal({
         it <- it.cut(it.sample(),  tStart = -1, tEnd = 1)
-        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[35], it$t[40], it$i[1], it$i[35], it$i[40])},
-        c(-1, 1, 40, 40, 0.05018141, 0.43875283, 0.49589569, 59.57159039, 64.97294548, 64.98963270))
+        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[35], it$t[71], it$i[1], it$i[35], it$i[71])},
+        c(-1, 1, 71, 71, 0.05522917, 0.50856250, 0.98856250, 40.85635685, 62.63965636, 67.69785165))
     expect_error(it.cut(it.sample(), 0.3, 0.2))
 })
 
@@ -283,23 +283,23 @@ test_that("it.cut0", {
     expect_error(it.cut0(it.sample(), NA))
     expect_equal({
         it <- it.cut0(it.sample(),  tStart = 0.3)
-        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[10], it$t[18], it$i[1], it$i[10], it$i[18])},
-        c(0, 0.2460771, 18, 18, 0.001609977, 0.104467120, 0.195895692, 70.8841436, 58.2129565, 64.9896327))
+        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[10], it$t[245], it$i[1], it$i[10], it$i[245])},
+        c(0, 3.3171250, 245, 245, 0.0085625, 0.1285625, 3.2618958, 77.5888192, 79.3352420, 39.5779048))
 
     expect_equal({
         it <- it.cut0(it.sample(),  tStart = .2, tEnd = .3)
         c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[4], it$t[8], it$i[1], it$i[4], it$i[8])},
-        c(0, 0.1, 8, 8, 0.01018141, 0.04446712, 0.09018141, 71.62539439, 71.17005977, 69.59564547))
+        c(0, 0.1, 8, 8, 0.001895833, 0.041895833, 0.095229167, 77.933512921, 58.760712936, 73.636590015))
 
     expect_equal({
         it <- it.cut0(it.sample(),  tEnd = 1)
-        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[35], it$t[40], it$i[1], it$i[35], it$i[40])},
-        c(0, 1, 40, 40, 0.05018141, 0.43875283, 0.49589569, 59.57159039, 64.97294548, 64.98963270))
+        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[35], it$t[71], it$i[1], it$i[35], it$i[71])},
+        c(0, 1, 71, 71, 0.05522917, 0.50856250, 0.98856250, 40.85635685, 62.63965636, 67.69785165))
 
     expect_equal({
         it <- it.cut0(it.sample(),  tStart = -1, tEnd = 1)
-        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[35], it$t[40], it$i[1], it$i[35], it$i[40])},
-        c(0, 2, 40, 40, 1.050181, 1.438753, 1.495896, 59.57159039, 64.97294548, 64.98963270))
+        c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[35], it$t[71], it$i[1], it$i[35], it$i[71])},
+        c(0, 2, 71, 71, 1.055229, 1.508563, 1.988563, 40.856357, 62.639656, 67.697852))
     expect_error(it.cut0(it.sample(), 0.3, 0.2))
 })
 

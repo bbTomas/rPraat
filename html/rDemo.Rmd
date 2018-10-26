@@ -78,6 +78,11 @@ Mouse Double-click: Default zoom
 
 Shift + mouse drag: plot scroll
 
+#### TextGrid, PitchTier and IntensityTier in one plot.
+
+```{r}
+tg.plot(tg.sample(), pt = pt.sample(), it = it.sample())
+```
 
 ## TextGrid
 
