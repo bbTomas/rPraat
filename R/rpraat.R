@@ -774,6 +774,9 @@ tg.write <- function(tg, fileNameTextGrid, format = "short") {
 #' @param group [optional] character string, name of group for dygraphs synchronization
 #' @param pt [optional] PitchTier object
 #' @param it [optional] IntensityTier object
+#' @param formant [optional] Formant object
+#' @param formantScaleIntensity [optional] Point size scaled according to relative intensity
+#' @param formantDrawBandwidth [optional] Draw formant bandwidth
 #'
 #' @export
 #' @seealso \code{\link{tg.read}}, \code{\link{pt.plot}}
@@ -784,13 +787,17 @@ tg.write <- function(tg, fileNameTextGrid, format = "short") {
 #' tg.plot(tg)
 #' tg.plot(tg.sample(), pt = pt.sample())
 #' }
-tg.plot <- function(tg, group = "", pt = NULL, it = NULL) {
+tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, formantScaleIntensity = TRUE, formantDrawBandwidth = TRUE) {
     ntiers <- tg.getNumberOfTiers(tg)
 
-    y2Axis <- !is.null(pt) | !is.null(it)
+    y2Axis <- !is.null(pt) | !is.null(it) | !is.null(formant)
+
+    if (!is.null(formant) & (!is.null(pt) | !is.null(it))) {
+        stop("Sorry, tg.plot cannot display Formant together with PitchTier or IntensityTier.")
+    }
 
     if (ntiers == 0) {
-        dygraphs::dygraph(list(x = 0, y = NA), main = "Empty TextGrid")
+        return(dygraphs::dygraph(list(x = 0, y = NA), main = "Empty TextGrid"))
     }
 
     if (length(names(tg)) != length(unique(names(tg)))) {
@@ -824,6 +831,9 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL) {
     if (!is.null(it)) {
         tAll <- c(tAll, it$t)
     }
+    if (!is.null(formant)) {
+        tAll <- c(tAll, formant$t)
+    }
 
     tAll <- unique(sort(tAll))
 
@@ -842,14 +852,80 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL) {
         data[[length(data)+1]] <- y2
         names(data)[length(data)] <- "IntensityTier"
     }
+    if (!is.null(formant)) {
+        fArray <- formant.toArray(formant)  ### formant
 
-    # create tiers
+        if (formantScaleIntensity) {
+            intensityNorm <- log10(fArray$intensityVector)
+            intensityNorm <- intensityNorm - min(intensityNorm) + 1
+            intensityNorm <- intensityNorm / max(intensityNorm) * 6 # maximum radius
+            intensityNorm <- intensityNorm - min(intensityNorm) + 1 # minimum radius [e.g., 1.1]
+        } else {
+            intensityNorm <- rep(2, formant$nx)
+        }
+        intensity2 <- rep(as.numeric(0), length(tAll))
+        intensity2[tAll %in% formant$t] <- intensityNorm
+        intensityNorm <- intensity2
+
+        for (I in seqM(1, formant$maxnFormants)) {
+            y2 <- rep(as.numeric(NA), length(tAll))
+            y2[tAll %in% formant$t] <- fArray$frequencyArray[I, ]
+
+            ### interpolation to make formant tracks not to be interrupted by labels in tg
+            i <- is.na(y2) & (intensityNorm == 0)
+            for (J in seqM(2, length(y2)-1)) {
+                if (i[J] == TRUE & i[J-1] == FALSE & i[J+1] == FALSE) {
+                    proportion <- (tAll[J] - tAll[J-1]) / (tAll[J+1] - tAll[J-1])  # where is my time point?
+                    y2[J] <- y2[J-1] + (y2[J+1] - y2[J-1]) * proportion # mean value of neighbours; intensity == 0, so no point will be visible (it will look just like a normal line)
+                }
+            }
+            ###
+            data[[length(data)+1]] <- y2
+
+            names(data)[length(data)] <- paste0("F", I)
+
+            if (formantDrawBandwidth) {
+                y2 <- rep(as.numeric(NA), length(tAll))
+                y2[tAll %in% formant$t] <- fArray$frequencyArray[I, ] - fArray$bandwidthArray[I, ]/2
+                ### interpolation to make formant tracks not to be interrupted by labels in tg
+                i <- is.na(y2) & (intensityNorm == 0)
+                for (J in seqM(2, length(y2)-1)) {
+                    if (i[J] == TRUE & i[J-1] == FALSE & i[J+1] == FALSE) {
+                        proportion <- (tAll[J] - tAll[J-1]) / (tAll[J+1] - tAll[J-1])  # where is my time point?
+                        y2[J] <- y2[J-1] + (y2[J+1] - y2[J-1]) * proportion # mean value of neighbours; intensity == 0, so no point will be visible (it will look just like a normal line)
+                    }
+                }
+                ###
+                data[[length(data)+1]] <- y2
+                names(data)[length(data)] <- paste0("lwr", I)
+
+
+                y2 <- rep(as.numeric(NA), length(tAll))
+                y2[tAll %in% formant$t] <- fArray$frequencyArray[I, ] + fArray$bandwidthArray[I, ]/2
+                ### interpolation to make formant tracks not to be interrupted by labels in tg
+                i <- is.na(y2) & (intensityNorm == 0)
+                for (J in seqM(2, length(y2)-1)) {
+                    if (i[J] == TRUE & i[J-1] == FALSE & i[J+1] == FALSE) {
+                        proportion <- (tAll[J] - tAll[J-1]) / (tAll[J+1] - tAll[J-1])  # where is my time point?
+                        y2[J] <- y2[J-1] + (y2[J+1] - y2[J-1]) * proportion # mean value of neighbours; intensity == 0, so no point will be visible (it will look just like a normal line)
+                    }
+                }
+                ###
+                data[[length(data)+1]] <- y2
+                names(data)[length(data)] <- paste0("upr", I)
+            }
+        }
+    }
+
+    # create tg tiers
     for (I in seqM(1, ntiers)) {
 
         if (tg[[I]]$type == "point") {
-            y <- rep(as.numeric(NA), length(tAll))
+            # y <- rep(as.numeric(NA), length(tAll))
+            # y[tAll %in% tg[[I]]$t] <- ntiers + 1 - I  # y-value of graphic point according to tier index
 
-            y[tAll %in% tg[[I]]$t] <- ntiers + 1 - I  # y-value of graphic point according to tier index
+            y <- rep(ntiers + 1 - I, length(tAll))  # this is to get invisible point (as all points are connected - no one is drawn)
+
             data[[length(data)+1]] <- y
             names(data)[length(data)] <- tg[[I]]$name
 
@@ -875,13 +951,12 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL) {
         g <- dygraphs::dyRangeSelector(g, fillColor = "", strokeColor = "")
     }
 
-    # Labels
+    # tg Labels
     for (I in seqM(1, ntiers)) {
 
         if (tg[[I]]$type == "point") {
             for (J in seqM(1, length(tg[[I]]$label))) {
-                g <- dygraphs::dyAnnotation(g, tg[[I]]$t[J], text = tg[[I]]$label[J], width = -0.1, height = 25, series = tg[[I]]$name, tooltip = tg[[I]]$label[J])
-                # width = -0.1: trick to get "right alignment". Original: width = 10*max(1, nchar(tg[[I]]$label[J]))
+                g <- dygraphs::dyAnnotation(g, tg[[I]]$t[J], text = tg[[I]]$label[J], width = 10*max(1, nchar(tg[[I]]$label[J])), height = 25, series = tg[[I]]$name, tooltip = tg[[I]]$label[J])
             }
 
         } else if (tg[[I]]$type == "interval") {
@@ -896,13 +971,13 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL) {
 
     }
 
-    # style of tiers
+    # tg style of tiers
     for (I in seqM(1, ntiers)) {
         if (tg[[I]]$type == "point") {
-            g <- dygraphs::dySeries(g, tg[[I]]$name, pointSize = 2, strokeWidth = 0)
+            g <- dygraphs::dySeries(g, tg[[I]]$name, drawPoints = FALSE, strokeWidth = 0)
 
         } else if (tg[[I]]$type == "interval") {
-            g <- dygraphs::dySeries(g, tg[[I]]$name, pointSize = 2, strokeWidth = 1)
+            g <- dygraphs::dySeries(g, tg[[I]]$name, drawPoints = FALSE, strokeWidth = 1)
 
         } else {
             stop("Unknown tier type")
@@ -935,8 +1010,36 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL) {
             yMax <- min(it$i) + delta
             g <- dygraphs::dyAxis(g, "y2", label = "IntensityTier", independentTicks = TRUE, valueRange = c(yMin, yMax))
             g <- dygraphs::dySeries(g, "IntensityTier", axis = "y2", drawPoints = TRUE, pointSize = 2, strokeWidth = 0)
-        }
+        } else if (!is.null(formant)) {
+            if (formantDrawBandwidth) {
+                max_f <- max(fArray$frequencyArray + fArray$bandwidthArray/2, na.rm = TRUE)
+                min_f <- min(fArray$frequencyArray - fArray$bandwidthArray/2, na.rm = TRUE)
+            } else {
+                max_f <- max(fArray$frequencyArray, na.rm = TRUE)
+                min_f <- min(fArray$frequencyArray, na.rm = TRUE)
+            }
+            delta <- (max_f - min_f)*4/3
+            yMin <- min_f - delta
+            yMax <- min_f + delta
+            g <- dygraphs::dyAxis(g, "y2", label = "Formant", independentTicks = TRUE, valueRange = c(yMin, yMax))
 
+            for (I in seqM(1, formant$maxnFormants)) {
+                if (!formantDrawBandwidth) {
+                    g <- dygraphs::dySeries(g, paste0("F", I), axis = "y2", drawPoints = TRUE, pointSize = 2)
+                } else {
+                    g <- dygraphs::dySeries(g, axis = "y2", c(paste0("lwr", I), paste0("F", I), paste0("upr", I)), drawPoints = TRUE, pointSize = 2)
+                }
+                g <- dygraphs::dyCallbacks(g, "drawPointCallback" = sprintf(
+                    "
+                function(g, name, ctx, canvasx, canvasy, color, radius, index) {
+                var radius_str = %s;
+                radius = radius_str[index];
+                return Dygraph.Circles.DEFAULT(g, name, ctx, canvasx, canvasy, color, radius)
+                }
+                ",
+                    paste0("[", paste0(intensityNorm, collapse = ","), "]") ))
+            }
+        }
     }
 
     g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
@@ -3735,7 +3838,7 @@ formant.toArray <- function(formant) {
 #' formant <- formant.sample()
 #' formant.plot(formant, drawBandwidth = TRUE)
 #' }
-formant.plot <- function(formant, scaleIntensity = TRUE, drawBandwidth = FALSE, group = "") {
+formant.plot <- function(formant, scaleIntensity = TRUE, drawBandwidth = TRUE, group = "") {
     fArray <- formant.toArray(formant)
 
     if (scaleIntensity) {
@@ -3790,7 +3893,7 @@ formant.plot <- function(formant, scaleIntensity = TRUE, drawBandwidth = FALSE, 
     g <- dygraphs::dyRangeSelector(g, dateWindow = c(formant$xmin, formant$xmax), fillColor = "")
 
     g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
-    print(g)
+    g
 }
 
 

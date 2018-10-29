@@ -4,7 +4,8 @@
 \alias{tg.plot}
 \title{tg.plot}
 \usage{
-tg.plot(tg, group = "", pt = NULL, it = NULL)
+tg.plot(tg, group = "", pt = NULL, it = NULL, formant = NULL,
+  formantScaleIntensity = TRUE, formantDrawBandwidth = TRUE)
 }
 \arguments{
 \item{tg}{TextGrid object}
@@ -14,6 +15,12 @@ tg.plot(tg, group = "", pt = NULL, it = NULL)
 \item{pt}{[optional] PitchTier object}
 
 \item{it}{[optional] IntensityTier object}
+
+\item{formant}{[optional] Formant object}
+
+\item{formantScaleIntensity}{[optional] Point size scaled according to relative intensity}
+
+\item{formantDrawBandwidth}{[optional] Draw formant bandwidth}
 }
 \description{
 Plots interactive TextGrid using dygraphs package.

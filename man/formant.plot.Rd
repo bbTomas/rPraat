@@ -4,7 +4,7 @@
 \alias{formant.plot}
 \title{formant.plot}
 \usage{
-formant.plot(formant, scaleIntensity = TRUE, drawBandwidth = FALSE,
+formant.plot(formant, scaleIntensity = TRUE, drawBandwidth = TRUE,
   group = "")
 }
 \arguments{
