@@ -3676,6 +3676,125 @@ formant.read_lines <- function(flines, find = 1, collection = FALSE) {
 }
 
 
+#' formant.toArray
+#'
+#' @param formant Formant object
+#'
+#' @return Formant object with frames converted to frequency and bandwidth arrays and intensity vector
+#' @export
+#'
+#' @seealso \code{\link{formant.read}}, \code{\link{formant.plot}}
+#'
+#' @examples
+#' formantArray <- formant.toArray(formant.sample())
+#' formantArray$t[1:10]
+#' formantArray$frequencyArray[, 1:10]
+#' formantArray$bandwidthArray[, 1:10]
+#' formantArray$intensityVector[1:10]
+#' \dontrun{
+#' plot(formantArray$t, formantArray$frequencyArray[1, ]) # draw 1st formant track
+#' }
+formant.toArray <- function(formant) {
+    frequencyArray <- array(NA_real_, dim = c(formant$maxnFormants, formant$nx))
+    bandwidthArray <- array(NA_real_, dim = c(formant$maxnFormants, formant$nx))
+    intensityVector <- numeric(formant$nx)
+    # udelat na toto funkci?
+
+    for (I in seqM(1, formant$nx)) {
+        f <- formant$frame[[I]]$frequency
+        frequencyArray[seqM(1,length(f)), I] <- f
+
+        b <- formant$frame[[I]]$bandwidth
+        bandwidthArray[seqM(1,length(f)), I] <- b
+
+        intensityVector[I] <- formant$frame[[I]]$intensity
+    }
+
+    formantArray <- list(xmin = formant$xmin, xmax = formant$xmax, nx = formant$nx, dx = formant$dx, x1 = formant$x1, t = formant$t,
+                         maxnFormants = formant$maxnFormants, frequencyArray = frequencyArray, bandwidthArray = bandwidthArray,
+                         intensityVector = intensityVector)
+
+    return(formantArray)
+}
+
+
+#' formant.plot
+#'
+#' Plots interactive Formant object using dygraphs package.
+#'
+#' @param formant Formant object
+#' @param scaleIntensity Point size scaled according to relative intensity
+#' @param drawBandwidth Draw formant bandwidth
+#' @param group [optional] character string, name of group for dygraphs synchronization
+#'
+#' @export
+#' @seealso \code{\link{formant.read}}, \code{\link{formant.sample}}, \code{\link{formant.toArray}}, \code{\link{tg.plot}}
+#'
+#' @examples
+#' \dontrun{
+#' formant <- formant.sample()
+#' formant.plot(formant, drawBandwidth = TRUE)
+#' }
+formant.plot <- function(formant, scaleIntensity = TRUE, drawBandwidth = FALSE, group = "") {
+    fArray <- formant.toArray(formant)
+
+    if (scaleIntensity) {
+        intensityNorm <- log10(fArray$intensityVector)
+        intensityNorm <- intensityNorm - min(intensityNorm) + 1
+        intensityNorm <- intensityNorm / max(intensityNorm) * 6 # maximum radius
+        intensityNorm <- intensityNorm - min(intensityNorm) + 1 # minimum radius [e.g., 1.1]
+    } else {
+        intensityNorm <- rep(2, formant$nx)
+    }
+
+
+    data <- list(t = formant$t)
+
+    for (I in seqM(1, formant$maxnFormants)) {
+        data[[length(data)+1]] <- fArray$frequencyArray[I, ]
+        names(data)[length(data)] <- paste0("F", I)
+
+        if (drawBandwidth) {
+            data[[length(data)+1]] <- fArray$frequencyArray[I, ] - fArray$bandwidthArray[I, ]/2
+            names(data)[length(data)] <- paste0("lwr", I)
+
+            data[[length(data)+1]] <- fArray$frequencyArray[I, ] + fArray$bandwidthArray[I, ]/2
+            names(data)[length(data)] <- paste0("upr", I)
+        }
+    }
+
+    if (group != "") {  # dygraphs plot-synchronization group
+        g <- dygraphs::dygraph(data, group = group, xlab = "Time (sec)")
+    } else {
+        g <- dygraphs::dygraph(data, xlab = "Time (sec)")
+    }
+
+    g <- dygraphs::dyOptions(g, drawPoints = TRUE)
+    g <- dygraphs::dyCallbacks(g, "drawPointCallback" = sprintf(
+        "
+        function(g, name, ctx, canvasx, canvasy, color, radius, index) {
+        var radius_str = %s;
+        radius = radius_str[index];
+        return Dygraph.Circles.DEFAULT(g, name, ctx, canvasx, canvasy, color, radius)
+        }
+        ",
+        paste0("[", paste0(intensityNorm, collapse = ","), "]") ))
+
+    if (drawBandwidth) {
+        for (I in seqM(1, formant$maxnFormants)) {
+            g <- dygraphs::dySeries(g, c(paste0("lwr", I), paste0("F", I), paste0("upr", I)))
+        }
+    }
+
+
+    g <- dygraphs::dyRangeSelector(g, dateWindow = c(formant$xmin, formant$xmax), fillColor = "")
+
+    g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
+    print(g)
+}
+
+
+
 
 
 #' pt.read

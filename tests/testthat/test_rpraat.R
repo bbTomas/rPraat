@@ -32,11 +32,12 @@ test_that("pitch.sample", {
 })
 
 test_that("formant.sample", {
-    expect_equal(length(formant.sample()$t), 10)
-    expect_equal(formant.sample()$frame[[5]]$nFormants, 4)
-    expect_equal(formant.sample()$frame[[5]]$intensity, 1.572223747442e-05)
-    expect_equal(formant.sample()$frame[[5]]$frequency[4], 3923.29057579107)
-    expect_equal(formant.sample()$frame[[5]]$bandwidth[4], 726.595127875472)
+    expect_equal(length(formant.sample()$t), 571)
+    expect_equal(formant.sample()$t[5], 0.0523)
+    expect_equal(formant.sample()$frame[[5]]$nFormants, 5)
+    expect_equal(formant.sample()$frame[[5]]$intensity, 1.77585520803808e-05)
+    expect_equal(formant.sample()$frame[[5]]$frequency[4], 3394.4)
+    expect_equal(formant.sample()$frame[[5]]$bandwidth[4], 82)
 })
 
 
@@ -905,6 +906,22 @@ test_that("formant.read", {
         f3 <- as.formant(formant.read("maminka_UTF16.Formant", encoding = "UTF-16"), "maminka.Formant")
         c(identical(f, f2), identical(f, f3))
     }, c(TRUE, TRUE))
+})
+
+test_that("formant.toArray", {
+    expect_equal({
+        f <- formant.sample()
+        f$nx <- 3
+        f$t <- f$t[c(1, 261, 571)]
+        f$frame <- f$frame[c(1, 261, 571)]
+        fa <- formant.toArray(f)
+        c(fa$xmin, fa$xmax, fa$nx, fa$dx, fa$x1, fa$t, fa$maxnFormants,
+          dim(fa$frequencyArray), fa$frequencyArray[1,1], is.na(fa$frequencyArray[5, 2]), fa$frequencyArray[5, 3],
+          dim(fa$bandwidthArray), fa$bandwidthArray[1,1], is.na(fa$bandwidthArray[5, 2]), fa$bandwidthArray[5, 3])
+        },
+        c(0, 3.617125, 3, 6.25e-03, 2.73e-02, 2.73e-02, 1.6523,3.5898, 5, 5, 3, 3.399e+02, 1, 3.7346e+03,
+          5, 3, 2.15e+01, 1, 7.83e+01)
+    )
 })
 
 
