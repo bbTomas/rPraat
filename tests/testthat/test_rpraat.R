@@ -884,6 +884,31 @@ test_that("pitch.read", {
     }, c(TRUE, TRUE))
 })
 
+test_that("pitch.toArray", {
+    expect_equal({
+        p <- pitch.sample()
+        p$nx <- 3
+        p$t <- p$t[c(1, 4, 10)]
+        p$frame <- p$frame[c(1, 4, 10)]
+        pa <- pitch.toArray(p)
+        c(pa$xmin, pa$xmax, pa$nx, pa$dx, pa$x1, pa$t, pa$ceiling, pa$maxnCandidates,
+          dim(pa$frequencyArray), pa$frequencyArray[1,1], is.na(pa$frequencyArray[5, 2]), pa$frequencyArray[8, 3],
+          dim(pa$strengthArray), pa$strengthArray[1,1], is.na(pa$strengthArray[5, 2]), pa$strengthArray[8, 3])
+    },
+    c(0, 0.12, 3, 0.01, 0.021, 0.021, 0.051, 0.111, 600, 15, 15, 3, 0, 1, 389.3119640274,
+      15, 3, 0, 1, 0.2353107686932)
+    )
+})
+
+test_that("pitch.toFrame", {
+    expect_equal({
+        p <- pitch.sample()
+        pa <- pitch.toArray(p)
+        p2 <- pitch.toFrame(pa)
+        identical(p, p2)
+    }, TRUE)
+})
+
 
 context("Formant")
 
@@ -922,6 +947,21 @@ test_that("formant.toArray", {
         c(0, 3.617125, 3, 6.25e-03, 2.73e-02, 2.73e-02, 1.6523,3.5898, 5, 5, 3, 3.399e+02, 1, 3.7346e+03,
           5, 3, 2.15e+01, 1, 7.83e+01)
     )
+})
+
+test_that("formant.toFrame", {
+    expect_equal({
+        f <- formant.sample()
+        fa <- formant.toArray(f)
+        f2 <- formant.toFrame(fa)
+        identical(f, f2)
+    }, TRUE)
+})
+
+test_that("normIntensity", {
+    expect_equal({
+        normIntensity(-3:3, 1, 9)
+    }, c(NaN, NaN, NaN, NaN, 1, 6.047438028572, 9))
 })
 
 

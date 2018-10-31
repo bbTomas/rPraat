@@ -856,10 +856,7 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
         fArray <- formant.toArray(formant)  ### formant
 
         if (formantScaleIntensity) {
-            intensityNorm <- log10(fArray$intensityVector)
-            intensityNorm <- intensityNorm - min(intensityNorm) + 1
-            intensityNorm <- intensityNorm / max(intensityNorm) * 6 # maximum radius
-            intensityNorm <- intensityNorm - min(intensityNorm) + 1 # minimum radius [e.g., 1.1]
+            intensityNorm <- normIntensity(fArray$intensityVector, 1, 6)  # minimum, maximum radius
         } else {
             intensityNorm <- rep(2, formant$nx)
         }
@@ -3601,6 +3598,203 @@ pitch.read_lines <- function(flines, find = 1, collection = FALSE) {
 }
 
 
+#' pitch.toArray
+#'
+#' @param pitch Pitch object (frame format)
+#'
+#' @return Pitch object with frames converted to frequency and strength arrays and intensity vector
+#' @export
+#'
+#' @seealso \code{\link{pitch.toFrame}}, \code{\link{pitch.read}}, \code{\link{pitch.plot}}
+#'
+#' @examples
+#' pitchArray <- pitch.toArray(pitch.sample())
+#' pitchArray$t[1:10]
+#' pitchArray$frequencyArray[, 1:10]
+#' pitchArray$bandwidthArray[, 1:10]
+#' pitchArray$intensityVector[1:10]
+pitch.toArray <- function(pitch) {
+    frequencyArray <- array(NA_real_, dim = c(pitch$maxnCandidates, pitch$nx))
+    strengthArray  <- array(NA_real_, dim = c(pitch$maxnCandidates, pitch$nx))
+    intensityVector <- numeric(pitch$nx)
+    # udelat na toto funkci?
+
+    for (I in seqM(1, pitch$nx)) {
+        f <- pitch$frame[[I]]$frequency
+        frequencyArray[seqM(1,length(f)), I] <- f
+
+        s <- pitch$frame[[I]]$strength
+        strengthArray[seqM(1,length(s)), I] <- s
+
+        intensityVector[I] <- pitch$frame[[I]]$intensity
+    }
+
+    pitchArray <- list(xmin = pitch$xmin, xmax = pitch$xmax, nx = pitch$nx, dx = pitch$dx, x1 = pitch$x1, t = pitch$t, ceiling = pitch$ceiling,
+                       maxnCandidates = pitch$maxnCandidates, frequencyArray = frequencyArray, strengthArray = strengthArray,
+                       intensityVector = intensityVector)
+
+    class(pitchArray)["type"] <- class(pitch)["type"]
+    class(pitchArray)["name"] <- class(pitch)["name"]
+
+    return(pitchArray)
+}
+
+#' pitch.toFrame
+#'
+#' @param pitchArray Pitch object (array format)
+#'
+#' @return Pitch object with frames
+#' @export
+#'
+#' @seealso \code{\link{pitch.toArray}}, \code{\link{pitch.read}}, \code{\link{pitch.plot}}
+#'
+#' @examples
+#' pitchArray <- pitch.toArray(pitch.sample())
+#' pitch <- pitch.toFrame(pitchArray)
+pitch.toFrame <- function(pitchArray) {
+    if (nrow(pitchArray$frequencyArray) != pitchArray$maxnCandidates  |   ncol(pitchArray$frequencyArray) != pitchArray$nx) {
+        stop("pitchArray$frequencyArray dimensions mismatch.")
+    }
+
+    if (nrow(pitchArray$strengthArray) != pitchArray$maxnCandidates  |   ncol(pitchArray$strengthArray) != pitchArray$nx) {
+        stop("pitchArray$strengthArray dimensions mismatch.")
+    }
+
+    if (length(pitchArray$t) != pitchArray$nx) {
+        stop("pitchArray$t dimensions mismatch.")
+    }
+
+    if (length(pitchArray$intensityVector) != pitchArray$nx) {
+        stop("pitchArray$intensityVector dimensions mismatch.")
+    }
+
+    frame <- vector("list", pitchArray$nx)
+
+    for (I in seqM(1, pitchArray$nx)) {
+        intensity <- pitchArray$intensityVector[I]
+        nCandidates <- as.numeric(sum(!is.na(pitchArray$frequencyArray[, I])))
+        frequency <- pitchArray$frequencyArray[seqM(1, nCandidates), I]
+        strength <- pitchArray$strengthArray[seqM(1, nCandidates), I]
+
+        frame[[I]] <- list(intensity = intensity, nCandidates = nCandidates,
+                           frequency = frequency, strength =  strength)
+    }
+
+
+    pitch <- list(xmin = pitchArray$xmin, xmax = pitchArray$xmax, nx = pitchArray$nx, dx = pitchArray$dx, x1 = pitchArray$x1, t = pitchArray$t, ceiling = pitchArray$ceiling,
+                       maxnCandidates = pitchArray$maxnCandidates, frame = frame)
+
+    class(pitch)["type"] <- class(pitchArray)["type"]
+    class(pitch)["name"] <- class(pitchArray)["name"]
+
+    return(pitch)
+}
+
+
+normIntensity <- function(intensity, minValue = 1, maxValue = 9) {
+    if (length(intensity) == 0) {
+        return(intensity)
+    }
+
+    iZero <- intensity <= 0
+    if (all(iZero)) {
+        return(rep(NA, length(intensity)))
+    }
+
+    intensityNorm <- intensity
+    intensityNorm[iZero] <- NaN
+    intensityNorm[!iZero] <- log10(intensity[!iZero])
+    iMin <- min(intensityNorm[!iZero])
+    iMax <- max(intensityNorm[!iZero])
+
+    if (iMin == iMax) {
+        return(rep(maxValue, length(intensity)))
+    }
+
+    a <- (maxValue - minValue) / (iMax - iMin)
+    b <- minValue - a*iMin
+
+    return(a*intensityNorm + b)
+}
+
+#' pitch.plot
+#'
+#' Plots interactive Pitch object using dygraphs package.
+#'
+#' @param pitch Pitch object
+#' @param scaleIntensity Point size scaled according to relative intensity
+#' @param group [optional] character string, name of group for dygraphs synchronization
+#' @param showStrength show strength annotation (TRUE/FALSE)
+#'
+#' @export
+#' @seealso \code{\link{pitch.read}}, \code{\link{pitch.sample}}, \code{\link{pitch.toArray}}, \code{\link{tg.plot}}
+#'
+#' @examples
+#' \dontrun{
+#' pitch <- pitch.sample()
+#' pitch.plot(pitch)
+#' }
+pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = TRUE, group = "") {
+    pArray <- pitch.toArray(pitch)
+
+    if (scaleIntensity) {
+        intensityNorm <- normIntensity(pArray$intensityVector, 0.5, 6)
+    } else {
+        intensityNorm <- rep(1, pArray$nx)
+    }
+
+    pArray$frequencyArray[which(pArray$strengthArray == 0)] <- NA
+    pArray$frequencyArray[which(pArray$frequencyArray > pArray$ceiling)] <- NA
+
+    data <- list(t = pitch$t)
+
+    for (I in seqM(1, pitch$maxnCandidates)) {
+        data[[length(data)+1]] <- pArray$frequencyArray[I, ]
+
+        names(data)[length(data)] <- paste0("c", I)
+    }
+
+    if (group != "") {  # dygraphs plot-synchronization group
+        g <- dygraphs::dygraph(data, group = group, xlab = "Time (sec)")
+    } else {
+        g <- dygraphs::dygraph(data, xlab = "Time (sec)")
+    }
+
+    g <- dygraphs::dyOptions(g, drawPoints = TRUE, strokeWidth = 0, colors = "black")
+    g <- dygraphs::dyCallbacks(g, "drawPointCallback" = sprintf(
+        "
+        function(g, name, ctx, canvasx, canvasy, color, radius, index) {
+        var radius_str = %s;
+        radius = radius_str[index];
+        return Dygraph.Circles.DEFAULT(g, name, ctx, canvasx, canvasy, color, radius)
+        }
+        ",
+        paste0("[", paste0(intensityNorm, collapse = ","), "]") ))
+
+
+    # strength Labels
+    if (showStrength) {
+        pArray$strengthArray <- round2(pArray$strengthArray*10)
+
+        for (I in seqM(1, pitch$maxnCandidates)) {
+            for (J in seqM(1, pArray$nx)) {
+                if (!is.na(pArray$frequencyArray[I, J])) {
+                    g <- dygraphs::dyAnnotation(g, pArray$t[J], text = pArray$strengthArray[I, J], series = paste0("c", I))
+                }
+            }
+        }
+    }
+
+
+    g <- dygraphs::dyRangeSelector(g, dateWindow = c(pitch$xmin, pitch$xmax), fillColor = "", strokeColor = "")
+
+    g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
+    g
+}
+
+# p <- pitch.read("html/demo/sound.Pitch")
+# pitch.plot(p, scaleIntensity = TRUE, showStrength = TRUE)
+
 
 #' formant.read
 #'
@@ -3808,7 +4002,7 @@ formant.toArray <- function(formant) {
         frequencyArray[seqM(1,length(f)), I] <- f
 
         b <- formant$frame[[I]]$bandwidth
-        bandwidthArray[seqM(1,length(f)), I] <- b
+        bandwidthArray[seqM(1,length(b)), I] <- b
 
         intensityVector[I] <- formant$frame[[I]]$intensity
     }
@@ -3817,7 +4011,62 @@ formant.toArray <- function(formant) {
                          maxnFormants = formant$maxnFormants, frequencyArray = frequencyArray, bandwidthArray = bandwidthArray,
                          intensityVector = intensityVector)
 
+    class(formantArray)["type"] <- class(formant)["type"]
+    class(formantArray)["name"] <- class(formant)["name"]
+
     return(formantArray)
+}
+
+
+#' formant.toFrame
+#'
+#' @param formantArray Formant object (array format)
+#'
+#' @return Formant object with frames
+#' @export
+#'
+#' @seealso \code{\link{formant.toArray}}, \code{\link{formant.read}}, \code{\link{formant.plot}}
+#'
+#' @examples
+#' formantArray <- formant.toArray(formant.sample())
+#' formant <- formant.toFrame(formantArray)
+formant.toFrame <- function(formantArray) {
+    if (nrow(formantArray$frequencyArray) != formantArray$maxnFormants  |   ncol(formantArray$frequencyArray) != formantArray$nx) {
+        stop("formantArray$frequencyArray dimensions mismatch.")
+    }
+
+    if (nrow(formantArray$bandwidthArray) != formantArray$maxnFormants  |   ncol(formantArray$bandwidthArray) != formantArray$nx) {
+        stop("formantArray$bandwidthArray dimensions mismatch.")
+    }
+
+    if (length(formantArray$t) != formantArray$nx) {
+        stop("formantArray$t dimensions mismatch.")
+    }
+
+    if (length(formantArray$intensityVector) != formantArray$nx) {
+        stop("formantArray$intensityVector dimensions mismatch.")
+    }
+
+    frame <- vector("list", formantArray$nx)
+
+    for (I in seqM(1, formantArray$nx)) {
+        intensity <- formantArray$intensityVector[I]
+        nFormants <- as.numeric(sum(!is.na(formantArray$frequencyArray[, I])))
+        frequency <- formantArray$frequencyArray[seqM(1, nFormants), I]
+        bandwidth <- formantArray$bandwidthArray[seqM(1, nFormants), I]
+
+        frame[[I]] <- list(intensity = intensity, nFormants = nFormants,
+                           frequency = frequency, bandwidth =  bandwidth)
+    }
+
+
+    formant <- list(xmin = formantArray$xmin, xmax = formantArray$xmax, nx = formantArray$nx, dx = formantArray$dx, x1 = formantArray$x1, t = formantArray$t,
+                  maxnFormants = formantArray$maxnFormants, frame = frame)
+
+    class(formant)["type"] <- class(formantArray)["type"]
+    class(formant)["name"] <- class(formantArray)["name"]
+
+    return(formant)
 }
 
 
@@ -3842,10 +4091,7 @@ formant.plot <- function(formant, scaleIntensity = TRUE, drawBandwidth = TRUE, g
     fArray <- formant.toArray(formant)
 
     if (scaleIntensity) {
-        intensityNorm <- log10(fArray$intensityVector)
-        intensityNorm <- intensityNorm - min(intensityNorm) + 1
-        intensityNorm <- intensityNorm / max(intensityNorm) * 6 # maximum radius
-        intensityNorm <- intensityNorm - min(intensityNorm) + 1 # minimum radius [e.g., 1.1]
+        intensityNorm <- normIntensity(fArray$intensityVector, 1, 6)  # minimum, maximum radius
     } else {
         intensityNorm <- rep(2, formant$nx)
     }

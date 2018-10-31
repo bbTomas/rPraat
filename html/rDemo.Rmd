@@ -107,7 +107,7 @@ formant.plot(formant, group="my_group1") %>% dyAxis("y", label = "Frequency (Hz)
 ```
 
 
-## Combination of objects in one plot.
+## Combination of objects in one plot
 
 ```{r}
 tg.plot(tg.sample(), pt = pt.sample(), it = it.sample())
