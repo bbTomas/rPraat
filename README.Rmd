@@ -1,4 +1,7 @@
-# rPraat package for R
+---
+title: "rPraat package for R"
+output: md_document
+---
 
 rPraat package for R constitutes an interface between the most popular software for phonetic analyses, Praat, and R.
 

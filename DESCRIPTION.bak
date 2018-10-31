@@ -5,7 +5,7 @@ Version: 1.1.3-2
 Encoding: UTF-8
 Authors@R: person("Tomas", "Boril", email = "borilt@gmail.com", role = c("aut", "cre"))
 Maintainer: Tomas Boril <borilt@gmail.com>
-Description: Read, write and manipulate 'Praat' TextGrid, PitchTier, Pitch, IntensityTier and Formant files <http://www.fon.hum.uva.nl/praat/>.
+Description: Read, write and manipulate 'Praat' TextGrid, PitchTier, Pitch, Intensity and Formant files <http://www.fon.hum.uva.nl/praat/>.
 URL: https://github.com/bbTomas/rPraat/
 BugReports: https://github.com/bbTomas/rPraat/issues
 License: MIT + file LICENSE

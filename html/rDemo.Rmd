@@ -1,12 +1,14 @@
 ---
-output: html_document
+title: 'rPraat: Praat in R'
+output:
+  html_document:
+      toc: true
+      toc_depth: 2
 editor_options: 
   chunk_output_type: console
 ---
-# rPraat: Praat in R
 
-
-## How to cite this package / toolbox?
+# How to cite this package / toolbox?
 We have invested a lot of time and effort in creating mPraat toolbox / rPraat package, please cite it when using it for data analysis.
 
 > Bořil, T., & Skarnitzl, R. (2016). Tools rPraat and mPraat. In P. Sojka, A. Horák, I. Kopeček, & K. Pala (Eds.), Text, Speech, and Dialogue (pp. 367–374). Springer International Publishing.
@@ -19,7 +21,7 @@ The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-
 [Download BibTeX reference mpraatrpraat2016.bib](mpraatrpraat2016.bib)
 
 
-## Installation and help
+# Installation and help
 
 rPraat and mPraat homepage: [http://fu.ff.cuni.cz/praat/](http://fu.ff.cuni.cz/praat/)
 
@@ -45,38 +47,10 @@ For help and examples, use command
 or read .pdf documentation at [https://github.com/bbTomas/rPraat/blob/master/rPraat.pdf](https://github.com/bbTomas/rPraat/blob/master/rPraat.pdf)
 
 
-## Demo files
+# Demo files
 To reproduce the following examples, you will need some sample files. Download and extract [rpraat_demo.zip](http://fu.ff.cuni.cz/praat/rpraat_demo.zip) to your Working Directory, it creates `demo` subdirectory.
 
-### Read and plot Sound, TextGrid, and PitchTier
-```{r, fig.height=2.5}
-library(tuneR)
-library(dygraphs)
-library(rPraat)
-library(dplyr)
-
-sndWav <- readWave("demo/H.wav"); fs <- sndWav@samp.rate; snd <- sndWav@left / (2^(sndWav@bit-1))
-t <- seqM(0, length(snd) - 1) / fs
-
-dygraph(data.frame(t, snd), xlab = "Time (sec)", group="group1") %>% dyRangeSelector(fillColor = "") %>%
-    dyAxis("y", label = "Amplitude")
-```
-
-```{r, fig.height=3}
-library(rPraat)
-library(dplyr)
-tg <- tg.read("demo/H.TextGrid") %>%
-    tg.removeTier("phrase") %>% tg.removeTier("phoneme") %>% tg.removeTier("syllable")
-
-tg.plot(tg, group="group1")
-```
-
-```{r, fig.height=2.5}
-pt <- pt.read("demo/H.PitchTier")
-pt.plot(pt, group="group1") %>% dyAxis("y", label = "Frequency (Hz)")
-```
-
-#### Interactive plots using dygraphs (including tg.plot, pt.plot)
+## Interactive plots using dygraphs (zooming and scrolling)
 
 Mouse drag: Zoom to selection
 
@@ -84,23 +58,91 @@ Mouse Double-click: Default zoom
 
 Shift + mouse drag: plot scroll
 
-#### TextGrid, PitchTier and IntensityTier in one plot.
+## Read and plot Sound, TextGrid, PitchTier, IntensityTier, Formant
+
+```{r, echo=FALSE}
+library(rPraat)
+library(dplyr, warn.conflicts = FALSE)
+library(dygraphs)
+library(tuneR)
+```
+
+```{r, eval=FALSE}
+library(rPraat)
+library(dplyr)
+library(dygraphs)
+library(tuneR)  # to read .wav files
+```
+
+### Separate plots with synchronised zoom using 'group' argument
+
+```{r, fig.height=2.5}
+sndWav <- readWave("demo/H.wav"); fs <- sndWav@samp.rate; snd <- sndWav@left / (2^(sndWav@bit-1))
+t <- seqM(0, length(snd) - 1) / fs
+
+dygraph(data.frame(t, snd), xlab = "Time (sec)", group="my_group1") %>% dyRangeSelector(fillColor = "") %>%
+    dyAxis("y", label = "Amplitude")
+```
+
+```{r, fig.height=3}
+tg <- tg.read("demo/H.TextGrid") %>%
+    tg.removeTier("phrase") %>% tg.removeTier("phoneme") %>% tg.removeTier("syllable")
+
+tg.plot(tg, group="my_group1")
+```
+
+```{r, fig.height=2.5}
+pt <- pt.read("demo/H.PitchTier")
+pt.plot(pt, group="my_group1") %>% dyAxis("y", label = "Frequency (Hz)")
+```
+
+```{r, fig.height=2.5}
+it <- it.read("demo/H.IntensityTier")
+it.plot(it, group="my_group1") %>% dyAxis("y", label = "Intensity (dB)")
+```
+
+```{r, fig.height=5}
+formant <- formant.read("demo/H.Formant")
+formant.plot(formant, group="my_group1") %>% dyAxis("y", label = "Frequency (Hz)")
+```
+
+
+## Combination of objects in one plot.
 
 ```{r}
 tg.plot(tg.sample(), pt = pt.sample(), it = it.sample())
+
+tg.plot(tg.sample(), formant = formant.sample())
 ```
 
-## TextGrid
 
-```{r}
+# TextGrid
+
+## Read, Write and plot TextGrid
+
+```{r, fig.height=3.5}
 tg <- tg.read("demo/H.TextGrid")
-tg.getNumberOfTiers(tg)
-length(tg)   # number of tiers, "low-level access"
-tg.getTotalDuration(tg)
-tg.getTierName(tg, 1)
+tg.plot(tg)
 ```
 
-### Tier accessed both by index and name
+```{r, fig.height=2.5}
+tg.plot(tg[c("phone", "word")]) # Plot selected tiers only
+tg.write(tg, "demo/new_file.TextGrid")  # save variable into a new file
+```
+
+## Get basic info
+```{r}
+tg.getNumberOfTiers(tg)
+length(tg)   # get number of tiers, "low-level access"
+
+tg.getTotalDuration(tg)
+tg.getStartTime(tg)
+tg.getEndTime(tg)
+
+tg.getTierName(tg, 1)  # get name of the first tier
+```
+
+## Tier accessed both by index and name
 
 ```{r}
 tg.isPointTier(tg, 1)
@@ -116,7 +158,7 @@ tg.checkTierInd(tg, "word")  # get index of a tier with specified name
 tg.checkTierInd(tg, 4)  # only checks whether TextGrid contains a tier with this index
 ```
 
-### Point tier
+## Point tier
 
 ```{r}
 tg.getNumberOfPoints(tg, 1)
@@ -125,7 +167,7 @@ tg.getPointTime(tg, "phoneme", 4)
 tg.getLabel(tg, "phoneme", 4)
 ```
 
-#### Point tier "low-level access"
+### Point tier "low-level access"
 
 ```{r}
 length(tg[[1]]$t)   # number of points
@@ -139,7 +181,7 @@ tg$phoneme$label[4]
 tg$phoneme$t[5:8]
 ```
 
-### Interval tier
+## Interval tier
 
 ```{r}
 tg.isPointTier(tg, "word")
@@ -158,7 +200,7 @@ tg.getIntervalDuration(tg, "word", index = 4)
 tg.getLabel(tg, "word", index = 4)
 ```
 
-#### Interval tier "low-level access"
+### Interval tier "low-level access"
 
 ```{r}
 length(tg[[4]]$t1)   # number of intervals
@@ -174,7 +216,7 @@ tg$word$label[4]
 tg$word$label[5:8]
 ```
 
-### Vectorized operations
+## Vectorized operations
 
 ```{r, fig.height=3.5}
 labelsOfInterest <- c("i", "i:", "e", "e:", "a", "a:", "o", "o:", "u", "u:")
@@ -184,30 +226,30 @@ sum(condition) # How many labels satisfy the condition?
 
 dur <- tg$phone$t2[condition] - tg$phone$t1[condition]
 mean(dur)
-hist(dur)
+hist(dur, breaks = 10)
 ```
 
-### Cut TextGrid
-```{r}
+## Cut TextGrid
+```{r, fig.height=3.5}
 tg.plot(tg.cut(tg.sample(), 2, 2.2)) # preserve times
 tg.plot(tg.cut0(tg.sample(), 2, 2.2)) # time from 0
 ```
 
 
 
-### Find labels in TextGrid
+## Find labels in TextGrid
 
 ```{r}
 tg <- tg.read("demo/H.TextGrid")
 
 # find label "n" in phoneme tier (Point tier)
 i <- tg.findLabels(tg, "phoneme", "n")
-i # 4 results and their indices
-length(i) # 4 results
+i # four results and their indices
+length(i) # how many results?
 i[[1]]  # index of the first result
 tg$phoneme$label[unlist(i)]
 
-# find fragments with successive labels "?" "a" in phone tear (Interval tier)
+# find fragments with successive labels "?" "a" in 'phone' tear (Interval tier)
 i <- tg.findLabels(tg, "phone", c("?", "a"))
 i  
 length(i) # 2 results found
@@ -217,15 +259,15 @@ tg$phone$label[i[[1]]]
 tg$phone$label[i[[2]]]
 tg$phone$label[unlist(i)]
 
-# find fragments with successive labels "?" "a" in phone tier
+# find fragments with successive labels "?" "a" in 'phone' tier
 # and return initial and final time of these fragments
 t <- tg.findLabels(tg, "phone", c("?", "a"), returnTime = TRUE)
 t # 2 results and their initial (t1) and final (t2) time
-length(t) # 2 results found
+length(t$t1) # 2 results found (Note: length(t$t1) == length(t$t2) == number of results)
 t$t2[1] - t$t1[1]   # duration of the first fragment
 t$t2[2] - t$t1[2]   # duration of the second fragment
 
-# find fragments with successive labels "ti" "řeknu" "co" in word tier (Interval tier)
+# find fragments with successive labels "ti" "řeknu" "co" in 'word' tier (Interval tier)
 i <- tg.findLabels(tg, "word", c("ti", "řeknu", "co"))
 i  
 length(i) # 1 result found
@@ -238,16 +280,13 @@ t <- tg.findLabels(tg, "word", c("ti", "řeknu", "co"), returnTime = TRUE)
 t
 ```
 
-### Create syllable tier from phone tier
+## Create syllable tier from phone tier
 
 ```{r}
 tg <- tg.read("demo/H.TextGrid")
-
-tg <- tg %>% tg.removeTier("phoneme") %>%  tg.removeTier("syllable") %>% tg.removeTier("word") %>%
-    tg.removeTier("phrase")
 ```
 
-Get actual labels.
+Get actual labels of 'phone' tier.
 
 ```{r}
 collapsed <- paste0(tg$phone$label, collapse = "")
@@ -259,15 +298,16 @@ Edit the collapsed string with labels - insert separators to mark boundaries of 
 * There can be segments with empty labels in the original tier (pauses), do not specify them in the pattern.
 * Beware of labels that appear empty but they are not (space, new line character etc.) - these segments are handled as classical non-empty labels. See example - one label is " ", therefore it must be specified in the pattern.
 
-```{r}
+```{r, fig.height=3}
 pattern <- "ja:-ci-P\\ek-nu-t_so-?u-J\\e-la:S- -nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"
+
 tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = "-")
-tg.plot(tg2)
+tg.plot(tg2[c("syll", "phone")])
 ```
 
 
 
-### Overview of some TextGrid operations
+## Overview of some TextGrid operations
 
 For all functions, see help `?functionName` for its description and example of use.
 
@@ -311,7 +351,7 @@ tg.write(tgNew, "demo/ex_output.TextGrid")
 
 
 
-### Repair continuity problem of TextGrid
+## Repair continuity problem of TextGrid
 
 Repairs problem of continuity of T2 and T1 in interval tiers. This problem is very rare and it should not appear. However, e.g., automatic segmentation tool Prague Labeller produces random numeric round-up errors featuring, e.g., T2 of preceding interval is slightly higher than the T1 of the current interval. Because of that, the boundary cannot be manually moved in Praat edit window.
 
@@ -323,68 +363,80 @@ tg.write(tgNew, "demo/H_problem_OK.TextGrid")
 tgNew2 <- tg.repairContinuity(tgNew) # no problem in repaired TextGrid
 ```
 
-## PitchTier
+# PitchTier
 
-**Example.** Transform Hz to semitones (ST), cut the original pitchtier along the TextGrid, make interpolated contour.
+**Example.** Transform Hz to semitones (ST), cut the original PitchTier along the TextGrid, make interpolated contour.
 
-```{r, fig.height=3.5}
+## Read, Write and plot PitchTier
+```{r, fig.height=2.5}
 pt <- pt.read("demo/H.PitchTier")
+pt.plot(pt) %>% dygraphs::dyAxis("y", label = "Frequency (Hz)")
+pt.write(pt, "demo/new_file.PitchTier")  # save variable into a new file
+```
+
+## Transform Hz to semitones (ST)
+```{r, fig.height=2.5}
 pt <- pt.Hz2ST(pt, ref = 100)  # conversion of Hz to Semitones, reference 0 ST = 100 Hz.
 
 pt.plot(pt) %>% dygraphs::dyAxis("y", label = "Frequency (ST re 100 Hz)")
+```
 
+## Plot PitchTier together with TextGrid
+```{r, fig.height=3}
 tg <- tg.read("demo/H.TextGrid")
+tg.plot(tg["word"], pt = pt) # plot "word" tier only together with PitchTier
+```
+
+## Cut PitchTier along the TextGrid
+```{r, fig.height=2.5}
 t <- tg.findLabels(tg, "word", c("já", "ti", "řeknu"), returnTime = TRUE)
 print(t)
-
 pt2 <- pt.cut0(pt, tStart = t$t1[1], tEnd = t$t2[1]) # "já ti řeknu"
 pt.plot(pt2) %>% dygraphs::dyAxis("y", label = "Frequency (ST re 100 Hz)")
+```
 
+## Interpolate PitchTier
+```{r, fig.height=2.5}
 pt2interp <- pt.interpolate(pt2, seq(pt2$t[1], pt2$t[length(pt2$t)], by = 0.001))
 pt.plot(pt2interp) %>% dygraphs::dyAxis("y", label = "Frequency (ST re 100 Hz)")
 
 pt.write(pt2interp, "demo/H_cut_interp.PitchTier")
 ```
 
-### Legendre polynomials modelling
+# Legendre polynomials modelling of PitchTiers
 
 
-#### Orthogonal basis
+## Orthogonal basis
 ```{r}
 pt.legendreDemo()
 ```
 
-#### Cut the PitchTier
+## Model PitchTier using Legendre polynomials
 ```{r}
-pt <- pt.sample()
-pt <- pt.Hz2ST(pt)
-pt <- pt.cut(pt, tStart = 3)  # cut PitchTier from t = 3 sec and preserve time
-```
-
-#### Model it using Legendre polynomials
-```{r}
-c <- pt.legendre(pt)
+c <- pt.legendre(pt2)
 print(c)
 ```
-#### Reconstruct the contour from these 4 coefficients
+## Reconstruct the interpolated F0 contour from Legendre coefficients
 ```{r, fig.height=5}
 leg <- pt.legendreSynth(c)
-ptLeg <- pt
+ptLeg <- pt2
 ptLeg$t <- seq(ptLeg$tmin, ptLeg$tmax, length.out = length(leg))
 ptLeg$f <- leg
 
-plot(pt$t, pt$f, xlab = "Time (sec)", ylab = "F0 (ST re 100 Hz)")
+plot(pt2$t, pt2$f, xlab = "Time (sec)", ylab = "F0 (ST re 100 Hz)")
 lines(ptLeg$t, ptLeg$f, col = "blue")
 ```
 
 
-## Pitch object
+# Pitch object
 
 In addition to PitchTier, a Pitch object represents periodicity candidates as a function of time.
+
+## Read Pitch, get strengths and frequencies of F0 candidates
 ```{r}
 p <- pitch.read('demo/sound.Pitch')
 names(p)
-p$nx
+p$nx          # get number of frames
 p$t[4]        # time instance of the 4th frame
 p$frame[[4]]  # 4th frame: pitch candidates
 p$frame[[4]]$frequency[2]
@@ -392,13 +444,15 @@ p$frame[[4]]$strength[2]
 ```
 
 
-## Formant object
+# Formant object
 
+
+## Read and plot Formant object with bandwidths and intensity scale
 A Formant object represents formant frequencies and bandwidths as a function of time.
 ```{r}
 f <- formant.read('demo/maminka.Formant')
 names(f)
-f$nx
+f$nx     # get number of frames
 f$t[4]        # time instance of the 4th frame
 f$frame[[4]]  # 4th frame: formants
 f$frame[[4]]$frequency[2]
@@ -408,26 +462,37 @@ formant.plot(f, scaleIntensity = TRUE, drawBandwidth = TRUE)
 ```
 
 
-### Convert Formant object from frames to arrays
+## Convert Formant object from frames to arrays
 ```{r, fig.height=3.5}
 fArray <- formant.toArray(f)
 plot(fArray$t, fArray$frequencyArray[1, ], main = "1st Formant (Hz)")
 ```
 
-### Plot TextGrid with Formant object together
-```{r}
+## Plot TextGrid with Formant object together
+```{r, fig.height=7}
 tg.plot(tg.sample(), formant = formant.sample())
 ```
 
 
 
-## IntensityTier
+# IntensityTier
 
 Intensity tier files have very similar structure to PitchTiers. Using this package, you can also interpolate, cut or model Intensity tiers with Legendre polynomials.
 
-```{r}
+## Read, Write and plot IntensityTier
+```{r, fig.height=2.5}
 it <- it.read('demo/maminka.IntensityTier')
+it.plot(it) %>% dygraphs::dyAxis("y", label = "Intensity (dB)")
+it.write(it, "demo/new_file.IntensityTier")  # save variable into a new file
+```
+
+## Cut the IntensityTier
+```{r}
 it <- it.cut(it, tStart = 0.2, tEnd = 0.4)  # cut IntensityTier from t = 0.2 to 0.4 sec and preserve time
+```
+
+## Legendre polynomials modelling
+```{r, fig.height=3.5}
 c <- it.legendre(it)
 print(c)
 leg <- it.legendreSynth(c)
@@ -439,25 +504,40 @@ lines(itLeg$t, itLeg$i, col = "blue")
 ```
 
 
-## Collection
+# Collection
 
-With col.read() function, it is convenient to read a lot of objects stored in one Praat .Collection file.
+With col.read() function, it is convenient to read a lot of objects stored in one .Collection file.
 
+## Read Collection and get number of objects
 ```{r}
 coll <- col.read("demo/coll_text.Collection")
 length(coll)  # number of objects in collection
+```
+
+## Access objects in Collection
+
+### 1st object: IntensityTier "1"
+```{r, fig.height=2.5}
 class(coll[[1]])["type"]  # 1st object type
 class(coll[[1]])["name"]  # 1st object name
 it <- coll[[1]]  # 1st object
-it.plot(it)
 
+it.plot(it)
+```
+
+### 2nd object: TextGrid "HC101bA"
+```{r, fig.height=3}
 class(coll[[2]])["type"]  # 2nd object type
 class(coll[[2]])["name"]  # 2nd object name
 tg <- coll[[2]]  # 2nd object
-tg.plot(tg)
 length(tg)  # number of tiers in TextGrid
 tg$word$label
 
+tg.plot(tg)
+```
+
+### 3rd object: Pitch "sound_short"
+```{r}
 class(coll[[3]])["type"]  # 3rd object type
 class(coll[[3]])["name"]  # 3rd object type
 pitch <- coll[[3]]  # 3rd object
@@ -467,12 +547,19 @@ pitch$t[4]        # time instance of the 4th frame
 pitch$frame[[4]]  # 4th frame: pitch candidates
 pitch$frame[[4]]$frequency[2]
 pitch$frame[[4]]$strength[2]
+```
 
+### 4th object: PitchTier "H_shortTextFile"
+```{r, fig.height=2.5}
 class(coll[[4]])["type"]  # 4th object type
 class(coll[[4]])["name"]  # 4th object name
 pt <- coll[[4]]  # 2nd object
-pt.plot(pt)
 
+pt.plot(pt)
+```
+
+### 5th object: Formant "maminka"
+```{r, fig.height=3.5}
 class(coll[[5]])["type"]  # 5th object type
 class(coll[[5]])["name"]  # 5th object type
 formant <- coll[[5]]  # 5th object
@@ -482,12 +569,14 @@ formant$t[4]        # time instance of the 4th frame
 formant$frame[[4]]  # 4th frame: formants
 formant$frame[[4]]$frequency[2]
 formant$frame[[4]]$bandwidth[2]
+
+formant.plot(formant)
 ```
 
 
 
 
-## Process all files in folder
+# Process all files in selected folder
 
 ```{R, eval = FALSE}
 inputFolder <- "experiment1/data"
@@ -495,26 +584,25 @@ listFiles <- list.files(path = inputFolder, pattern = "\\.TextGrid$" , ignore.ca
 
 for (I in seq_along(listFiles)) {
     file <- listFiles[I]
-    fileName <- substr(file, 1, nchar(file)-9)
+    fileName <- substr(file, 1, nchar(file) - nchar(".TextGrid"))
+    
     fileTextGrid <- paste0(inputFolder, "/", fileName, ".TextGrid")
-    filePitchTier <- paste0(inputFolder, "/", fileName, ".PitchTier")
-    fileIntensityTier <- paste0(inputFolder, "/", fileName, ".IntensityTier")
-    fileSound <- paste0(inputFolder, "/", fileName, ".wav")
+    # filePitchTier <- paste0(inputFolder, "/", fileName, ".PitchTier")
+    # filePitch <- paste0(inputFolder, "/", fileName, ".Pitch")
+    # fileIntensityTier <- paste0(inputFolder, "/", fileName, ".IntensityTier")
+    # fileFormant <- paste0(inputFolder, "/", fileName, ".Formant")
+    # fileCollection <- paste0(inputFolder, "/", fileName, ".Collection")
+    # fileSound <- paste0(inputFolder, "/", fileName, ".wav")
     
     tg <- tg.read(fileTextGrid)
-    pt <- pt.read(filePitchTier)
-    it <- it.read(fileIntensityTier)
+    # pt <- pt.read(filePitchTier)
+    # pitch <- pt.read(filePitch)
+    # it <- it.read(fileIntensityTier)
+    # formant <- formant.read(fileFormant)
+    # col <- col.read(fileCollection)
     # ...
+    
+    # ... process tg, pt, pitch, it, formant ...
 }
-
 ```
-
-
-
-
-
-
-
-
-
 
