@@ -3772,6 +3772,10 @@ pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = FALSE, group
             var c_strength = %s;
             var nc = %d;
             ctx.fillText(c_strength[parseInt(name)-1 + index*nc], canvasx+7, canvasy);
+            var grey = (10 - c_strength[parseInt(name)-1 + index*nc])*20;
+            var hex = grey.toString(16);
+            hex = (hex.length == 1 ? '0' + hex : hex);
+            color = '#' + hex + hex + hex;
             var radius_str = %s;
             radius = radius_str[index];
             return Dygraph.Circles.DEFAULT(g, name, ctx, canvasx, canvasy, color, radius)
