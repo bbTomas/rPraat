@@ -4,13 +4,13 @@
 \alias{pitch.plot}
 \title{pitch.plot}
 \usage{
-pitch.plot(pitch, scaleIntensity = TRUE, showStrength = TRUE,
+pitch.plot(pitch, scaleIntensity = TRUE, showStrength = FALSE,
   group = "")
 }
 \arguments{
 \item{pitch}{Pitch object}
 
-\item{scaleIntensity}{Point size scaled according to relative intensity}
+\item{scaleIntensity}{Point size scaled according to relative intensity (TRUE/FALSE)}
 
 \item{showStrength}{show strength annotation (TRUE/FALSE)}
 
@@ -22,7 +22,7 @@ Plots interactive Pitch object using dygraphs package.
 \examples{
 \dontrun{
 pitch <- pitch.sample()
-pitch.plot(pitch)
+pitch.plot(pitch, scaleIntensity = TRUE, showStrength = TRUE)
 }
 }
 \seealso{

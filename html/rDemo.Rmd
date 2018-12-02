@@ -434,13 +434,24 @@ In addition to PitchTier, a Pitch object represents periodicity candidates as a 
 
 ## Read Pitch, get strengths and frequencies of F0 candidates
 ```{r}
-p <- pitch.read('demo/sound.Pitch')
+p <- pitch.read('demo/H.Pitch')
 names(p)
 p$nx          # get number of frames
 p$t[4]        # time instance of the 4th frame
 p$frame[[4]]  # 4th frame: pitch candidates
 p$frame[[4]]$frequency[2]
 p$frame[[4]]$strength[2]
+
+pitch.plot(p, scaleIntensity = TRUE, showStrength = TRUE)
+```
+
+## Convert Pitch object from frames to arrays and vice versa
+```{r, fig.height=3.5}
+pitchArray <- pitch.toArray(pitch.sample())
+pitchArray$frequencyArray[, 1:7]
+
+pitch <- pitch.toFrame(pitchArray)
+pitch$frame[[1]]
 ```
 
 
@@ -462,10 +473,12 @@ formant.plot(f, scaleIntensity = TRUE, drawBandwidth = TRUE)
 ```
 
 
-## Convert Formant object from frames to arrays
+## Convert Formant object from frames to arrays and vice versa
 ```{r, fig.height=3.5}
 fArray <- formant.toArray(f)
 plot(fArray$t, fArray$frequencyArray[1, ], main = "1st Formant (Hz)")
+
+formant <- formant.toFrame(fArray)
 ```
 
 ## Plot TextGrid with Formant object together

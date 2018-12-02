@@ -3722,7 +3722,7 @@ normIntensity <- function(intensity, minValue = 1, maxValue = 9) {
 #' Plots interactive Pitch object using dygraphs package.
 #'
 #' @param pitch Pitch object
-#' @param scaleIntensity Point size scaled according to relative intensity
+#' @param scaleIntensity Point size scaled according to relative intensity (TRUE/FALSE)
 #' @param group [optional] character string, name of group for dygraphs synchronization
 #' @param showStrength show strength annotation (TRUE/FALSE)
 #'
@@ -3732,9 +3732,9 @@ normIntensity <- function(intensity, minValue = 1, maxValue = 9) {
 #' @examples
 #' \dontrun{
 #' pitch <- pitch.sample()
-#' pitch.plot(pitch)
+#' pitch.plot(pitch, scaleIntensity = TRUE, showStrength = TRUE)
 #' }
-pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = TRUE, group = "") {
+pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = FALSE, group = "") {
     pArray <- pitch.toArray(pitch)
 
     if (scaleIntensity) {
@@ -3751,7 +3751,7 @@ pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = TRUE, group 
     for (I in seqM(1, pitch$maxnCandidates)) {
         data[[length(data)+1]] <- pArray$frequencyArray[I, ]
 
-        names(data)[length(data)] <- paste0("c", I)
+        names(data)[length(data)] <- I
     }
 
     if (group != "") {  # dygraphs plot-synchronization group
@@ -3761,30 +3761,36 @@ pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = TRUE, group 
     }
 
     g <- dygraphs::dyOptions(g, drawPoints = TRUE, strokeWidth = 0, colors = "black")
-    g <- dygraphs::dyCallbacks(g, "drawPointCallback" = sprintf(
-        "
-        function(g, name, ctx, canvasx, canvasy, color, radius, index) {
-        var radius_str = %s;
-        radius = radius_str[index];
-        return Dygraph.Circles.DEFAULT(g, name, ctx, canvasx, canvasy, color, radius)
-        }
-        ",
-        paste0("[", paste0(intensityNorm, collapse = ","), "]") ))
 
-
-    # strength Labels
     if (showStrength) {
+        pArray$strengthArray[is.na(pArray$strengthArray)] <- 0 # or NaN, the value does not matter
         pArray$strengthArray <- round2(pArray$strengthArray*10)
 
-        for (I in seqM(1, pitch$maxnCandidates)) {
-            for (J in seqM(1, pArray$nx)) {
-                if (!is.na(pArray$frequencyArray[I, J])) {
-                    g <- dygraphs::dyAnnotation(g, pArray$t[J], text = pArray$strengthArray[I, J], series = paste0("c", I))
-                }
+        g <- dygraphs::dyCallbacks(g, "drawPointCallback" = sprintf(
+            "
+            function(g, name, ctx, canvasx, canvasy, color, radius, index) {
+            var c_strength = %s;
+            var nc = %d;
+            ctx.fillText(c_strength[parseInt(name)-1 + index*nc], canvasx+7, canvasy);
+            var radius_str = %s;
+            radius = radius_str[index];
+            return Dygraph.Circles.DEFAULT(g, name, ctx, canvasx, canvasy, color, radius)
             }
-        }
+            ",
+            paste0("[", paste0(pArray$strengthArray, collapse = ","), "]"),
+            pitch$maxnCandidates,
+            paste0("[", paste0(intensityNorm, collapse = ","), "]") ))
+    } else {
+        g <- dygraphs::dyCallbacks(g, "drawPointCallback" = sprintf(
+            "
+            function(g, name, ctx, canvasx, canvasy, color, radius, index) {
+            var radius_str = %s;
+            radius = radius_str[index];
+            return Dygraph.Circles.DEFAULT(g, name, ctx, canvasx, canvasy, color, radius)
+            }
+            ",
+            paste0("[", paste0(intensityNorm, collapse = ","), "]") ))
     }
-
 
     g <- dygraphs::dyRangeSelector(g, dateWindow = c(pitch$xmin, pitch$xmax), fillColor = "", strokeColor = "")
 
