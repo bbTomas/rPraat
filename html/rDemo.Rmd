@@ -123,11 +123,12 @@ tg.plot(tg.sample(), pitch = pitch.sample(), pitchShowStrength = TRUE, pt = pt.s
 
 # Sound files
 
-## Read and plot sound file
+## Read, write and plot Sound file
 
 ```{r, fig.height=3}
 snd <- snd.read("demo/H.wav")
 snd.plot(snd)
+snd.write(snd, "demo/temp.wav")
 snd$fs
 snd$nChannels
 snd$nBits
@@ -150,14 +151,25 @@ head(snd$sig)
 ```{r, fig.height=3}
 snd1 <- list(fs = 8000, sig = sin(seq(0, 2*pi, length.out = 4000)))
 snd.plot(snd1)
-snd2 <- list(t = seq(0, 4000)/8000, sig = sin(seq(0, 2*pi, length.out = 4000)))
+snd2 <- list(t = seq(0, 3999)/8000, sig = sin(seq(0, 2*pi, length.out = 4000)))
 snd.plot(snd2)
+
+fs <- 48000
+t <- seq(0, fs-1)/fs  # duration of 1 second
+sig <- 1*sin(2*pi*1000*t)
+snd.write(list(sig = sig, nBits = 16, fs = fs), "demo/temp.wav")
+snd <- snd.read("demo/temp.wav")
+min(snd$sig)
+max(snd$sig)
+max(snd$sig)-1
+min(snd$sig)+1
+mean(snd$sig)
 ```
 
 
 # TextGrid
 
-## Read, Write and plot TextGrid
+## Read, write and plot TextGrid
 
 ```{r, fig.height=3.5}
 tg <- tg.read("demo/H.TextGrid")
@@ -406,7 +418,7 @@ tgNew2 <- tg.repairContinuity(tgNew) # no problem in repaired TextGrid
 
 **Example.** Transform Hz to semitones (ST), cut the original PitchTier along the TextGrid, make interpolated contour.
 
-## Read, Write and plot PitchTier
+## Read, write and plot PitchTier
 ```{r, fig.height=2.5}
 pt <- pt.read("demo/H.PitchTier")
 pt.plot(pt) %>% dygraphs::dyAxis("y", label = "Frequency (Hz)")
@@ -537,7 +549,7 @@ tg.plot(tg.sample(), formant = formant.sample())
 
 Intensity tier files have very similar structure to PitchTiers. Using this package, you can also interpolate, cut or model Intensity tiers with Legendre polynomials.
 
-## Read, Write and plot IntensityTier
+## Read, write and plot IntensityTier
 ```{r, fig.height=2.5}
 it <- it.read('demo/maminka.IntensityTier')
 it.plot(it) %>% dygraphs::dyAxis("y", label = "Intensity (dB)")

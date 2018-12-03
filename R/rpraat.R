@@ -167,6 +167,8 @@ col.read <- function(fileName, encoding = "UTF-8") {
 #'
 #' @examples
 #' \dontrun{
+#' snd <- snd.read("demo/H.wav")
+#' snd.plot(snd)
 #' }
 snd.read <- function(fileNameSound, fileType = "auto", from = 1, to = Inf, units = "samples") {
     if (!isString(fileNameSound)) {
@@ -214,7 +216,7 @@ snd.read <- function(fileNameSound, fileType = "auto", from = 1, to = Inf, units
 #'
 #' Plots interactive Sound object using dygraphs package. If the sound is 2-channel (stereo), the 1st channel is plotted around mean value +1, the 2nd around mean value -1.
 #'
-#' @param snd Sound object
+#' @param snd Sound object (with $sig and $fs or $t members at least)
 #' @param group [optional] character string, name of group for dygraphs synchronization
 #'
 #' @export
@@ -229,10 +231,10 @@ snd.read <- function(fileNameSound, fileType = "auto", from = 1, to = Inf, units
 #' snd.plot(list(sig = 0.3*sin(seq(0, 2*pi, length.out = 4000)), t = 1:4000))
 #' }
 snd.plot <- function(snd, group = "") {
-    if (is.null(nrow(snd$sig))) {   # vector, not a matrix
-        nsamples <- length(snd$sig)
+    if (is.null(nrow(snd$sig))) {
+        nsamples <- length(snd$sig) # vector, not a matrix
     } else {
-        nsamples <- nrow(snd$sig)
+        nsamples <- nrow(snd$sig)   # matrix
     }
 
 
@@ -257,7 +259,7 @@ snd.plot <- function(snd, group = "") {
         } else {
             data <- list(t = snd$t, ch1 = snd$sig[, 1])
         }
-    } else if (snd$nChannels == 2) {
+    } else if (nch == 2) {
         data <- list(t = snd$t, ch1 = snd$sig[, 1] + 1, ch2 = snd$sig[, 2] - 1)
     } else {
         stop("Only 1 or 2 channels are supported.")
@@ -273,6 +275,67 @@ snd.plot <- function(snd, group = "") {
 
     g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
     g
+}
+
+
+#' snd.write
+#'
+#' Saves Sound object to a file.
+#' snd is a list with $sig, $nBits and $fs members at least. Vector $t is ignored. If the sound signal is 2-channel (stereo),
+#' $sig must be a two-column matrix (1st column corresponds to the left channel, 2nd column to the right channel).
+#' If the sound is 1-channel (mono), $sig can be eather a numeric vector or a one-column matrix.
+#' optional $t, $nChannels, $nSamples, $duration vectors are ignored.
+#'
+#' @param snd Sound object (with $sig, $nBits and $fs members)
+#' @param fileNameSound file name to be created
+#'
+#' @export
+#' @seealso \code{\link{snd.read}}
+#'
+#' @examples
+#' \dontrun{
+#' snd <- snd.sample()
+#' snd.plot(snd)
+#' snd.write(snd, "temp1.wav")
+#'
+#' signal <- 0.8*sin(seq(0, 2*pi*440, length.out = 8000))
+#' snd.write(list(sig = signal, fs = 8000, nBits = 16), "temp2.wav")
+#'
+#' left  <- 0.3*sin(seq(0, 2*pi*440, length.out = 4000))
+#' rigth <- 0.5*sin(seq(0, 2*pi*220, length.out = 4000))
+#' snd.write(list(sig = matrix(c(left, right), ncol = 2), fs = 8000, nBits = 16), "temp3.wav")
+#' }
+snd.write <- function(snd, fileNameSound) {
+    if (!isString(fileNameSound)) {
+        stop("Invalid 'fileNameSound' parameter.")
+    }
+
+    if (is.null(ncol(snd$sig))) {
+        nch <- 1  # probably a vector
+    } else {
+        nch <- ncol(snd$sig)
+    }
+
+    if (nch == 1) {
+        if (is.null(nrow(snd$sig))) {
+            signal <- snd$sig  # probably a vector
+        } else {
+            signal <- snd$sig[, 1]
+        }
+
+        s <- tuneR::Wave(
+            left = round(signal*(2^(snd$nBits - 1) - 1)),
+            samp.rate = snd$fs, bit = snd$nBits)
+    } else if (nch == 2) {
+        s <- tuneR::Wave(
+            left = round(snd$sig[, 1]*(2^(snd$nBits - 1) - 1)),
+            right = round(snd$sig[, 2]*(2^(snd$nBits - 1) - 1)),
+            samp.rate = snd$fs, bit = snd$nBits)
+    } else {
+        stop("Only 1 or 2 channels are supported.")
+    }
+
+    tuneR::writeWave(s, filename = fileNameSound)
 }
 
 
@@ -1234,7 +1297,7 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
                 lbl <- paste0(lbl, " & IntensityTier")
             }
 
-            g <- dygraphs::dyAxis(g, "y2", label = lbl, independentTicks = TRUE, valueRange = c(yMin, yMax), drawGrid = TRUE) # @@
+            g <- dygraphs::dyAxis(g, "y2", label = lbl, independentTicks = TRUE, valueRange = c(yMin, yMax), drawGrid = TRUE)
 
             for (I in seqM(1, pitch$maxnCandidates)) {
                 g <- dygraphs::dySeries(g, paste0("c", I), axis = "y2", drawPoints = TRUE, strokeWidth = 0, color = "black")
@@ -4629,8 +4692,8 @@ pt.read_lines <- function(flines, find = 1, collection = FALSE) {
 
 #' pt.write
 #'
-#' Saves PitchTier to file (in UTF-8 encoding).
-#' pt is list with at least $t and $f vectors (of the same length).
+#' Saves PitchTier to a file (in UTF-8 encoding).
+#' pt is a list with $t and $f vectors (of the same length) at least.
 #' If there are no $tmin and $tmax values, there are
 #' set as min and max of $t vector.
 #'
@@ -5861,7 +5924,7 @@ as.formant <- function(formant, name = "") {
 }
 
 
-#' as.sound
+#' as.snd
 #'
 #' Renames the class(snd)["name"] attribute and sets class(snd)["type"] <- "Sound" (if it is not already set)
 #'
@@ -5874,7 +5937,7 @@ as.formant <- function(formant, name = "") {
 #' @examples
 #' class(snd.sample())
 #' class(as.snd(snd.sample(), name = "New Name"))
-as.sound <- function(snd, name = "") {
+as.snd <- function(snd, name = "") {
     class(snd)["type"] <- "Sound"
     class(snd)["name"] <- name
     return(snd)

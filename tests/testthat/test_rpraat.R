@@ -349,6 +349,17 @@ test_that("snd.read", {
          3.05185094759972e-05, -6.10370189519944e-05, -3.35703604235969e-03, -1.34281441694388e-03))
 })
 
+test_that("snd.write", {
+    expect_equal({
+        snd <- snd.read("H.wav")
+        f <- tempfile()
+        snd.write(snd, f)
+        snd2 <- as.snd(snd.read(f), "H.wav")
+        unlink(f)
+        identical(snd, snd2)
+    }, TRUE)
+})
+
 
 
 context("TextGrid")

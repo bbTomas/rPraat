@@ -7,17 +7,20 @@
 snd.plot(snd, group = "")
 }
 \arguments{
-\item{snd}{Sound object}
+\item{snd}{Sound object (with $sig and $fs or $t members at least)}
 
 \item{group}{[optional] character string, name of group for dygraphs synchronization}
 }
 \description{
-Plots interactive Sound object using dygraphs package.
+Plots interactive Sound object using dygraphs package. If the sound is 2-channel (stereo), the 1st channel is plotted around mean value +1, the 2nd around mean value -1.
 }
 \examples{
 \dontrun{
 snd <- snd.sample()
 snd.plot(snd)
+
+snd.plot(list(sig = sin(seq(0, 2*pi, length.out = 4000)), fs = 8000))
+snd.plot(list(sig = 0.3*sin(seq(0, 2*pi, length.out = 4000)), t = 1:4000))
 }
 }
 \seealso{

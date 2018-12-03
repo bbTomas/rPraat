@@ -4,7 +4,7 @@ rPraat package for R
 rPraat package for R constitutes an interface between the most popular
 software for phonetic analyses, Praat, and R.
 
-Version 1.1.3-3.
+Version 1.1.3-4.
 
 For demonstration, see
 [html/rDemo.html](http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html)
@@ -64,6 +64,8 @@ mpraatrpraat2016.bib](http://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
 
 What is new
 -----------
+
+v1.1.3-4 (2018/12/03): snd.read(), snd.write(), snd.plot()
 
 v1.1.3-3 (2018/12/03): formant.toFrame(), pitch.toArray(),
 pitch.toFrame(), pitch.plot(); tg.plot() can plot TextGrid together with

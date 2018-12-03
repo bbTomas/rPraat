@@ -33,5 +33,7 @@ Loads sound file (.wav or .mp3) using tuneR package.
 }
 \examples{
 \dontrun{
+snd <- snd.read("demo/H.wav")
+snd.plot(snd)
 }
 }
