@@ -40,6 +40,26 @@ test_that("formant.sample", {
     expect_equal(formant.sample()$frame[[5]]$bandwidth[4], 82)
 })
 
+test_that("snd.sample", {
+    expect_equal(length(snd.sample()), 7)
+    expect_equal(length(snd.sample()$t), 5484)
+    expect_equal(snd.sample()$t[1], 0)
+    expect_equal(snd.sample()$t[2], 1/8000)
+    expect_equal(snd.sample()$t[5484], 0.685375)
+    expect_equal(snd.sample()$fs, 8000)
+    expect_equal(snd.sample()$nChannels, 1)
+    expect_equal(snd.sample()$nBits, 16)
+    expect_equal(snd.sample()$nSamples, 5484)
+    expect_equal(snd.sample()$duration, 0.6855)
+    expect_equal(class(snd.sample()$sig), "matrix")
+    expect_equal(dim(snd.sample()$sig), c(5484, 1))
+    expect_equal(snd.sample()$sig[1, 1], 0)
+    expect_equal(snd.sample()$sig[2, 1], 0.00116)
+    expect_equal(snd.sample()$sig[1000, 1], -0.033235)
+    expect_equal(snd.sample()$sig[5484, 1], 0)
+})
+
+
 
 context("PitchTier")
 
@@ -302,6 +322,31 @@ test_that("it.cut0", {
         c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[35], it$t[71], it$i[1], it$i[35], it$i[71])},
         c(0, 2, 71, 71, 1.055229, 1.508563, 1.988563, 40.856357, 62.639656, 67.697852))
     expect_error(it.cut0(it.sample(), 0.3, 0.2))
+})
+
+
+context("Sound")
+
+test_that("snd.read", {
+    expect_equal({
+        snd <- snd.read("H.wav")
+        c(length(snd),
+          length(snd$t),
+          snd$t[1],
+          snd$t[2],
+          snd$t[28937],
+          snd$fs,
+          snd$nChannels,
+          snd$nBits,
+          snd$nSamples,
+          snd$duration,
+          dim(snd$sig),
+          snd$sig[1, 1],
+          snd$sig[2, 1],
+          snd$sig[1000, 1],
+          snd$sig[28937, 1])
+    }, c(7, 28937, 0, 1/8000, 3.617, 8000, 1, 16, 28937, 3.617125, 28937, 1,
+         3.05185094759972e-05, -6.10370189519944e-05, -3.35703604235969e-03, -1.34281441694388e-03))
 })
 
 

@@ -77,11 +77,8 @@ library(tuneR)  # to read .wav files
 ### Separate plots with synchronised zoom using 'group' argument
 
 ```{r, fig.height=2.5}
-sndWav <- readWave("demo/H.wav"); fs <- sndWav@samp.rate; snd <- sndWav@left / (2^(sndWav@bit-1))
-t <- seqM(0, length(snd) - 1) / fs
-
-dygraph(data.frame(t, snd), xlab = "Time (sec)", group="my_group1") %>% dyRangeSelector(fillColor = "") %>%
-    dyAxis("y", label = "Amplitude")
+sndWav <- snd.read("demo/H.wav")
+snd.plot(sndWav, group = "my_group1") %>% dyAxis("y", label = "Amplitude")
 ```
 
 ```{r, fig.height=3}
@@ -121,6 +118,40 @@ tg.plot(tg.sample(), pt = pt.sample(), it = it.sample())
 tg.plot(tg.sample(), formant = formant.sample())
 
 tg.plot(tg.sample(), pitch = pitch.sample(), pitchShowStrength = TRUE, pt = pt.sample())
+```
+
+
+# Sound files
+
+## Read and plot sound file
+
+```{r, fig.height=3}
+snd <- snd.read("demo/H.wav")
+snd.plot(snd)
+snd$fs
+snd$nChannels
+snd$nBits
+snd$nSamples
+snd$duration
+head(snd$t)
+head(snd$sig)
+```
+
+### Stereo sound (2-channel)
+```{r, fig.height=3}
+snd <- snd.read("demo/cali.wav")
+snd.plot(snd)
+snd$nChannels
+head(snd$t)
+head(snd$sig)
+```
+
+## Create a new sound object
+```{r, fig.height=3}
+snd1 <- list(fs = 8000, sig = sin(seq(0, 2*pi, length.out = 4000)))
+snd.plot(snd1)
+snd2 <- list(t = seq(0, 4000)/8000, sig = sin(seq(0, 2*pi, length.out = 4000)))
+snd.plot(snd2)
 ```
 
 
@@ -618,18 +649,19 @@ for (I in seq_along(listFiles)) {
     # filePitch <- paste0(inputFolder, "/", fileName, ".Pitch")
     # fileIntensityTier <- paste0(inputFolder, "/", fileName, ".IntensityTier")
     # fileFormant <- paste0(inputFolder, "/", fileName, ".Formant")
-    # fileCollection <- paste0(inputFolder, "/", fileName, ".Collection")
     # fileSound <- paste0(inputFolder, "/", fileName, ".wav")
+    # fileCollection <- paste0(inputFolder, "/", fileName, ".Collection")
     
     tg <- tg.read(fileTextGrid)
     # pt <- pt.read(filePitchTier)
     # pitch <- pt.read(filePitch)
     # it <- it.read(fileIntensityTier)
     # formant <- formant.read(fileFormant)
+    # snd <- snd.read(fileSound)
     # col <- col.read(fileCollection)
     # ...
     
-    # ... process tg, pt, pitch, it, formant ...
+    # ... process tg, pt, pitch, it, formant, snd, col...
 }
 ```
 
