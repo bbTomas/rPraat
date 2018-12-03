@@ -10,9 +10,9 @@ pitch.plot(pitch, scaleIntensity = TRUE, showStrength = FALSE,
 \arguments{
 \item{pitch}{Pitch object}
 
-\item{scaleIntensity}{Point size scaled according to relative intensity (TRUE/FALSE)}
+\item{scaleIntensity}{Point size scaled according to relative intensity}
 
-\item{showStrength}{show strength annotation (TRUE/FALSE)}
+\item{showStrength}{Show strength annotation}
 
 \item{group}{[optional] character string, name of group for dygraphs synchronization}
 }

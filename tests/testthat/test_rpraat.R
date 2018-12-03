@@ -23,12 +23,12 @@ test_that("it.sample", {
 })
 
 test_that("pitch.sample", {
-    expect_equal(length(pitch.sample()$t), 10)
+    expect_equal(length(pitch.sample()$t), 358)
     expect_equal(pitch.sample()$ceiling, 600)
-    expect_equal(pitch.sample()$frame[[5]]$nCandidates, 5)
-    expect_equal(pitch.sample()$frame[[5]]$intensity, 7.777478353175910e-05)
-    expect_equal(pitch.sample()$frame[[5]]$frequency[4], 2248.97907136615)
-    expect_equal(pitch.sample()$frame[[5]]$strength[4], 0.264006571781677)
+    expect_equal(pitch.sample()$frame[[5]]$nCandidates, 3)
+    expect_equal(pitch.sample()$frame[[5]]$intensity, 0.00283569949248335)
+    expect_equal(pitch.sample()$frame[[5]]$frequency[3], 158.25417311564)
+    expect_equal(pitch.sample()$frame[[5]]$strength[3], 0.250648211921512)
 })
 
 test_that("formant.sample", {
@@ -892,11 +892,11 @@ test_that("pitch.toArray", {
         p$frame <- p$frame[c(1, 4, 10)]
         pa <- pitch.toArray(p)
         c(pa$xmin, pa$xmax, pa$nx, pa$dx, pa$x1, pa$t, pa$ceiling, pa$maxnCandidates,
-          dim(pa$frequencyArray), pa$frequencyArray[1,1], is.na(pa$frequencyArray[5, 2]), pa$frequencyArray[8, 3],
-          dim(pa$strengthArray), pa$strengthArray[1,1], is.na(pa$strengthArray[5, 2]), pa$strengthArray[8, 3])
+          dim(pa$frequencyArray), pa$frequencyArray[1,1], is.na(pa$frequencyArray[6, 1]), pa$frequencyArray[3, 3],
+          dim(pa$strengthArray), pa$strengthArray[1,1], is.na(pa$strengthArray[6, 1]), pa$strengthArray[3, 3])
     },
-    c(0, 0.12, 3, 0.01, 0.021, 0.021, 0.051, 0.111, 600, 15, 15, 3, 0, 1, 389.3119640274,
-      15, 3, 0, 1, 0.2353107686932)
+    c(0, 3.617125, 3, 0.01, 0.0235625, 0.0235625, 0.0535625, 0.1135625, 600, 15, 15, 3, 0, 1, 109.982215319168006,
+      15, 3, 0, 1, 0.927799045152899)
     )
 })
 

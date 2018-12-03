@@ -777,9 +777,12 @@ tg.write <- function(tg, fileNameTextGrid, format = "short") {
 #' @param formant [optional] Formant object
 #' @param formantScaleIntensity [optional] Point size scaled according to relative intensity
 #' @param formantDrawBandwidth [optional] Draw formant bandwidth
+#' @param pitch [optional] Pitch object
+#' @param pitchScaleIntensity [optional] Point size scaled according to relative intensity
+#' @param pitchShowStrength [optional] Show strength annotation
 #'
 #' @export
-#' @seealso \code{\link{tg.read}}, \code{\link{pt.plot}}
+#' @seealso \code{\link{tg.read}}, \code{\link{pt.plot}}, \code{\link{it.plot}}, \code{\link{pitch.plot}}
 #'
 #' @examples
 #' \dontrun{
@@ -787,13 +790,17 @@ tg.write <- function(tg, fileNameTextGrid, format = "short") {
 #' tg.plot(tg)
 #' tg.plot(tg.sample(), pt = pt.sample())
 #' }
-tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, formantScaleIntensity = TRUE, formantDrawBandwidth = TRUE) {
+tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, formantScaleIntensity = TRUE, formantDrawBandwidth = TRUE, pitch = NULL, pitchScaleIntensity = TRUE, pitchShowStrength = FALSE) {
     ntiers <- tg.getNumberOfTiers(tg)
 
-    y2Axis <- !is.null(pt) | !is.null(it) | !is.null(formant)
+    y2Axis <- !is.null(pt) | !is.null(it) | !is.null(formant) | !is.null(pitch)
 
-    if (!is.null(formant) & (!is.null(pt) | !is.null(it))) {
-        stop("Sorry, tg.plot cannot display Formant together with PitchTier or IntensityTier.")
+    if (!is.null(formant) & (!is.null(pt) | !is.null(it) | !is.null(pitch))) {
+        stop("Sorry, tg.plot cannot display Formant together with PitchTier, IntensityTier or Pitch.")
+    }
+
+    if (!is.null(pitch) & (!is.null(pt) | !is.null(it) | !is.null(formant))) {
+        stop("Sorry, tg.plot cannot display Pitch together with PitchTier, IntensityTier or Formant")
     }
 
     if (ntiers == 0) {
@@ -827,6 +834,9 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
 
     if (!is.null(pt)) {
         tAll <- c(tAll, pt$t)
+    }
+    if (!is.null(pitch)) {
+        tAll <- c(tAll, pitch$t)
     }
     if (!is.null(it)) {
         tAll <- c(tAll, it$t)
@@ -911,6 +921,30 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
                 data[[length(data)+1]] <- y2
                 names(data)[length(data)] <- paste0("upr", I)
             }
+        }
+    }
+    if (!is.null(pitch)) {
+        pArray <- pitch.toArray(pitch)  ### pitch
+
+        if (pitchScaleIntensity) {
+            intensityNorm <- normIntensity(pArray$intensityVector, 0.5, 6)  # minimum, maximum radius
+        } else {
+            intensityNorm <- rep(1, pArray$nx)
+        }
+        pArray$frequencyArray[which(pArray$strengthArray == 0)] <- NA
+        pArray$frequencyArray[which(pArray$frequencyArray > pArray$ceiling)] <- NA
+
+        intensity2 <- rep(as.numeric(0), length(tAll))
+        intensity2[tAll %in% pitch$t] <- intensityNorm
+        intensityNorm <- intensity2
+
+        for (I in seqM(1, pitch$maxnCandidates)) {
+            y2 <- rep(as.numeric(NA), length(tAll))
+            y2[tAll %in% pitch$t] <- pArray$frequencyArray[I, ]
+
+            data[[length(data)+1]] <- y2
+
+            names(data)[length(data)] <- paste0("c", I)
         }
     }
 
@@ -1026,17 +1060,72 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
                 } else {
                     g <- dygraphs::dySeries(g, axis = "y2", c(paste0("lwr", I), paste0("F", I), paste0("upr", I)), drawPoints = TRUE, pointSize = 2)
                 }
-                g <- dygraphs::dyCallbacks(g, "drawPointCallback" = sprintf(
-                    "
+            }
+
+            g <- dygraphs::dyCallbacks(g, "drawPointCallback" = sprintf(
+                "
                 function(g, name, ctx, canvasx, canvasy, color, radius, index) {
                 var radius_str = %s;
                 radius = radius_str[index];
                 return Dygraph.Circles.DEFAULT(g, name, ctx, canvasx, canvasy, color, radius)
                 }
                 ",
-                    paste0("[", paste0(intensityNorm, collapse = ","), "]") ))
+                paste0("[", paste0(intensityNorm, collapse = ","), "]") ))
+
+        } else if (!is.null(pitch)) {
+            max_f <- max(pArray$frequencyArray, na.rm = TRUE)
+            min_f <- min(pArray$frequencyArray, na.rm = TRUE)
+
+            delta <- (max_f - min_f)*4/3
+            yMin <- min_f - delta
+            yMax <- min_f + delta
+            g <- dygraphs::dyAxis(g, "y2", label = "Pitch", independentTicks = TRUE, valueRange = c(yMin, yMax))
+
+            for (I in seqM(1, pitch$maxnCandidates)) {
+                g <- dygraphs::dySeries(g, paste0("c", I), axis = "y2", drawPoints = TRUE, strokeWidth = 0, color = "black")
+            }
+
+            if (!pitchShowStrength) {
+                g <- dygraphs::dyCallbacks(g, "drawPointCallback" = sprintf(
+                    "
+                    function(g, name, ctx, canvasx, canvasy, color, radius, index) {
+                    var radius_str = %s;
+                    radius = radius_str[index];
+                    return Dygraph.Circles.DEFAULT(g, name, ctx, canvasx, canvasy, color, radius)
+                    }
+                    ",
+                paste0("[", paste0(intensityNorm, collapse = ","), "]") ))
+            } else {
+                pArray$strengthArray[is.na(pArray$strengthArray)] <- 0 # or NaN, the value does not matter
+                pArray$strengthArray <- round2(pArray$strengthArray*10)
+
+                strength2 <- array(data = 0, dim = c(pitch$maxnCandidates, length(tAll)))
+                for (I in seqM(1, pitch$maxnCandidates)) {
+                    strength2[I, tAll %in% pitch$t] <- pArray$strengthArray[I, ]
+                }
+
+                g <- dygraphs::dyCallbacks(g, "drawPointCallback" = sprintf(
+                    "
+                    function(g, name, ctx, canvasx, canvasy, color, radius, index) {
+                    var c_strength = %s;
+                    var nc = %d;
+                    var cs = c_strength[parseInt(name.substring(1))-1 + index*nc];
+                    ctx.fillText(cs, canvasx+7, canvasy);
+                    var grey = (10 - cs)*20;
+                    var hex = grey.toString(16);
+                    hex = (hex.length == 1 ? '0' + hex : hex);
+                    color = '#' + hex + hex + hex;
+                    var radius_str = %s;
+                    radius = radius_str[index];
+                    return Dygraph.Circles.DEFAULT(g, name, ctx, canvasx, canvasy, color, radius)
+                    }
+                    ",
+                paste0("[", paste0(strength2, collapse = ","), "]"),
+                pitch$maxnCandidates,
+                paste0("[", paste0(intensityNorm, collapse = ","), "]") ))
             }
         }
+
     }
 
     g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
@@ -3722,9 +3811,9 @@ normIntensity <- function(intensity, minValue = 1, maxValue = 9) {
 #' Plots interactive Pitch object using dygraphs package.
 #'
 #' @param pitch Pitch object
-#' @param scaleIntensity Point size scaled according to relative intensity (TRUE/FALSE)
+#' @param scaleIntensity Point size scaled according to relative intensity
+#' @param showStrength Show strength annotation
 #' @param group [optional] character string, name of group for dygraphs synchronization
-#' @param showStrength show strength annotation (TRUE/FALSE)
 #'
 #' @export
 #' @seealso \code{\link{pitch.read}}, \code{\link{pitch.sample}}, \code{\link{pitch.toArray}}, \code{\link{tg.plot}}
@@ -3751,7 +3840,7 @@ pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = FALSE, group
     for (I in seqM(1, pitch$maxnCandidates)) {
         data[[length(data)+1]] <- pArray$frequencyArray[I, ]
 
-        names(data)[length(data)] <- I
+        names(data)[length(data)] <- paste0("c", I)
     }
 
     if (group != "") {  # dygraphs plot-synchronization group
@@ -3771,8 +3860,9 @@ pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = FALSE, group
             function(g, name, ctx, canvasx, canvasy, color, radius, index) {
             var c_strength = %s;
             var nc = %d;
-            ctx.fillText(c_strength[parseInt(name)-1 + index*nc], canvasx+7, canvasy);
-            var grey = (10 - c_strength[parseInt(name)-1 + index*nc])*20;
+            var cs = c_strength[parseInt(name.substring(1))-1 + index*nc];
+            ctx.fillText(cs, canvasx+7, canvasy);
+            var grey = (10 - cs)*20;
             var hex = grey.toString(16);
             hex = (hex.length == 1 ? '0' + hex : hex);
             color = '#' + hex + hex + hex;
@@ -3802,7 +3892,7 @@ pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = FALSE, group
     g
 }
 
-# p <- pitch.read("html/demo/sound.Pitch")
+# p <- pitch.read("html/demo/H.Pitch")
 # pitch.plot(p, scaleIntensity = TRUE, showStrength = TRUE)
 
 

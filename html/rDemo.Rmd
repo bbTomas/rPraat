@@ -106,6 +106,12 @@ formant <- formant.read("demo/H.Formant")
 formant.plot(formant, group="my_group1") %>% dyAxis("y", label = "Frequency (Hz)")
 ```
 
+```{r, fig.height=5}
+pitch <- pitch.read("demo/H.Pitch")
+pitch.plot(pitch, group="my_group1", scaleIntensity = TRUE, showStrength = TRUE) %>%
+    dyAxis("y", label = "Frequency (Hz)")
+```
+
 
 ## Combination of objects in one plot
 
@@ -113,6 +119,8 @@ formant.plot(formant, group="my_group1") %>% dyAxis("y", label = "Frequency (Hz)
 tg.plot(tg.sample(), pt = pt.sample(), it = it.sample())
 
 tg.plot(tg.sample(), formant = formant.sample())
+
+tg.plot(tg.sample(), pitch = pitch.sample(), pitchShowStrength = TRUE)
 ```
 
 
@@ -437,10 +445,10 @@ In addition to PitchTier, a Pitch object represents periodicity candidates as a 
 p <- pitch.read('demo/H.Pitch')
 names(p)
 p$nx          # get number of frames
-p$t[4]        # time instance of the 4th frame
-p$frame[[4]]  # 4th frame: pitch candidates
-p$frame[[4]]$frequency[2]
-p$frame[[4]]$strength[2]
+p$t[5]        # time instance of the 5th frame
+p$frame[[5]]  # 5th frame: pitch candidates
+p$frame[[5]]$frequency[2]
+p$frame[[5]]$strength[2]
 
 pitch.plot(p, scaleIntensity = TRUE, showStrength = TRUE)
 ```

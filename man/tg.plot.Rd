@@ -5,7 +5,9 @@
 \title{tg.plot}
 \usage{
 tg.plot(tg, group = "", pt = NULL, it = NULL, formant = NULL,
-  formantScaleIntensity = TRUE, formantDrawBandwidth = TRUE)
+  formantScaleIntensity = TRUE, formantDrawBandwidth = TRUE,
+  pitch = NULL, pitchScaleIntensity = TRUE,
+  pitchShowStrength = FALSE)
 }
 \arguments{
 \item{tg}{TextGrid object}
@@ -21,6 +23,12 @@ tg.plot(tg, group = "", pt = NULL, it = NULL, formant = NULL,
 \item{formantScaleIntensity}{[optional] Point size scaled according to relative intensity}
 
 \item{formantDrawBandwidth}{[optional] Draw formant bandwidth}
+
+\item{pitch}{[optional] Pitch object}
+
+\item{pitchScaleIntensity}{[optional] Point size scaled according to relative intensity}
+
+\item{pitchShowStrength}{[optional] Show strength annotation}
 }
 \description{
 Plots interactive TextGrid using dygraphs package.
@@ -33,5 +41,5 @@ tg.plot(tg.sample(), pt = pt.sample())
 }
 }
 \seealso{
-\code{\link{tg.read}}, \code{\link{pt.plot}}
+\code{\link{tg.read}}, \code{\link{pt.plot}}, \code{\link{it.plot}}, \code{\link{pitch.plot}}
 }
