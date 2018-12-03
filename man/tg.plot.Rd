@@ -7,7 +7,7 @@
 tg.plot(tg, group = "", pt = NULL, it = NULL, formant = NULL,
   formantScaleIntensity = TRUE, formantDrawBandwidth = TRUE,
   pitch = NULL, pitchScaleIntensity = TRUE,
-  pitchShowStrength = FALSE)
+  pitchShowStrength = FALSE, snd = NULL)
 }
 \arguments{
 \item{tg}{TextGrid object}
@@ -29,6 +29,8 @@ tg.plot(tg, group = "", pt = NULL, it = NULL, formant = NULL,
 \item{pitchScaleIntensity}{[optional] Point size scaled according to relative intensity}
 
 \item{pitchShowStrength}{[optional] Show strength annotation}
+
+\item{snd}{[optional] Sound object}
 }
 \description{
 Plots interactive TextGrid using dygraphs package.

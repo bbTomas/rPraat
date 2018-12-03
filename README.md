@@ -65,7 +65,9 @@ mpraatrpraat2016.bib](http://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
 What is new
 -----------
 
-v1.1.3-4 (2018/12/03): snd.read(), snd.write(), snd.plot()
+v1.1.3-4 (2018/12/03): snd.read(), snd.write(), snd.plot(); tg.plot()
+can plot TextGrid together with Sound object; it.plot() can plot
+IntensityTier together with Sound object
 
 v1.1.3-3 (2018/12/03): formant.toFrame(), pitch.toArray(),
 pitch.toFrame(), pitch.plot(); tg.plot() can plot TextGrid together with

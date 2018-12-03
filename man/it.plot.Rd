@@ -4,12 +4,14 @@
 \alias{it.plot}
 \title{it.plot}
 \usage{
-it.plot(it, group = "")
+it.plot(it, group = "", snd = NULL)
 }
 \arguments{
 \item{it}{IntensityTier object}
 
 \item{group}{[optional] character string, name of group for dygraphs synchronization}
+
+\item{snd}{[optional] Sound object}
 }
 \description{
 Plots interactive IntensityTier using dygraphs package.

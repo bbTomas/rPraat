@@ -978,6 +978,7 @@ tg.write <- function(tg, fileNameTextGrid, format = "short") {
 #' @param pitch [optional] Pitch object
 #' @param pitchScaleIntensity [optional] Point size scaled according to relative intensity
 #' @param pitchShowStrength [optional] Show strength annotation
+#' @param snd [optional] Sound object
 #'
 #' @export
 #' @seealso \code{\link{tg.read}}, \code{\link{pt.plot}}, \code{\link{it.plot}}, \code{\link{pitch.plot}}
@@ -988,7 +989,7 @@ tg.write <- function(tg, fileNameTextGrid, format = "short") {
 #' tg.plot(tg)
 #' tg.plot(tg.sample(), pt = pt.sample())
 #' }
-tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, formantScaleIntensity = TRUE, formantDrawBandwidth = TRUE, pitch = NULL, pitchScaleIntensity = TRUE, pitchShowStrength = FALSE) {
+tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, formantScaleIntensity = TRUE, formantDrawBandwidth = TRUE, pitch = NULL, pitchScaleIntensity = TRUE, pitchShowStrength = FALSE, snd = NULL) {
     ntiers <- tg.getNumberOfTiers(tg)
 
     y2Axis <- !is.null(pt) | !is.null(it) | !is.null(formant) | !is.null(pitch)
@@ -1041,6 +1042,27 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
     }
     if (!is.null(formant)) {
         tAll <- c(tAll, formant$t)
+    }
+    if (!is.null(snd)) {
+        if (is.null(nrow(snd$sig))) {
+            nsamples <- length(snd$sig) # vector, not a matrix
+        } else {
+            nsamples <- nrow(snd$sig)   # matrix
+        }
+
+        if (!("nChannels" %in% names(snd))) {
+            if (is.null(ncol(snd$sig))) {
+                snd$nChannels <- 1  # probably a vector
+            } else {
+                snd$nChannels <- ncol(snd$sig)
+            }
+        }
+
+        if (!("t" %in% names(snd))) {
+            snd$t <- seqM(0, nsamples-1)/snd$fs
+        }
+
+        tAll <- c(tAll, snd$t)
     }
 
     tAll <- unique(sort(tAll))
@@ -1146,6 +1168,33 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
         data[[length(data)+1]] <- y2
         names(data)[length(data)] <- "IntensityTier"
     }
+    if (!is.null(snd)) {
+        if (snd$nChannels == 1) {
+            if (is.null(nrow(snd$sig))) {
+                ch1 <- snd$sig  # probably a vector
+            } else {
+                ch1 <- snd$sig[, 1]
+            }
+            y2 <- rep(as.numeric(NA), length(tAll))
+            y2[tAll %in% snd$t] <- ch1
+            data[[length(data)+1]] <- y2
+            names(data)[length(data)] <- "Sound"
+        } else if (snd$nChannels == 2) {
+            ch1 <- snd$sig[, 1]
+            ch2 <-  snd$sig[, 2] - 2
+
+            y2 <- rep(as.numeric(NA), length(tAll))
+            y2[tAll %in% snd$t] <- ch1
+            data[[length(data)+1]] <- y2
+            names(data)[length(data)] <- "Sound1"
+            y2 <- rep(as.numeric(NA), length(tAll))
+            y2[tAll %in% snd$t] <- ch2
+            data[[length(data)+1]] <- y2
+            names(data)[length(data)] <- "Sound2"
+        } else {
+            stop("Only 1 or 2 channels are supported.")
+        }
+    }
 
     # create tg tiers
     for (I in seqM(1, ntiers)) {
@@ -1214,10 +1263,22 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
         }
     }
 
+    yMinAxis <- 0
+    yMaxAxisCoef <- 0
+    if (!is.null(snd)) {
+        if (snd$nChannels == 1) {
+            yMinAxis <- -1
+            yMaxAxisCoef <- 1
+        } else {
+            yMinAxis <- -3
+            yMaxAxisCoef <- 3
+        }
+    }
+
     if (!y2Axis) {
-        g <- dygraphs::dyAxis(g, "y", label = "TextGrid", valueRange = c(0, length(tg)+2))
+        g <- dygraphs::dyAxis(g, "y", label = "TextGrid", valueRange = c(yMinAxis, length(tg)+2+yMaxAxisCoef))
     } else {
-        g <- dygraphs::dyAxis(g, "y", label = "TextGrid", valueRange = c(0, length(tg)*2+2), independentTicks = TRUE, drawGrid = TRUE, gridLineColor = "white")  # *2
+        g <- dygraphs::dyAxis(g, "y", label = "TextGrid", valueRange = c(yMinAxis, length(tg)*2+2+yMaxAxisCoef), independentTicks = TRUE, drawGrid = TRUE, gridLineColor = "white")  # *2
         # Note: drawGrid = FALSE also turns off y2 grid :-(  Note2: gridLineWidth=0 does not work => the only solution is to set the white color
 
         if (is.null(pitch) & !is.null(pt) & !is.null(it)) {
@@ -5438,6 +5499,7 @@ it.write <- function(it, fileNameIntensityTier, format = "short") {
 #'
 #' @param it IntensityTier object
 #' @param group [optional] character string, name of group for dygraphs synchronization
+#' @param snd [optional] Sound object
 #'
 #' @export
 #' @seealso \code{\link{it.read}}, \code{\link{tg.plot}}, \code{\link{it.cut}}, \code{\link{it.cut0}}, \code{\link{it.interpolate}}, \code{\link{it.write}}
@@ -5447,8 +5509,66 @@ it.write <- function(it, fileNameIntensityTier, format = "short") {
 #' it <- it.sample()
 #' it.plot(it)
 #' }
-it.plot <- function(it, group = "") {
-    data <- list(t = it$t, i = it$i)
+it.plot <- function(it, group = "", snd = NULL) {
+    tAll <- it$t
+
+    if (!is.null(snd)) {
+        if (is.null(nrow(snd$sig))) {
+            nsamples <- length(snd$sig) # vector, not a matrix
+        } else {
+            nsamples <- nrow(snd$sig)   # matrix
+        }
+
+        if (!("nChannels" %in% names(snd))) {
+            if (is.null(ncol(snd$sig))) {
+                snd$nChannels <- 1  # probably a vector
+            } else {
+                snd$nChannels <- ncol(snd$sig)
+            }
+        }
+
+        if (!("t" %in% names(snd))) {
+            snd$t <- seqM(0, nsamples-1)/snd$fs
+        }
+
+        tAll <- c(tAll, snd$t)
+    }
+
+    tAll <- unique(sort(tAll))
+
+    data <- list(t = tAll)
+    y2 <- rep(as.numeric(NA), length(tAll))  ### it
+    y2[tAll %in% it$t] <- it$i
+    data[[length(data)+1]] <- y2
+    names(data)[length(data)] <- "IntensityTier"
+
+    if (!is.null(snd)) {
+        if (snd$nChannels == 1) {
+            if (is.null(nrow(snd$sig))) {
+                ch1 <- snd$sig  # probably a vector
+            } else {
+                ch1 <- snd$sig[, 1]
+            }
+            y2 <- rep(as.numeric(NA), length(tAll))
+            y2[tAll %in% snd$t] <- ch1
+            data[[length(data)+1]] <- y2
+            names(data)[length(data)] <- "Sound"
+        } else if (snd$nChannels == 2) {
+            ch1 <- snd$sig[, 1] + 1
+            ch2 <-  snd$sig[, 2] - 1
+
+            y2 <- rep(as.numeric(NA), length(tAll))
+            y2[tAll %in% snd$t] <- ch1
+            data[[length(data)+1]] <- y2
+            names(data)[length(data)] <- "Sound1"
+            y2 <- rep(as.numeric(NA), length(tAll))
+            y2[tAll %in% snd$t] <- ch2
+            data[[length(data)+1]] <- y2
+            names(data)[length(data)] <- "Sound2"
+        } else {
+            stop("Only 1 or 2 channels are supported.")
+        }
+    }
 
     if (group != "") {  # dygraphs plot-synchronization group
         g <- dygraphs::dygraph(data, group = group, xlab = "Time (sec)")
@@ -5456,7 +5576,18 @@ it.plot <- function(it, group = "") {
         g <- dygraphs::dygraph(data, xlab = "Time (sec)")
     }
 
-    g <- dygraphs::dyOptions(g, drawPoints = TRUE, pointSize = 2, strokeWidth = 0)
+    if (!is.null(snd)) {
+        if (snd$nChannels == 1) {
+            g <- dygraphs::dyAxis(g, "y2", label = "Sound", independentTicks = TRUE, valueRange = c(-1, 1), drawGrid = FALSE)
+            g <- dygraphs::dySeries(g, "Sound", axis = "y2")
+        } else if (snd$nChannels == 2) {
+            g <- dygraphs::dyAxis(g, "y2", label = "Sound", independentTicks = TRUE, valueRange = c(-2, 2), drawGrid = FALSE)
+            g <- dygraphs::dySeries(g, "Sound1", axis = "y2")
+            g <- dygraphs::dySeries(g, "Sound2", axis = "y2")
+        }
+    }
+
+    g <- dygraphs::dySeries(g, "IntensityTier", drawPoints = TRUE, pointSize = 2, strokeWidth = 0, color = "green")
     g <- dygraphs::dyRangeSelector(g, dateWindow = c(it$tmin, it$tmax), fillColor = "")
 
     g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
