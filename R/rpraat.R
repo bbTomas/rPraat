@@ -3869,12 +3869,34 @@ pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = FALSE, group
     pArray$frequencyArray[which(pArray$strengthArray == 0)] <- NA
     pArray$frequencyArray[which(pArray$frequencyArray > pArray$ceiling)] <- NA
 
-    data <- list(t = pitch$t)
+    tAll <- pitch$t
+    if (!is.null(pt)) {
+        tAll <- c(tAll, pt$t)
+    }
+
+    tAll <- unique(sort(tAll))
+
+    data <- list(t = tAll)
+
+    intensity2 <- rep(as.numeric(0), length(tAll))
+    intensity2[tAll %in% pitch$t] <- intensityNorm
+    intensityNorm <- intensity2
+
 
     for (I in seqM(1, pitch$maxnCandidates)) {
-        data[[length(data)+1]] <- pArray$frequencyArray[I, ]
+        y2 <- rep(as.numeric(NA), length(tAll))
+        y2[tAll %in% pitch$t] <- pArray$frequencyArray[I, ]
+
+        data[[length(data)+1]] <- y2
 
         names(data)[length(data)] <- paste0("c", I)
+    }
+
+    if (!is.null(pt)) {
+        y2 <- rep(as.numeric(NA), length(tAll))  ### pt
+        y2[tAll %in% pt$t] <- pt$f
+        data[[length(data)+1]] <- y2
+        names(data)[length(data)] <- "PitchTier"
     }
 
     if (group != "") {  # dygraphs plot-synchronization group
@@ -3883,7 +3905,14 @@ pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = FALSE, group
         g <- dygraphs::dygraph(data, xlab = "Time (sec)")
     }
 
-    g <- dygraphs::dyOptions(g, drawPoints = TRUE, strokeWidth = 0, colors = "black")
+    # g <- dygraphs::dyOptions(g, drawPoints = TRUE, strokeWidth = 0)
+    for (I in seqM(1, pitch$maxnCandidates)) {
+        g <- dygraphs::dySeries(g, paste0("c", I), drawPoints = TRUE, strokeWidth = 0, color = "black")
+    }
+
+    if (!is.null(pt)) {
+        g <- dygraphs::dySeries(g, "PitchTier", drawPoints = TRUE, pointSize = 3, strokeWidth = 0, color = "blue")
+    }
 
     if (showStrength) {
         pArray$strengthArray[is.na(pArray$strengthArray)] <- 0 # or NaN, the value does not matter
@@ -3894,14 +3923,16 @@ pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = FALSE, group
             function(g, name, ctx, canvasx, canvasy, color, radius, index) {
             var c_strength = %s;
             var nc = %d;
-            var cs = c_strength[parseInt(name.substring(1))-1 + index*nc];
-            ctx.fillText(cs, canvasx+7, canvasy);
-            var grey = (10 - cs)*20;
-            var hex = grey.toString(16);
-            hex = (hex.length == 1 ? '0' + hex : hex);
-            color = '#' + hex + hex + hex;
             var radius_str = %s;
-            radius = radius_str[index];
+            if (name != 'PitchTier') {
+                var cs = c_strength[parseInt(name.substring(1))-1 + index*nc];
+                ctx.fillText(cs, canvasx+7, canvasy);
+                var grey = (10 - cs)*20;
+                var hex = grey.toString(16);
+                hex = (hex.length == 1 ? '0' + hex : hex);
+                color = '#' + hex + hex + hex;
+                radius = radius_str[index];
+            }
             return Dygraph.Circles.DEFAULT(g, name, ctx, canvasx, canvasy, color, radius)
             }
             ",
@@ -3913,7 +3944,9 @@ pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = FALSE, group
             "
             function(g, name, ctx, canvasx, canvasy, color, radius, index) {
             var radius_str = %s;
-            radius = radius_str[index];
+            if (name != 'PitchTier') {
+                radius = radius_str[index];
+            }
             return Dygraph.Circles.DEFAULT(g, name, ctx, canvasx, canvasy, color, radius)
             }
             ",

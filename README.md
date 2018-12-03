@@ -67,7 +67,7 @@ What is new
 
 v1.1.3-3 (2018/12/03): formant.toFrame(), pitch.toArray(),
 pitch.toFrame(), pitch.plot(); tg.plot() can plot TextGrid together with
-Pitch object
+Pitch object; pitch.plot() can plot Pitch object together with PitchTier
 
 v1.1.3-2 (2018/10/29): formant.plot(), formant.toArray(); tg.plot() can
 plot TextGrid together with Formant object

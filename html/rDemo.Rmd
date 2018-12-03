@@ -462,6 +462,12 @@ pitch <- pitch.toFrame(pitchArray)
 pitch$frame[[1]]
 ```
 
+## Plot Pitch object with PitchTier together
+```{r}
+pitch.plot(pitch.sample(), pt = pt.sample(), showStrength = TRUE)
+```
+
+
 
 # Formant object
 

@@ -5,7 +5,7 @@
 \title{pitch.plot}
 \usage{
 pitch.plot(pitch, scaleIntensity = TRUE, showStrength = FALSE,
-  group = "")
+  group = "", pt = NULL)
 }
 \arguments{
 \item{pitch}{Pitch object}
@@ -15,6 +15,8 @@ pitch.plot(pitch, scaleIntensity = TRUE, showStrength = FALSE,
 \item{showStrength}{Show strength annotation}
 
 \item{group}{[optional] character string, name of group for dygraphs synchronization}
+
+\item{pt}{[optional] PitchTier object}
 }
 \description{
 Plots interactive Pitch object using dygraphs package.
@@ -23,8 +25,10 @@ Plots interactive Pitch object using dygraphs package.
 \dontrun{
 pitch <- pitch.sample()
 pitch.plot(pitch, scaleIntensity = TRUE, showStrength = TRUE)
+
+pitch.plot(pitch, scaleIntensity = TRUE, showStrength = TRUE, pt = pt.sample())
 }
 }
 \seealso{
-\code{\link{pitch.read}}, \code{\link{pitch.sample}}, \code{\link{pitch.toArray}}, \code{\link{tg.plot}}
+\code{\link{pitch.read}}, \code{\link{pitch.sample}}, \code{\link{pitch.toArray}}, \code{\link{tg.plot}}, \code{\link{pt.plot}}, \code{\link{formant.plot}}
 }
