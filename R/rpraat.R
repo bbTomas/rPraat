@@ -799,9 +799,9 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
         stop("Sorry, tg.plot cannot display Formant together with PitchTier, IntensityTier or Pitch.")
     }
 
-    if (!is.null(pitch) & (!is.null(pt) | !is.null(it) | !is.null(formant))) {
-        stop("Sorry, tg.plot cannot display Pitch together with PitchTier, IntensityTier or Formant")
-    }
+    # if (!is.null(pitch) & (!is.null(pt) | !is.null(it) | !is.null(formant))) {
+    #     stop("Sorry, tg.plot cannot display Pitch together with PitchTier, IntensityTier or Formant")
+    # }
 
     if (ntiers == 0) {
         return(dygraphs::dygraph(list(x = 0, y = NA), main = "Empty TextGrid"))
@@ -850,18 +850,7 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
 
     data <- list(t = tAll)
 
-    if (!is.null(pt)) {
-        y2 <- rep(as.numeric(NA), length(tAll))  ### pt
-        y2[tAll %in% pt$t] <- pt$f
-        data[[length(data)+1]] <- y2
-        names(data)[length(data)] <- "PitchTier"
-    }
-    if (!is.null(it)) {
-        y2 <- rep(as.numeric(NA), length(tAll))  ### it
-        y2[tAll %in% it$t] <- it$i
-        data[[length(data)+1]] <- y2
-        names(data)[length(data)] <- "IntensityTier"
-    }
+
     if (!is.null(formant)) {
         fArray <- formant.toArray(formant)  ### formant
 
@@ -947,6 +936,18 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
             names(data)[length(data)] <- paste0("c", I)
         }
     }
+    if (!is.null(pt)) {
+        y2 <- rep(as.numeric(NA), length(tAll))  ### pt
+        y2[tAll %in% pt$t] <- pt$f
+        data[[length(data)+1]] <- y2
+        names(data)[length(data)] <- "PitchTier"
+    }
+    if (!is.null(it)) {
+        y2 <- rep(as.numeric(NA), length(tAll))  ### it
+        y2[tAll %in% it$t] <- it$i
+        data[[length(data)+1]] <- y2
+        names(data)[length(data)] <- "IntensityTier"
+    }
 
     # create tg tiers
     for (I in seqM(1, ntiers)) {
@@ -1018,29 +1019,30 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
     if (!y2Axis) {
         g <- dygraphs::dyAxis(g, "y", label = "TextGrid", valueRange = c(0, length(tg)+2))
     } else {
-        g <- dygraphs::dyAxis(g, "y", label = "TextGrid", valueRange = c(0, length(tg)*2+2))  # *2
+        g <- dygraphs::dyAxis(g, "y", label = "TextGrid", valueRange = c(0, length(tg)*2+2), independentTicks = TRUE, drawGrid = TRUE, gridLineColor = "white")  # *2
+        # Note: drawGrid = FALSE also turns off y2 grid :-(  Note2: gridLineWidth=0 does not work => the only solution is to set the white color
 
-        if (!is.null(pt) & !is.null(it)) {
+        if (is.null(pitch) & !is.null(pt) & !is.null(it)) {
             y_min <- min(c(pt$f, it$i))
             y_max <- max(c(pt$f, it$i))
             delta <- (y_max - y_min)*4/3
             yMin <- y_min - delta
             yMax <- y_min + delta
-            g <- dygraphs::dyAxis(g, "y2", label = "PitchTier & IntensityTier", independentTicks = TRUE, valueRange = c(yMin, yMax))
-            g <- dygraphs::dySeries(g, "PitchTier", axis = "y2", drawPoints = TRUE, pointSize = 2, strokeWidth = 0)
-            g <- dygraphs::dySeries(g, "IntensityTier", axis = "y2", drawPoints = TRUE, pointSize = 2, strokeWidth = 0)
-        } else if (!is.null(pt)) {
+            g <- dygraphs::dyAxis(g, "y2", label = "PitchTier & IntensityTier", independentTicks = TRUE, valueRange = c(yMin, yMax), drawGrid = TRUE)
+            g <- dygraphs::dySeries(g, "PitchTier", axis = "y2", drawPoints = TRUE, pointSize = 2, strokeWidth = 0, color = "blue")
+            g <- dygraphs::dySeries(g, "IntensityTier", axis = "y2", drawPoints = TRUE, pointSize = 2, strokeWidth = 0, color = "green")
+        } else if (is.null(pitch) & !is.null(pt)) {
             delta <- (max(pt$f)-min(pt$f))*4/3
             yMin <- min(pt$f) - delta
             yMax <- min(pt$f) + delta
-            g <- dygraphs::dyAxis(g, "y2", label = "PitchTier", independentTicks = TRUE, valueRange = c(yMin, yMax))
-            g <- dygraphs::dySeries(g, "PitchTier", axis = "y2", drawPoints = TRUE, pointSize = 2, strokeWidth = 0)
-        } else if (!is.null(it)) {
+            g <- dygraphs::dyAxis(g, "y2", label = "PitchTier", independentTicks = TRUE, valueRange = c(yMin, yMax), drawGrid = TRUE)
+            g <- dygraphs::dySeries(g, "PitchTier", axis = "y2", drawPoints = TRUE, pointSize = 2, strokeWidth = 0, color = "blue")
+        } else if (is.null(pitch) & !is.null(it)) {
             delta <- (max(it$i)-min(it$i))*4/3
             yMin <- min(it$i) - delta
             yMax <- min(it$i) + delta
-            g <- dygraphs::dyAxis(g, "y2", label = "IntensityTier", independentTicks = TRUE, valueRange = c(yMin, yMax))
-            g <- dygraphs::dySeries(g, "IntensityTier", axis = "y2", drawPoints = TRUE, pointSize = 2, strokeWidth = 0)
+            g <- dygraphs::dyAxis(g, "y2", label = "IntensityTier", independentTicks = TRUE, valueRange = c(yMin, yMax), drawGrid = TRUE)
+            g <- dygraphs::dySeries(g, "IntensityTier", axis = "y2", drawPoints = TRUE, pointSize = 2, strokeWidth = 0, color = "green")
         } else if (!is.null(formant)) {
             if (formantDrawBandwidth) {
                 max_f <- max(fArray$frequencyArray + fArray$bandwidthArray/2, na.rm = TRUE)
@@ -1052,7 +1054,7 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
             delta <- (max_f - min_f)*4/3
             yMin <- min_f - delta
             yMax <- min_f + delta
-            g <- dygraphs::dyAxis(g, "y2", label = "Formant", independentTicks = TRUE, valueRange = c(yMin, yMax))
+            g <- dygraphs::dyAxis(g, "y2", label = "Formant", independentTicks = TRUE, valueRange = c(yMin, yMax), drawGrid = TRUE)
 
             for (I in seqM(1, formant$maxnFormants)) {
                 if (!formantDrawBandwidth) {
@@ -1076,13 +1078,38 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
             max_f <- max(pArray$frequencyArray, na.rm = TRUE)
             min_f <- min(pArray$frequencyArray, na.rm = TRUE)
 
+            if (!is.null(pt)) {
+                max_f <- max(max_f, max(pt$f))
+                min_f <- min(min_f, min(pt$f))
+            }
+            if (!is.null(it)) {
+                max_f <- max(max_f, max(it$i))
+                min_f <- min(min_f, min(it$i))
+            }
+
             delta <- (max_f - min_f)*4/3
             yMin <- min_f - delta
             yMax <- min_f + delta
-            g <- dygraphs::dyAxis(g, "y2", label = "Pitch", independentTicks = TRUE, valueRange = c(yMin, yMax))
+
+            lbl <- "Pitch"
+            if (!is.null(pt)) {
+                lbl <- paste0(lbl, " & PitchTier")
+            }
+            if (!is.null(it)) {
+                lbl <- paste0(lbl, " & IntensityTier")
+            }
+
+            g <- dygraphs::dyAxis(g, "y2", label = lbl, independentTicks = TRUE, valueRange = c(yMin, yMax), drawGrid = TRUE) # @@
 
             for (I in seqM(1, pitch$maxnCandidates)) {
                 g <- dygraphs::dySeries(g, paste0("c", I), axis = "y2", drawPoints = TRUE, strokeWidth = 0, color = "black")
+            }
+
+            if (!is.null(pt)) {
+                g <- dygraphs::dySeries(g, "PitchTier", axis = "y2", drawPoints = TRUE, pointSize = 3, strokeWidth = 0, color = "blue")
+            }
+            if (!is.null(it)) {
+                g <- dygraphs::dySeries(g, "IntensityTier", axis = "y2", drawPoints = TRUE, pointSize = 3, strokeWidth = 0, color = "green")
             }
 
             if (!pitchShowStrength) {
@@ -1090,7 +1117,9 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
                     "
                     function(g, name, ctx, canvasx, canvasy, color, radius, index) {
                     var radius_str = %s;
-                    radius = radius_str[index];
+                    if (name != 'PitchTier' &&  name != 'IntensityTier') {
+                        radius = radius_str[index];
+                    }
                     return Dygraph.Circles.DEFAULT(g, name, ctx, canvasx, canvasy, color, radius)
                     }
                     ",
@@ -1109,14 +1138,16 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
                     function(g, name, ctx, canvasx, canvasy, color, radius, index) {
                     var c_strength = %s;
                     var nc = %d;
-                    var cs = c_strength[parseInt(name.substring(1))-1 + index*nc];
-                    ctx.fillText(cs, canvasx+7, canvasy);
-                    var grey = (10 - cs)*20;
-                    var hex = grey.toString(16);
-                    hex = (hex.length == 1 ? '0' + hex : hex);
-                    color = '#' + hex + hex + hex;
                     var radius_str = %s;
-                    radius = radius_str[index];
+                    if (name != 'PitchTier' &&  name != 'IntensityTier') {
+                        var cs = c_strength[parseInt(name.substring(1))-1 + index*nc];
+                        ctx.fillText(cs, canvasx+7, canvasy);
+                        var grey = (10 - cs)*20;
+                        var hex = grey.toString(16);
+                        hex = (hex.length == 1 ? '0' + hex : hex);
+                        color = '#' + hex + hex + hex;
+                        radius = radius_str[index];
+                    }
                     return Dygraph.Circles.DEFAULT(g, name, ctx, canvasx, canvasy, color, radius)
                     }
                     ",
@@ -3814,16 +3845,19 @@ normIntensity <- function(intensity, minValue = 1, maxValue = 9) {
 #' @param scaleIntensity Point size scaled according to relative intensity
 #' @param showStrength Show strength annotation
 #' @param group [optional] character string, name of group for dygraphs synchronization
+#' @param pt [optional] PitchTier object
 #'
 #' @export
-#' @seealso \code{\link{pitch.read}}, \code{\link{pitch.sample}}, \code{\link{pitch.toArray}}, \code{\link{tg.plot}}
+#' @seealso \code{\link{pitch.read}}, \code{\link{pitch.sample}}, \code{\link{pitch.toArray}}, \code{\link{tg.plot}}, \code{\link{pt.plot}}, \code{\link{formant.plot}}
 #'
 #' @examples
 #' \dontrun{
 #' pitch <- pitch.sample()
 #' pitch.plot(pitch, scaleIntensity = TRUE, showStrength = TRUE)
+#'
+#' pitch.plot(pitch, scaleIntensity = TRUE, showStrength = TRUE, pt = pt.sample())
 #' }
-pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = FALSE, group = "") {
+pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = FALSE, group = "", pt = NULL) {
     pArray <- pitch.toArray(pitch)
 
     if (scaleIntensity) {
@@ -4534,7 +4568,7 @@ pt.write <- function(pt, fileNamePitchTier, format = "spreadsheet") {
 #' @param group [optional] character string, name of group for dygraphs synchronization
 #'
 #' @export
-#' @seealso \code{\link{pt.read}}, \code{\link{tg.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.interpolate}}, \code{\link{pt.write}}
+#' @seealso \code{\link{pt.read}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.interpolate}}, \code{\link{pt.write}}, \code{\link{tg.plot}}, \code{\link{pitch.plot}}, \code{\link{formant.plot}}
 #'
 #' @examples
 #' \dontrun{

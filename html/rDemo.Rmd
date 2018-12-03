@@ -120,7 +120,7 @@ tg.plot(tg.sample(), pt = pt.sample(), it = it.sample())
 
 tg.plot(tg.sample(), formant = formant.sample())
 
-tg.plot(tg.sample(), pitch = pitch.sample(), pitchShowStrength = TRUE)
+tg.plot(tg.sample(), pitch = pitch.sample(), pitchShowStrength = TRUE, pt = pt.sample())
 ```
 
 
