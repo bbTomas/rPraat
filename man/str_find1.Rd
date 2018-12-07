@@ -12,7 +12,7 @@ str_find1(string, patternNoRegex)
 \item{patternNoRegex}{string we want to find, "as it is" - no regular exprressions}
 }
 \value{
-index of the first occurence only (1 = 1st character)
+index of the first occurence only (\code{1} = 1st character)
 }
 \description{
 Find string in another string (without regular expressions), returns indices of the first occurence only.

@@ -16,7 +16,7 @@ returns a character string with removed leading and trailing whitespace characte
 Trim leading and trailing whitespace in character string.
 }
 \details{
-Like str_trim() in stringr package or trimws() in R3.2.0 but way faster.
+Like \code{str_trim()} in \code{stringr} package or \code{trimws()} in R3.2.0 but way faster.
 
 Source: Hadley Wickham comment at http://stackoverflow.com/questions/2261079/how-to-trim-leading-and-trailing-whitespace-in-r
 }

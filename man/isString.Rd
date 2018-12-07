@@ -10,10 +10,10 @@ isString(string)
 \item{string}{variable to be tested}
 }
 \value{
-TRUE / FALSE
+\code{TRUE} / \code{FALSE}
 }
 \description{
-Returns TRUE / FALSE whether it is exactly 1 character string (character vector of length 1, non-missing)
+Returns \code{TRUE} / \code{FALSE} whether it is exactly 1 character string (character vector of length 1, non-missing)
 }
 \examples{
 isString("hello")

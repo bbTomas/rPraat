@@ -12,10 +12,10 @@ str_contains(string, patternNoRegex)
 \item{patternNoRegex}{string we want to find, "as it is" - no regular exprressions}
 }
 \value{
-TRUE / FALSE
+\code{TRUE} / \code{FALSE}
 }
 \description{
-Find string in another string (without regular expressions), returns TRUE / FALSE.
+Find string in another string (without regular expressions), returns \code{TRUE} / \code{FALSE}.
 }
 \examples{
 str_contains("Hello world", "wor")  # TRUE

@@ -16,7 +16,7 @@ output vector of the same length as the input vector
 Inverse Fast Fourier Transform (discrete FT), Matlab-like behavior.
 }
 \details{
-This is really the inverse of the fft function, so ifft(fft(x)) == x.
+This really is the inverse of the fft function, so \code{ifft(fft(x)) == x}.
 }
 \examples{
 ifft(fft(1:5))

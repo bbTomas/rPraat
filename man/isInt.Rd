@@ -10,10 +10,10 @@ isInt(num)
 \item{num}{variable to be tested}
 }
 \value{
-TRUE / FALSE
+\code{TRUE} / \code{FALSE}
 }
 \description{
-Returns TRUE / FALSE whether it is exactly 1 integer number (in fact, the class can be numeric but the number must be integer), non-missing
+Returns \code{TRUE} / \code{FALSE} whether it is exactly 1 integer number (in fact, the class can be numeric but the number must be integer), non-missing
 }
 \examples{
 isInt(2)

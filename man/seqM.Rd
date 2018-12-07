@@ -24,8 +24,8 @@ Matlab-like behaviour of colon operator or linspace for creating sequences, for-
 \details{
 Like \code{seq()} but with Matlab-like behavior ([: operator] with \code{by} or [linspace] with \code{length.out}).
 
-If I create a for-loop, I would like to get an empty vector for 3:1 (I want a default step +1)
-and also an empty vector for seq(3, 1, by = 1) (not an error). This is solved by this \code{seqM} function.
+If I create a for-loop, I would like to get an empty vector for \code{3:1} (I want a default step +1)
+and also an empty vector for \code{seq(3, 1, by = 1)} (not an error). This is solved by this \code{seqM} function.
 }
 \section{Comparison}{
 
