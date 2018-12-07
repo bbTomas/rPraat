@@ -295,7 +295,12 @@ pitch.toFrame <- function(pitchArray) {
 #' pitch.plot(pitch, scaleIntensity = TRUE, showStrength = TRUE, pt = pt.sample())
 #' }
 pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = FALSE, group = "", pt = NULL) {
-    pArray <- pitch.toArray(pitch)
+    if (!("frame" %in% names(pitch))) {
+        pArray <- pitch
+    } else {
+        pArray <- pitch.toArray(pitch)
+    }
+
 
     if (scaleIntensity) {
         intensityNorm <- normIntensity(pArray$intensityVector, 0.5, 6)
@@ -395,6 +400,192 @@ pitch.plot <- function(pitch, scaleIntensity = TRUE, showStrength = FALSE, group
     g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
     g
 }
+
+
+#' pitch.cut
+#'
+#' Cut the specified interval from the Pitch object and preserve time
+#'
+#' @param pitch Pitch object (either in Frame or Array format)
+#' @param tStart beginning time of interval to be cut (default \code{-Inf} = cut from the \code{xmin} of the Pitch)
+#' @param tEnd final time of interval to be cut (default \code{Inf} = cut to the \code{xmax} of the Pitch)
+#'
+#' @return Pitch object
+#' @export
+#' @seealso \code{\link{pitch.cut0}}, \code{\link{tg.cut}}, \code{\link{tg.cut0}}, \code{\link{pitch.read}}, \code{\link{pitch.plot}}
+#'
+#' @examples
+#' pitch <- pitch.sample()
+#' pitch2 <-   pitch.cut(pitch,  tStart = 3)
+#' pitch2_0 <- pitch.cut0(pitch, tStart = 3)
+#' pitch3 <-   pitch.cut(pitch,  tStart = 2, tEnd = 3)
+#' pitch3_0 <- pitch.cut0(pitch, tStart = 2, tEnd = 3)
+#' pitch4 <-   pitch.cut(pitch,  tEnd = 1)
+#' pitch4_0 <- pitch.cut0(pitch, tEnd = 1)
+#' pitch5 <-   pitch.cut(pitch,  tStart = -1, tEnd = 1)
+#' pitch5_0 <- pitch.cut0(pitch, tStart = -1, tEnd = 1)
+#' \dontrun{
+#' pitch.plot(pitch)
+#' pitch.plot(pitch2)
+#' pitch.plot(pitch2_0)
+#' pitch.plot(pitch3)
+#' pitch.plot(pitch3_0)
+#' pitch.plot(pitch4)
+#' pitch.plot(pitch4_0)
+#' pitch.plot(pitch5)
+#' pitch.plot(pitch5_0)
+#' }
+pitch.cut <- function(pitch, tStart = -Inf, tEnd = Inf) {
+    if (!isNum(tStart)) {
+        stop("tStart must be a number.")
+    }
+    if (!isNum(tEnd)) {
+        stop("tEnd must be a number.")
+    }
+    if (is.infinite(tStart) & tStart>0) {
+        stop("infinite tStart can be negative only")
+    }
+    if (is.infinite(tEnd) & tEnd<0) {
+        stop("infinite tEnd can be positive only")
+    }
+    if (tEnd < tStart) {
+        stop("tEnd must be >= tStart")
+    }
+
+    formatFrame <- TRUE
+    if (!("frame" %in% names(pitch))) {
+        formatFrame <- FALSE
+        pitch <- pitch.toFrame(pitch)
+        pitch2 <- pitch
+    } else {
+        pitch2 <- pitch
+    }
+
+    pitch2$t <- pitch$t[pitch$t >= tStart  &  pitch$t <= tEnd]
+    pitch2$frame <- pitch$frame[pitch$t >= tStart  &  pitch$t <= tEnd]
+
+    if (is.infinite(tStart)) {
+        pitch2$xmin <- pitch$xmin
+    } else {
+        pitch2$xmin <- tStart
+    }
+
+    if (is.infinite(tEnd)) {
+        pitch2$xmax <- pitch$xmax
+    } else {
+        pitch2$xmax <- tEnd
+    }
+
+    pitch2$nx <- length(pitch2$t)
+
+    if (pitch2$nx >= 1) {
+        pitch2$x1 <- pitch2$t[1]
+    } else {
+        pitch2$x1 <- pitch2$xmin
+    }
+
+    if (!formatFrame) {
+        return(pitch.toArray(pitch2))
+    } else {
+        return(pitch2)
+    }
+}
+
+
+#' pitch.cut0
+#'
+#' Cut the specified interval from the Pitch object and shift time so that the new \code{xmin} = 0
+#'
+#' @param pitch Pitch object (either in Frame or Array format)
+#' @param tStart beginning time of interval to be cut (default \code{-Inf} = cut from the \code{xmin} of the Pitch)
+#' @param tEnd final time of interval to be cut (default \code{Inf} = cut to the \code{xmax} of the Pitch)
+#'
+#' @return Pitch object
+#' @export
+#' @seealso \code{\link{pitch.cut}}, \code{\link{tg.cut}}, \code{\link{tg.cut0}}, \code{\link{pitch.read}}, \code{\link{pitch.plot}}
+#'
+#' @examples
+#' pitch <- pitch.sample()
+#' pitch2 <-   pitch.cut(pitch,  tStart = 3)
+#' pitch2_0 <- pitch.cut0(pitch, tStart = 3)
+#' pitch3 <-   pitch.cut(pitch,  tStart = 2, tEnd = 3)
+#' pitch3_0 <- pitch.cut0(pitch, tStart = 2, tEnd = 3)
+#' pitch4 <-   pitch.cut(pitch,  tEnd = 1)
+#' pitch4_0 <- pitch.cut0(pitch, tEnd = 1)
+#' pitch5 <-   pitch.cut(pitch,  tStart = -1, tEnd = 1)
+#' pitch5_0 <- pitch.cut0(pitch, tStart = -1, tEnd = 1)
+#' \dontrun{
+#' pitch.plot(pitch)
+#' pitch.plot(pitch2)
+#' pitch.plot(pitch2_0)
+#' pitch.plot(pitch3)
+#' pitch.plot(pitch3_0)
+#' pitch.plot(pitch4)
+#' pitch.plot(pitch4_0)
+#' pitch.plot(pitch5)
+#' pitch.plot(pitch5_0)
+#' }
+pitch.cut0 <- function(pitch, tStart = -Inf, tEnd = Inf) {
+    if (!isNum(tStart)) {
+        stop("tStart must be a number.")
+    }
+    if (!isNum(tEnd)) {
+        stop("tEnd must be a number.")
+    }
+    if (is.infinite(tStart) & tStart>0) {
+        stop("infinite tStart can be negative only")
+    }
+    if (is.infinite(tEnd) & tEnd<0) {
+        stop("infinite tEnd can be positive only")
+    }
+    if (tEnd < tStart) {
+        stop("tEnd must be >= tStart")
+    }
+
+    formatFrame <- TRUE
+    if (!("frame" %in% names(pitch))) {
+        formatFrame <- FALSE
+        pitch <- pitch.toFrame(pitch)
+        pitch2 <- pitch
+    } else {
+        pitch2 <- pitch
+    }
+
+    pitch2$t <- pitch$t[pitch$t >= tStart  &  pitch$t <= tEnd]
+    pitch2$frame <- pitch$frame[pitch$t >= tStart  &  pitch$t <= tEnd]
+
+    if (is.infinite(tStart)) {
+        pitch2$xmin <- pitch$xmin
+    } else {
+        pitch2$xmin <- tStart
+    }
+
+    if (is.infinite(tEnd)) {
+        pitch2$xmax <- pitch$xmax
+    } else {
+        pitch2$xmax <- tEnd
+    }
+
+    pitch2$t <- pitch2$t - pitch2$xmin
+    pitch2$xmax <- pitch2$xmax - pitch2$xmin
+    pitch2$xmin <- 0
+
+    pitch2$nx <- length(pitch2$t)
+
+    if (pitch2$nx >= 1) {
+        pitch2$x1 <- pitch2$t[1]
+    } else {
+        pitch2$x1 <- pitch2$xmin
+    }
+
+    if (!formatFrame) {
+        return(pitch.toArray(pitch2))
+    } else {
+        return(pitch2)
+    }
+}
+
+
 
 #' as.pitch
 #'

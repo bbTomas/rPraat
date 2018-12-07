@@ -290,7 +290,12 @@ formant.toFrame <- function(formantArray) {
 #' formant.plot(formant, drawBandwidth = TRUE)
 #' }
 formant.plot <- function(formant, scaleIntensity = TRUE, drawBandwidth = TRUE, group = "") {
-    fArray <- formant.toArray(formant)
+    if (!("frame" %in% names(formant))) {
+        fArray <- formant
+    } else {
+        fArray <- formant.toArray(formant)
+    }
+
 
     if (scaleIntensity) {
         intensityNorm <- normIntensity(fArray$intensityVector, 1, 6)  # minimum, maximum radius
@@ -343,6 +348,191 @@ formant.plot <- function(formant, scaleIntensity = TRUE, drawBandwidth = TRUE, g
     g <- dygraphs::dyAxis(g, "x", valueFormatter = "function(d){return d.toFixed(3)}")
     g
 }
+
+#' formant.cut
+#'
+#' Cut the specified interval from the Formant object and preserve time
+#'
+#' @param formant Formant object (either in Frame or Array format)
+#' @param tStart beginning time of interval to be cut (default \code{-Inf} = cut from the \code{xmin} of the Formant)
+#' @param tEnd final time of interval to be cut (default \code{Inf} = cut to the \code{xmax} of the Formant)
+#'
+#' @return Formant object
+#' @export
+#' @seealso \code{\link{formant.cut0}}, \code{\link{tg.cut}}, \code{\link{tg.cut0}}, \code{\link{formant.read}}, \code{\link{formant.plot}}
+#'
+#' @examples
+#' formant <- formant.sample()
+#' formant2 <-   formant.cut(formant,  tStart = 3)
+#' formant2_0 <- formant.cut0(formant, tStart = 3)
+#' formant3 <-   formant.cut(formant,  tStart = 2, tEnd = 3)
+#' formant3_0 <- formant.cut0(formant, tStart = 2, tEnd = 3)
+#' formant4 <-   formant.cut(formant,  tEnd = 1)
+#' formant4_0 <- formant.cut0(formant, tEnd = 1)
+#' formant5 <-   formant.cut(formant,  tStart = -1, tEnd = 1)
+#' formant5_0 <- formant.cut0(formant, tStart = -1, tEnd = 1)
+#' \dontrun{
+#' formant.plot(formant)
+#' formant.plot(formant2)
+#' formant.plot(formant2_0)
+#' formant.plot(formant3)
+#' formant.plot(formant3_0)
+#' formant.plot(formant4)
+#' formant.plot(formant4_0)
+#' formant.plot(formant5)
+#' formant.plot(formant5_0)
+#' }
+formant.cut <- function(formant, tStart = -Inf, tEnd = Inf) {
+    if (!isNum(tStart)) {
+        stop("tStart must be a number.")
+    }
+    if (!isNum(tEnd)) {
+        stop("tEnd must be a number.")
+    }
+    if (is.infinite(tStart) & tStart>0) {
+        stop("infinite tStart can be negative only")
+    }
+    if (is.infinite(tEnd) & tEnd<0) {
+        stop("infinite tEnd can be positive only")
+    }
+    if (tEnd < tStart) {
+        stop("tEnd must be >= tStart")
+    }
+
+    formatFrame <- TRUE
+    if (!("frame" %in% names(formant))) {
+        formatFrame <- FALSE
+        formant <- formant.toFrame(formant)
+        formant2 <- formant
+    } else {
+        formant2 <- formant
+    }
+
+    formant2$t <- formant$t[formant$t >= tStart  &  formant$t <= tEnd]
+    formant2$frame <- formant$frame[formant$t >= tStart  &  formant$t <= tEnd]
+
+    if (is.infinite(tStart)) {
+        formant2$xmin <- formant$xmin
+    } else {
+        formant2$xmin <- tStart
+    }
+
+    if (is.infinite(tEnd)) {
+        formant2$xmax <- formant$xmax
+    } else {
+        formant2$xmax <- tEnd
+    }
+
+    formant2$nx <- length(formant2$t)
+
+    if (formant2$nx >= 1) {
+        formant2$x1 <- formant2$t[1]
+    } else {
+        formant2$x1 <- formant2$xmin
+    }
+
+    if (!formatFrame) {
+        return(formant.toArray(formant2))
+    } else {
+        return(formant2)
+    }
+}
+
+
+#' formant.cut0
+#'
+#' Cut the specified interval from the Formant object and shift time so that the new \code{xmin} = 0
+#'
+#' @param formant Formant object (either in Frame or Array format)
+#' @param tStart beginning time of interval to be cut (default \code{-Inf} = cut from the \code{xmin} of the Formant)
+#' @param tEnd final time of interval to be cut (default \code{Inf} = cut to the \code{xmax} of the Formant)
+#'
+#' @return Formant object
+#' @export
+#' @seealso \code{\link{formant.cut}}, \code{\link{tg.cut}}, \code{\link{tg.cut0}}, \code{\link{formant.read}}, \code{\link{formant.plot}}
+#'
+#' @examples
+#' formant <- formant.sample()
+#' formant2 <-   formant.cut(formant,  tStart = 3)
+#' formant2_0 <- formant.cut0(formant, tStart = 3)
+#' formant3 <-   formant.cut(formant,  tStart = 2, tEnd = 3)
+#' formant3_0 <- formant.cut0(formant, tStart = 2, tEnd = 3)
+#' formant4 <-   formant.cut(formant,  tEnd = 1)
+#' formant4_0 <- formant.cut0(formant, tEnd = 1)
+#' formant5 <-   formant.cut(formant,  tStart = -1, tEnd = 1)
+#' formant5_0 <- formant.cut0(formant, tStart = -1, tEnd = 1)
+#' \dontrun{
+#' formant.plot(formant)
+#' formant.plot(formant2)
+#' formant.plot(formant2_0)
+#' formant.plot(formant3)
+#' formant.plot(formant3_0)
+#' formant.plot(formant4)
+#' formant.plot(formant4_0)
+#' formant.plot(formant5)
+#' formant.plot(formant5_0)
+#' }
+formant.cut0 <- function(formant, tStart = -Inf, tEnd = Inf) {
+    if (!isNum(tStart)) {
+        stop("tStart must be a number.")
+    }
+    if (!isNum(tEnd)) {
+        stop("tEnd must be a number.")
+    }
+    if (is.infinite(tStart) & tStart>0) {
+        stop("infinite tStart can be negative only")
+    }
+    if (is.infinite(tEnd) & tEnd<0) {
+        stop("infinite tEnd can be positive only")
+    }
+    if (tEnd < tStart) {
+        stop("tEnd must be >= tStart")
+    }
+
+    formatFrame <- TRUE
+    if (!("frame" %in% names(formant))) {
+        formatFrame <- FALSE
+        formant <- formant.toFrame(formant)
+        formant2 <- formant
+    } else {
+        formant2 <- formant
+    }
+
+    formant2$t <- formant$t[formant$t >= tStart  &  formant$t <= tEnd]
+    formant2$frame <- formant$frame[formant$t >= tStart  &  formant$t <= tEnd]
+
+    if (is.infinite(tStart)) {
+        formant2$xmin <- formant$xmin
+    } else {
+        formant2$xmin <- tStart
+    }
+
+    if (is.infinite(tEnd)) {
+        formant2$xmax <- formant$xmax
+    } else {
+        formant2$xmax <- tEnd
+    }
+
+    formant2$t <- formant2$t - formant2$xmin
+    formant2$xmax <- formant2$xmax - formant2$xmin
+    formant2$xmin <- 0
+
+    formant2$nx <- length(formant2$t)
+
+    if (formant2$nx >= 1) {
+        formant2$x1 <- formant2$t[1]
+    } else {
+        formant2$x1 <- formant2$xmin
+    }
+
+    if (!formatFrame) {
+        return(formant.toArray(formant2))
+    } else {
+        return(formant2)
+    }
+}
+
+
 
 #' as.formant
 #'
