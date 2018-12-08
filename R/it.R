@@ -132,6 +132,10 @@ it.read_lines <- function(flines, find = 1, collection = FALSE) {
 #' it.write(it, "demo/intensity.IntensityTier")
 #' }
 it.write <- function(it, fileNameIntensityTier, format = "short") {
+    it.write0(it, fileNameIntensityTier, format)
+}
+
+it.write0 <- function(it, fileNameIntensityTier, format = "short", fid = NULL, collection = FALSE) {
     if (!isString(fileNameIntensityTier)) {
         stop("Invalid 'fileNameIntensityTier' parameter.")
     }
@@ -168,15 +172,19 @@ it.write <- function(it, fileNameIntensityTier, format = "short") {
     }
 
 
-    fid <- file(fileNameIntensityTier, open = "wb", encoding = "UTF-8")
-    if (!isOpen(fid)) {
-        stop(paste0("cannot open file [", fileNameIntensityTier, "]"))
+    if (!collection) {
+        fid <- file(fileNameIntensityTier, open = "wb", encoding = "UTF-8")
+        if (!isOpen(fid)) {
+            stop(paste0("cannot open file [", fileNameIntensityTier, "]"))
+        }
     }
 
-    if (format == "short" || format == "text") {
-        wrLine('File type = "ooTextFile"', fid)
-        wrLine('Object class = "IntensityTier"', fid)
-        wrLine('', fid)
+    if (!collection) {
+        if (format == "short" || format == "text") {
+            wrLine('File type = "ooTextFile"', fid)
+            wrLine('Object class = "IntensityTier"', fid)
+            wrLine('', fid)
+        }
     }
 
     if (format == "short") {
@@ -184,9 +192,9 @@ it.write <- function(it, fileNameIntensityTier, format = "short") {
         wrLine(as.character(round2(xmax, -15)), fid)
         wrLine(as.character(N), fid)
     } else if (format == "text") {
-        wrLine(paste0("xmin = ", as.character(round2(xmin, -15)), " "), fid)
-        wrLine(paste0("xmax = ", as.character(round2(xmax, -15)), " "), fid)
-        wrLine(paste0("points: size = ", as.character(N), " "), fid)
+        wrLine(paste0("xmin = ", as.character(round2(xmin, -15)), " "), fid, collection)
+        wrLine(paste0("xmax = ", as.character(round2(xmax, -15)), " "), fid, collection)
+        wrLine(paste0("points: size = ", as.character(N), " "), fid, collection)
     }
 
     for (n in seqM(1, N)) {
@@ -194,13 +202,15 @@ it.write <- function(it, fileNameIntensityTier, format = "short") {
             wrLine(as.character(round2(it$t[n], -15)), fid)
             wrLine(as.character(round2(it$i[n], -15)), fid)
         } else if (format == "text") {
-            wrLine(paste0("points [", as.character(n), "]:"), fid)
-            wrLine(paste0("    number = ", as.character(round2(it$t[n], -15)), " "), fid)
-            wrLine(paste0("    value = ", as.character(round2(it$i[n], -15)), " "), fid)
+            wrLine(paste0("points [", as.character(n), "]:"), fid, collection)
+            wrLine(paste0("    number = ", as.character(round2(it$t[n], -15)), " "), fid, collection)
+            wrLine(paste0("    value = ", as.character(round2(it$i[n], -15)), " "), fid, collection)
         }
     }
 
-    close(fid)
+    if (!collection) {
+        close(fid)
+    }
 }
 
 

@@ -43,9 +43,13 @@ detectEncoding <- function(fileName) {
 #
 # @param string Text line.
 # @param fid A connection object.
+# @param collectionFullText If TRUE, add extra 8 spaces at the beginning of the string
 #
 # @return a raw vector (if fid is a raw vector) or invisibly NULL.
-wrLine <- function(string, fid) {
+wrLine <- function(string, fid, collectionFullText = FALSE) {
+    if (collectionFullText) {
+        writeBin(charToRaw("        "), fid, endian = "little")
+    }
     writeBin(c(charToRaw(string), as.raw(c(13, 10))), fid, endian = "little")
 }
 

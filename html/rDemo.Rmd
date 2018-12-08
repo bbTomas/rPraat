@@ -504,16 +504,22 @@ lines(ptLeg$t, ptLeg$f, col = "blue")
 
 In addition to PitchTier, a Pitch object represents periodicity candidates as a function of time.
 
-## Read Pitch, get strengths and frequencies of F0 candidates
+## Read, write and plot Pitch, get strengths and frequencies of F0 candidates
 ```{r}
-p <- pitch.read('demo/H.Pitch')
+p <- pitch.read("demo/H.Pitch")
 names(p)
 p$nx          # get number of frames
 p$t[5]        # time instance of the 5th frame
 p$frame[[5]]  # 5th frame: pitch candidates
 p$frame[[5]]$frequency[2]
 p$frame[[5]]$strength[2]
+```
 
+```{r}
+pitch.write(p, "demo/temp.Pitch")
+```
+
+```{r}
 pitch.plot(p, scaleIntensity = TRUE, showStrength = TRUE)
 ```
 
@@ -541,17 +547,23 @@ pitch.plot(pitch, showStrength = TRUE)
 # Formant object
 
 
-## Read and plot Formant object with bandwidths and intensity scale
+## Read, write and plot Formant object with bandwidths and intensity scale
 A Formant object represents formant frequencies and bandwidths as a function of time.
 ```{r}
-f <- formant.read('demo/maminka.Formant')
+f <- formant.read("demo/maminka.Formant")
 names(f)
 f$nx     # get number of frames
 f$t[4]        # time instance of the 4th frame
 f$frame[[4]]  # 4th frame: formants
 f$frame[[4]]$frequency[2]
 f$frame[[4]]$bandwidth[2]
+```
 
+```{r}
+formant.write(f, "demo/temp.Formant")
+```
+
+```{r}
 formant.plot(f, scaleIntensity = TRUE, drawBandwidth = TRUE)
 ```
 
@@ -609,7 +621,7 @@ lines(itLeg$t, itLeg$i, col = "blue")
 
 With col.read() function, it is convenient to read a lot of objects stored in one .Collection file.
 
-## Read Collection and get number of objects
+## Read Collection from file and get number of objects
 ```{r}
 coll <- col.read("demo/coll_text.Collection")
 length(coll)  # number of objects in collection
@@ -638,7 +650,7 @@ tg.plot(tg)
 ```
 
 ### 3rd object: Pitch "sound_short"
-```{r}
+```{r, fig.height=3.5}
 class(coll[[3]])["type"]  # 3rd object type
 class(coll[[3]])["name"]  # 3rd object type
 pitch <- coll[[3]]  # 3rd object
@@ -648,6 +660,8 @@ pitch$t[4]        # time instance of the 4th frame
 pitch$frame[[4]]  # 4th frame: pitch candidates
 pitch$frame[[4]]$frequency[2]
 pitch$frame[[4]]$strength[2]
+
+pitch.plot(pitch, showStrength = TRUE)
 ```
 
 ### 4th object: PitchTier "H_shortTextFile"
@@ -674,10 +688,18 @@ formant$frame[[4]]$bandwidth[2]
 formant.plot(formant)
 ```
 
+## Write Collection to file
+
+```{r}
+col <- list(as.tg(tg.sample(), "My textgrid"), as.pt(pt.sample(), "My PitchTier 1"),
+       as.pt(pt.Hz2ST(pt.sample()), "My PitchTier 2"), as.it(it.sample(), "My IntensityTier"),
+       as.pitch(pitch.sample(), "My Pitch"), as.formant(formant.sample(), "My Formant"))
+col.write(col, "demo/temp.Collection")
+```
 
 
 
-# Process all files in selected folder
+# Process all files in folder
 
 ```{R, eval = FALSE}
 inputFolder <- "experiment1/data"

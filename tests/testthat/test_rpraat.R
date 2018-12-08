@@ -98,24 +98,24 @@ test_that("pt.write", {
         pt.write(pt, f, "short")
         pt2 <- as.pt(pt.read(f), "Hround.PitchTier")
         unlink(f)
-        identical(pt, pt2)
-    }, TRUE)
+        pt
+    }, pt2)
     expect_equal({
         pt <- pt.read("Hround.PitchTier")
         f <- tempfile()
         pt.write(pt, f, "text")
         pt2 <- as.pt(pt.read(f), "Hround.PitchTier")
         unlink(f)
-        identical(pt, pt2)
-    }, TRUE)
+        pt
+    }, pt2)
     expect_equal({
         pt <- pt.read("Hround.PitchTier")
         f <- tempfile()
         pt.write(pt, f, "spreadsheet")
         pt2 <- as.pt(pt.read(f), "Hround.PitchTier")
         unlink(f)
-        identical(pt, pt2)
-    }, TRUE)
+        pt
+    }, pt2)
 })
 
 test_that("pt.Hz2ST", {
@@ -389,8 +389,8 @@ test_that("snd.write", {
         snd.write(snd, f)
         snd2 <- as.snd(snd.read(f), "H.wav")
         unlink(f)
-        identical(snd, snd2)
-    }, TRUE)
+        snd
+    }, snd2)
 })
 
 
@@ -758,8 +758,8 @@ test_that("tg.write", {
         tg.write(tg, f, format = "text")
         tg2 <- as.tg(tg.read(f), "2pr.TextGrid")
         unlink(f)
-        identical(tg, tg2)
-    }, TRUE)
+        tg
+    }, tg2)
     expect_equal({
         tg <- tg.createNewTextGrid(0, 3)
         tg <- tg.insertNewIntervalTier(tg, 1, "word")
@@ -776,8 +776,8 @@ test_that("tg.write", {
         tg.write(tg, f, format = "short")
         tg2 <- as.tg(tg.read(f), "2pr.TextGrid")
         unlink(f)
-        identical(tg, tg2)
-    }, TRUE)
+        tg
+    }, tg2)
 })
 
 
@@ -1296,6 +1296,25 @@ test_that("pitch.read", {
     }, c(TRUE, TRUE))
 })
 
+test_that("pitch.write", {
+    expect_equal({
+        pitch <- pitch.read("sound.Pitch")
+        f <- tempfile()
+        pitch.write(pitch, f, "short")
+        pitch2 <- as.pitch(pitch.read(f), "sound.Pitch")
+        unlink(f)
+        pitch
+    }, pitch2)
+    expect_equal({
+        pitch <- pitch.read("sound.Pitch")
+        f <- tempfile()
+        pitch.write(pitch, f, "text")
+        pitch2 <- as.pitch(pitch.read(f), "sound.Pitch")
+        unlink(f)
+        pitch
+    }, pitch2)
+})
+
 test_that("pitch.toArray", {
     expect_equal({
         p <- pitch.sample()
@@ -1460,6 +1479,26 @@ test_that("formant.read", {
         c(identical(f, f2), identical(f, f3))
     }, c(TRUE, TRUE))
 })
+
+test_that("formant.write", {
+    expect_equal({
+        formant <- formant.read("maminka.Formant")
+        f <- tempfile()
+        formant.write(formant, f, "short")
+        formant2 <- as.formant(formant.read(f), "maminka.Formant")
+        unlink(f)
+        formant
+    }, formant2)
+    expect_equal({
+        formant <- formant.read("maminka.Formant")
+        f <- tempfile()
+        formant.write(formant, f, "text")
+        formant2 <- as.formant(formant.read(f), "maminka.Formant")
+        unlink(f)
+        formant
+    }, formant2)
+})
+
 
 test_that("formant.toArray", {
     expect_equal({
@@ -1638,6 +1677,26 @@ test_that("col.read", {
         c(identical(c1, c2),
           identical(c2, c3))
     }, c(TRUE, TRUE))
+})
+
+test_that("col.write", {
+    expect_equal({
+        col <- col.read("coll_text.Collection")
+        f <- tempfile()
+        col.write(col, f, "short")
+        col2 <- col.read(f)
+        unlink(f)
+        col
+    }, col2)
+
+    expect_equal({
+        col <- col.read("coll_text.Collection")
+        f <- tempfile()
+        col.write(col, f, "text")
+        col2 <- col.read(f)
+        unlink(f)
+        col
+    }, col2)
 })
 
 

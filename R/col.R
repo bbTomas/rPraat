@@ -104,7 +104,7 @@ col.read <- function(fileName, encoding = "UTF-8") {
             objClass <- "Pitch 1"
         } else if (str_contains(r, "Formant 2")) {
             objClass <- "Formant 2"
-        } else if (str_contains(r, "Sound")) {
+        } else if (str_contains(r, "Sound") | str_contains(r, "Sound 2")) {
             stop("Sound files are currently not supported, because of their inefficient loading and saving duration, rather use WAVE files")
         } else {
             stop(paste0("Class not recognized! Line: ", r))
@@ -140,4 +140,87 @@ col.read <- function(fileName, encoding = "UTF-8") {
     }
 
     return(collection)
+}
+
+
+#' col.write
+#'
+#' Saves Collection of objects to a file (in UTF-8 encoding). \code{col} is list of objects, each item \code{col[[i]]} must contain \code{class(col[[i]])["type"]} ("TextGrid", "PitchTier", "IntensityTier", "Pitch 1", or "Formant 2") and \code{class(col[[i]])["name"]} (name of the object) parameters set.
+#' These parameters can be created easily using "as.something()" functions: \code{as.tg()}, \code{as.pt()}, \code{as.it()}, \code{as.pitch()}, \code{as.formant()}
+#'
+#' Sound objects in \code{col.read()} and \code{col.write()} are not supported at this moment because they would occupy too much disc space in text format.
+#'
+#' @param col Collection object = list of objects (\code{col[[1]]}, \code{col[[2]]}, etc.) with \code{class(col[[i]])["type"]} and \code{class(col[[i]])["name"]} parameters set
+#' @param fileNameCollection file name to be created
+#' @param format Output file format (\code{"short"} (short text format) or \code{"text"} (a.k.a. full text format))
+#'
+#' @export
+#' @seealso \code{\link{col.read}}
+#'
+#' @examples
+#' \dontrun{
+#' col <- list(as.tg(tg.sample(), "My textgrid"), as.pt(pt.sample(), "My PitchTier 1"),
+#'        as.pt(pt.Hz2ST(pt.sample()), "My PitchTier 2"), as.it(it.sample(), "My IntensityTier"),
+#'        as.pitch(pitch.sample(), "My Pitch"), as.formant(formant.sample(), "My Formant"))
+#' col.write(col, "my_collection.Collection")
+#' }
+col.write <- function(col, fileNameCollection, format = "short") {
+    if (!isString(fileNameCollection)) {
+        stop("Invalid 'fileNameCollection' parameter.")
+    }
+
+    if (!isString(format)) {
+        stop("Invalid 'format' parameter.")
+    }
+
+    if (format != "short" && format != "text") {
+        stop("Unsupported format (supported: short and text")
+    }
+
+    fid <- file(fileNameCollection, open = "wb", encoding = "UTF-8")
+    if (!isOpen(fid)) {
+        stop(paste0("cannot open file [", fileNameCollection, "]"))
+    }
+
+    wrLine('File type = "ooTextFile"', fid)
+    wrLine('Object class = "Collection"', fid)
+    wrLine('', fid)
+
+    if (format == "short") {
+        wrLine(as.character(length(col)), fid)
+    } else if (format == "text") {
+        wrLine(paste0("size = ", as.character(length(col)), " "), fid)
+        wrLine("item []: ", fid)
+    }
+
+    for (n in seqM(1, length(col))) {
+        type <- class(col[[n]])["type"]
+        name <- class(col[[n]])["name"]
+
+        if (format == "short") {
+            wrLine(paste0('"', type, '"'), fid)
+            wrLine(paste0('"', name, '"'), fid)
+        } else if (format == "text") {
+            wrLine(paste0("    item [", as.character(n), "]:"), fid)
+            wrLine(paste0('        class = "', type, '" '), fid)
+            wrLine(paste0('        name = "', name, '" '), fid)
+        }
+
+        if (type == "PitchTier") {
+            pt.write0(col[[n]], "", format, fid, collection = TRUE)
+        } else if (type == "IntensityTier") {
+            it.write0(col[[n]], "", format, fid, collection = TRUE)
+        } else if (type == "Pitch 1") {
+            pitch.write0(col[[n]], "", format, fid, collection = TRUE)
+        } else if (type == "Formant 2") {
+            formant.write0(col[[n]], "", format, fid, collection = TRUE)
+        } else if (type == "TextGrid") {
+            tg.write0(col[[n]], "", format, fid, collection = TRUE)
+        } else {
+            close(fid)
+            stop(paste0("Unsupported type of object: ", type))
+        }
+    }
+
+    close(fid)
 }

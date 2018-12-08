@@ -606,3 +606,103 @@ as.pitch <- function(pitch, name = "") {
     return(pitch)
 }
 
+
+#' pitch.write
+#'
+#' Saves Pitch to the file.
+#'
+#' @param pitch Pitch object
+#' @param fileNamePitch Output file name
+#' @param format Output file format (\code{"short"} (default, short text format) or \code{"text"} (a.k.a. full text format))
+#'
+#' @export
+#' @seealso \code{\link{pitch.read}}, \code{\link{pt.read}}
+#'
+#' @examples
+#' \dontrun{
+#' pitch <- pitch.sample()
+#' pitch.write(pitch, "demo_output.Pitch")
+#' }
+pitch.write <- function(pitch, fileNamePitch, format = "short") {
+    pitch.write0(pitch, fileNamePitch, format)
+}
+
+pitch.write0 <- function(pitch, fileNamePitch, format = "short", fid = NULL, collection = FALSE) {
+    if (!isString(fileNamePitch)) {
+        stop("Invalid 'fileNamePitch' parameter.")
+    }
+
+    if (!isString(format)) {
+        stop("Invalid 'format' parameter.")
+    }
+    if (format != "short" && format != "text") {
+        stop("Unsupported format (supported: short [default], text)")
+    }
+
+    if (!("frame" %in% names(pitch))) {
+        pitch <- pitch.toFrame(pitch)
+    }
+
+    if (!collection) {
+        fid <- file(fileNamePitch, open = "wb", encoding = "UTF-8")
+        if (!isOpen(fid)) {
+            stop(paste0("cannot open file [", fileNamePitch, "]"))
+        }
+    }
+
+    if (!collection) {
+        wrLine('File type = "ooTextFile"', fid)
+        wrLine('Object class = "Pitch 1"', fid)
+        wrLine("", fid)
+    }
+
+    if (format == "short") {
+        wrLine(as.character(round2(pitch$xmin, -15)), fid)
+        wrLine(as.character(round2(pitch$xmax, -15)), fid)
+        wrLine(as.character(pitch$nx), fid)
+        wrLine(as.character(round2(pitch$dx, -15)), fid)
+        wrLine(as.character(round2(pitch$x1, -15)), fid)
+        wrLine(as.character(round2(pitch$ceiling), -15), fid)
+        wrLine(as.character(pitch$maxnCandidates), fid)
+    } else if (format == "text") {
+        wrLine(paste0("xmin = ", as.character(round2(pitch$xmin, -15)), " "), fid, collection)
+        wrLine(paste0("xmax = ", as.character(round2(pitch$xmax, -15)), " "), fid, collection)
+        wrLine(paste0("nx = ", pitch$nx, " "), fid, collection)
+        wrLine(paste0("dx = ", as.character(round2(pitch$dx, -15)), " "), fid, collection)
+        wrLine(paste0("x1 = ", as.character(round2(pitch$x1, -15)), " "), fid, collection)
+        wrLine(paste0("ceiling = ", as.character(round2(pitch$ceiling, -15)), " "), fid, collection)
+        wrLine(paste0("maxnCandidates = ", pitch$maxnCandidates, " "), fid, collection)
+        wrLine("frame []: ", fid, collection)
+    }
+
+    for (N in seqM(1, pitch$nx)) {
+        if (format == "text") {
+            wrLine(paste0("    frame [", as.character(N), "]:"), fid, collection)
+        }
+
+        if (format == "short") {
+            wrLine(as.character(round2(pitch$frame[[N]]$intensity, -15)), fid)
+            wrLine(as.character(pitch$frame[[N]]$nCandidates), fid)
+        } else if (format == "text") {
+            wrLine(paste0("        intensity = ", as.character(round2(pitch$frame[[N]]$intensity, -15)), " "), fid, collection)
+            wrLine(paste0("        nCandidates = ", pitch$frame[[N]]$nCandidate, " "), fid, collection)
+            wrLine("        candidate []: ", fid, collection)
+        }
+
+
+        for (I in seqM(1, pitch$frame[[N]]$nCandidate)) {
+            if (format == "short") {
+                wrLine(as.character(pitch$frame[[N]]$frequency[I], -15), fid)
+                wrLine(as.character(pitch$frame[[N]]$strength[I], -15), fid)
+            } else if (format == "text") {
+                wrLine(paste0("            candidate [", as.character(I), "]:"), fid, collection)
+                wrLine(paste0("                frequency = ", as.character(pitch$frame[[N]]$frequency[I], -15), " "), fid, collection)
+                wrLine(paste0("                strength = ", as.character(pitch$frame[[N]]$strength[I], -15), " "), fid, collection)
+            }
+        }
+    }
+
+    if (!collection) {
+        close(fid)
+    }
+}

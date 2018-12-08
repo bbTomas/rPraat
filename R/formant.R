@@ -121,7 +121,7 @@ formant.read_lines <- function(flines, find = 1, collection = FALSE) {
 
                 for (If in seqM(1, nFormants)) {
                     if (strTrim(flines[iline]) != paste0("formant [", If, "]:")) {
-                        stop(paste0("Unknown Formant format, wrong formant nr. (", If, ") in frame id (", I, "')."))
+                        stop(paste0("Unknown Formant format, wrong formant nr. (", If, ") in frame id (", I, ")."))
                     }
                     iline <- iline + 1
 
@@ -553,3 +553,100 @@ as.formant <- function(formant, name = "") {
     return(formant)
 }
 
+#' formant.write
+#'
+#' Saves Formant to the file.
+#'
+#' @param formant Formant object
+#' @param fileNameFormant Output file name
+#' @param format Output file format (\code{"short"} (default, short text format) or \code{"text"} (a.k.a. full text format))
+#'
+#' @export
+#' @seealso \code{\link{formant.read}}, \code{\link{tg.read}}
+#'
+#' @examples
+#' \dontrun{
+#' formant <- formant.sample()
+#' formant.write(formant, "demo_output.Formant")
+#' }
+formant.write <- function(formant, fileNameFormant, format = "short") {
+    formant.write0(formant, fileNameFormant, format)
+}
+
+formant.write0 <- function(formant, fileNameFormant, format = "short", fid = NULL, collection = FALSE) {
+    if (!isString(fileNameFormant)) {
+        stop("Invalid 'fileNameFormant' parameter.")
+    }
+
+    if (!isString(format)) {
+        stop("Invalid 'format' parameter.")
+    }
+    if (format != "short" && format != "text") {
+        stop("Unsupported format (supported: short [default], text)")
+    }
+
+    if (!("frame" %in% names(formant))) {
+        formant <- formant.toFrame(formant)
+    }
+
+    if (!collection) {
+        fid <- file(fileNameFormant, open = "wb", encoding = "UTF-8")
+        if (!isOpen(fid)) {
+            stop(paste0("cannot open file [", fileNameFormant, "]"))
+        }
+    }
+
+    if (!collection) {
+        wrLine('File type = "ooTextFile"', fid)
+        wrLine('Object class = "Formant 2"', fid)
+        wrLine("", fid)
+    }
+
+    if (format == "short") {
+        wrLine(as.character(round2(formant$xmin, -15)), fid)
+        wrLine(as.character(round2(formant$xmax, -15)), fid)
+        wrLine(as.character(formant$nx), fid)
+        wrLine(as.character(round2(formant$dx, -15)), fid)
+        wrLine(as.character(round2(formant$x1, -15)), fid)
+        wrLine(as.character(formant$maxnFormants), fid)
+    } else if (format == "text") {
+        wrLine(paste0("xmin = ", as.character(round2(formant$xmin, -15)), " "), fid, collection)
+        wrLine(paste0("xmax = ", as.character(round2(formant$xmax, -15)), " "), fid, collection)
+        wrLine(paste0("nx = ", formant$nx, " "), fid, collection)
+        wrLine(paste0("dx = ", as.character(round2(formant$dx, -15)), " "), fid, collection)
+        wrLine(paste0("x1 = ", as.character(round2(formant$x1, -15)), " "), fid, collection)
+        wrLine(paste0("maxnFormants = ", formant$maxnFormants, " "), fid, collection)
+        wrLine("frames []: ", fid, collection)
+    }
+
+    for (N in seqM(1, formant$nx)) {
+        if (format == "text") {
+            wrLine(paste0("    frames [", as.character(N), "]:"), fid, collection)
+        }
+
+        if (format == "short") {
+            wrLine(as.character(round2(formant$frame[[N]]$intensity, -15)), fid)
+            wrLine(as.character(formant$frame[[N]]$nFormants), fid)
+        } else if (format == "text") {
+            wrLine(paste0("        intensity = ", as.character(round2(formant$frame[[N]]$intensity, -15)), " "), fid, collection)
+            wrLine(paste0("        nFormants = ", formant$frame[[N]]$nFormants, " "), fid, collection)
+            wrLine("        formant []: ", fid, collection)
+        }
+
+
+        for (I in seqM(1, formant$frame[[N]]$nFormants)) {
+            if (format == "short") {
+                wrLine(as.character(formant$frame[[N]]$frequency[I], -15), fid)
+                wrLine(as.character(formant$frame[[N]]$bandwidth[I], -15), fid)
+            } else if (format == "text") {
+                wrLine(paste0("            formant [", as.character(I), "]:"), fid, collection)
+                wrLine(paste0("                frequency = ", as.character(formant$frame[[N]]$frequency[I], -15), " "), fid, collection)
+                wrLine(paste0("                bandwidth = ", as.character(formant$frame[[N]]$bandwidth[I], -15), " "), fid, collection)
+            }
+        }
+    }
+
+    if (!collection) {
+        close(fid)
+    }
+}

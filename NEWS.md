@@ -1,3 +1,7 @@
+v1.1.5 (2018/12/08)
+-------------------
+- pitch.write(), formant.write(), col.write()
+
 v1.1.4 (2018/12/08)
 -------------------
 - pitch.cut(), formant.cut(), snd.cut()

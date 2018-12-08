@@ -199,6 +199,10 @@ pt.read_lines <- function(flines, find = 1, collection = FALSE) {
 #' pt.write(pt, "demo/H_st.PitchTier")
 #' }
 pt.write <- function(pt, fileNamePitchTier, format = "spreadsheet") {
+    pt.write0(pt, fileNamePitchTier, format)
+}
+
+pt.write0 <- function(pt, fileNamePitchTier, format = "spreadsheet", fid = NULL, collection = FALSE) {
     if (!isString(fileNamePitchTier)) {
         stop("Invalid 'fileNamePitchTier' parameter.")
     }
@@ -235,18 +239,22 @@ pt.write <- function(pt, fileNamePitchTier, format = "spreadsheet") {
     }
 
 
-    fid <- file(fileNamePitchTier, open = "wb", encoding = "UTF-8")
-    if (!isOpen(fid)) {
-        stop(paste0("cannot open file [", fileNamePitchTier, "]"))
+    if (!collection) {
+        fid <- file(fileNamePitchTier, open = "wb", encoding = "UTF-8")
+        if (!isOpen(fid)) {
+            stop(paste0("cannot open file [", fileNamePitchTier, "]"))
+        }
     }
 
-    if (format == "spreadsheet") {
-        wrLine('"ooTextFile"', fid)
-        wrLine('"PitchTier"', fid)
-    } else if (format == "short" || format == "text") {
-        wrLine('File type = "ooTextFile"', fid)
-        wrLine('Object class = "PitchTier"', fid)
-        wrLine('', fid)
+    if (!collection) {
+        if (format == "spreadsheet") {
+            wrLine('"ooTextFile"', fid)
+            wrLine('"PitchTier"', fid)
+        } else if (format == "short" || format == "text") {
+            wrLine('File type = "ooTextFile"', fid)
+            wrLine('Object class = "PitchTier"', fid)
+            wrLine('', fid)
+        }
     }
 
     if (format == "spreadsheet") {
@@ -256,9 +264,9 @@ pt.write <- function(pt, fileNamePitchTier, format = "spreadsheet") {
         wrLine(as.character(round2(xmax, -15)), fid)
         wrLine(as.character(N), fid)
     } else if (format == "text") {
-        wrLine(paste0("xmin = ", as.character(round2(xmin, -15)), " "), fid)
-        wrLine(paste0("xmax = ", as.character(round2(xmax, -15)), " "), fid)
-        wrLine(paste0("points: size = ", as.character(N), " "), fid)
+        wrLine(paste0("xmin = ", as.character(round2(xmin, -15)), " "), fid, collection)
+        wrLine(paste0("xmax = ", as.character(round2(xmax, -15)), " "), fid, collection)
+        wrLine(paste0("points: size = ", as.character(N), " "), fid, collection)
     }
 
     for (n in seqM(1, N)) {
@@ -268,13 +276,15 @@ pt.write <- function(pt, fileNamePitchTier, format = "spreadsheet") {
             wrLine(as.character(round2(pt$t[n], -15)), fid)
             wrLine(as.character(round2(pt$f[n], -15)), fid)
         } else if (format == "text") {
-            wrLine(paste0("points [", as.character(n), "]:"), fid)
-            wrLine(paste0("    number = ", as.character(round2(pt$t[n], -15)), " "), fid)
-            wrLine(paste0("    value = ", as.character(round2(pt$f[n], -15)), " "), fid)
+            wrLine(paste0("points [", as.character(n), "]:"), fid, collection)
+            wrLine(paste0("    number = ", as.character(round2(pt$t[n], -15)), " "), fid, collection)
+            wrLine(paste0("    value = ", as.character(round2(pt$f[n], -15)), " "), fid, collection)
         }
     }
 
-    close(fid)
+    if (!collection) {
+        close(fid)
+    }
 }
 
 
