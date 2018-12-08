@@ -110,7 +110,7 @@ pitch.plot(pitch, group="my_group1", scaleIntensity = TRUE, showStrength = TRUE)
 ```
 
 
-## Combination of objects in one plot
+## Combination of objects in the same plot
 
 ```{r}
 tg.plot(tg.sample(), pt = pt.sample(), it = it.sample())
@@ -128,7 +128,13 @@ tg.plot(tg.sample(), pitch = pitch.sample(), pitchShowStrength = TRUE, pt = pt.s
 ```{r, fig.height=3}
 snd <- snd.read("demo/H.wav")
 snd.plot(snd)
+```
+
+```{r}
 snd.write(snd, "demo/temp.wav")
+```
+
+```{r}
 snd$fs
 snd$nChannels
 snd$nBits
@@ -149,21 +155,36 @@ head(snd$sig)
 
 ## Create a new sound object
 ```{r, fig.height=3}
-snd1 <- list(fs = 8000, sig = sin(seq(0, 2*pi, length.out = 4000)))
-snd.plot(snd1)
-snd2 <- list(t = seq(0, 3999)/8000, sig = sin(seq(0, 2*pi, length.out = 4000)))
-snd.plot(snd2)
+fs <- 48000   # Hz
+duration <- 0.005 # sec
+f <- 1000     # Hz
+t <- seq(0, duration*fs-1)/fs
+sig <- 1*sin(2*pi*f*t)
 
-fs <- 48000
-t <- seq(0, fs-1)/fs  # duration of 1 second
-sig <- 1*sin(2*pi*1000*t)
-snd.write(list(sig = sig, nBits = 16, fs = fs), "demo/temp.wav")
+snd <- list(sig = sig, fs = fs)
+snd.plot(snd)
+snd.plot(snd, stemPlot = TRUE)
+
+snd$nBits = 16
+snd.write(snd, "demo/temp.wav")
+
 snd <- snd.read("demo/temp.wav")
 min(snd$sig)
 max(snd$sig)
 max(snd$sig)-1
 min(snd$sig)+1
 mean(snd$sig)
+```
+
+## Cut Sound object
+
+```{r,fig.height=2.5}
+snd <- snd.sample()
+snd.plot(snd)
+snd2 <- snd.cut(snd, Start = 0.2, End = 0.3)
+snd.plot(snd2)
+snd3 <- snd.cut0(snd, Start = 2000, End = 3000, units = "samples")
+snd.plot(snd3)
 ```
 
 
@@ -510,6 +531,11 @@ pitch$frame[[1]]
 pitch.plot(pitch.sample(), pt = pt.sample(), showStrength = TRUE)
 ```
 
+## Cut Pitch object
+```{r,fig.height=3.5}
+pitch <- pitch.sample() %>% pitch.cut(tStart = 0.7, tEnd = 1.5)
+pitch.plot(pitch, showStrength = TRUE)
+```
 
 
 # Formant object
@@ -543,6 +569,11 @@ formant <- formant.toFrame(fArray)
 tg.plot(tg.sample(), formant = formant.sample())
 ```
 
+## Cut Formant object
+```{r,fig.height=3.5}
+formant <- formant.sample() %>% formant.cut(tStart = 1, tEnd = 1.5)
+formant.plot(formant)
+```
 
 
 # IntensityTier

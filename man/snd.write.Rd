@@ -13,7 +13,7 @@ snd.write(snd, fileNameSound)
 }
 \description{
 Saves Sound object to a file.
-snd is a list with \code{$sig}, \code{$nBits} and \code{$fs} members at least. Vector \code{$t} is ignored. If the sound signal is 2-channel (stereo),
+snd is a list with \code{$sig} and \code{$fs} members at least. If \code{$nBits} is not present, default value of 16 bits is used. Vector \code{$t} is ignored. If the sound signal is 2-channel (stereo),
 \code{$sig} must be a two-column matrix (1st column corresponds to the left channel, 2nd column to the right channel).
 If the sound is 1-channel (mono), \code{$sig} can be either a numeric vector or a one-column matrix.
 optional \code{$t}, \code{$nChannels}, \code{$nSamples}, \code{$duration} vectors are ignored.

@@ -4,12 +4,14 @@
 \alias{snd.plot}
 \title{snd.plot}
 \usage{
-snd.plot(snd, group = "")
+snd.plot(snd, group = "", stemPlot = FALSE)
 }
 \arguments{
-\item{snd}{Sound object (with \code{$sig} and \code{$fs} or \code{$t} members at least)}
+\item{snd}{Sound object (with \code{$sig} and \code{$fs} members at least)}
 
 \item{group}{[optional] character string, name of group for dygraphs synchronization}
+
+\item{stemPlot}{[optional] discrete style of plot using}
 }
 \description{
 Plots interactive Sound object using dygraphs package. If the sound is 2-channel (stereo), the 1st channel is plotted around mean value +1, the 2nd around mean value -1.
@@ -20,7 +22,6 @@ snd <- snd.sample()
 snd.plot(snd)
 
 snd.plot(list(sig = sin(seq(0, 2*pi, length.out = 4000)), fs = 8000))
-snd.plot(list(sig = 0.3*sin(seq(0, 2*pi, length.out = 4000)), t = 1:4000))
 }
 }
 \seealso{

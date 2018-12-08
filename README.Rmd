@@ -65,7 +65,7 @@ The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-
 
 v1.1.4 (2018/12/08): pitch.cut(), formant.cut(), snd.cut(); pitch.cut0(), formant.cut0(), snd.cut0()
 
-v1.1.3-4 (2018/12/03): snd.read(), snd.write(), snd.plot(); tg.plot() can plot TextGrid together with Sound object; it.plot() can plot IntensityTier together with Sound object
+v1.1.3-4 (2018/12/03): snd.read(), snd.write(), snd.plot(), as.snd(); tg.plot() can plot TextGrid together with Sound object; it.plot() can plot IntensityTier together with Sound object
 
 v1.1.3-3 (2018/12/03): formant.toFrame(), pitch.toArray(), pitch.toFrame(), pitch.plot(); tg.plot() can plot TextGrid together with Pitch object; pitch.plot() can plot Pitch object together with PitchTier
 

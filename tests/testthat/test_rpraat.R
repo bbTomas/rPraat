@@ -327,6 +327,29 @@ test_that("it.cut0", {
 
 context("Sound")
 
+test_that("as.snd", {
+    expect_equal({
+        as.snd(list(sig = seq(-1, 1, by = 0.5), fs = 10), "New sound")
+    }, {x <- list(sig = c(-1, -0.5, 0, 0.5, 1), fs = 10, t = c(0, 0.1, 0.2, 0.3, 0.4), nChannels = 1, nBits = 16, nSamples = 5, duration = 0.5)
+    class(x)["type"] <- "Sound"
+    class(x)["name"] <- "New sound"
+    x})
+
+    expect_equal({
+        as.snd(list(sig = matrix(seq(-1, 1, by = 0.5), ncol=1), fs = 10), "New sound")
+    }, {x <- list(sig = matrix(c(-1, -0.5, 0, 0.5, 1), ncol=1), fs = 10, t = c(0, 0.1, 0.2, 0.3, 0.4), nChannels = 1, nBits = 16, nSamples = 5, duration = 0.5)
+    class(x)["type"] <- "Sound"
+    class(x)["name"] <- "New sound"
+    x})
+
+    expect_equal({
+        as.snd(list(sig = matrix(c(seq(-1, 1, by = 0.5), 2:6), ncol=2), fs = 10), "New sound")
+    }, {x <- list(sig = matrix(c(-1, -0.5, 0, 0.5, 1:6), ncol=2), fs = 10, t = c(0, 0.1, 0.2, 0.3, 0.4), nChannels = 2, nBits = 16, nSamples = 5, duration = 0.5)
+    class(x)["type"] <- "Sound"
+    class(x)["name"] <- "New sound"
+    x})
+})
+
 test_that("snd.read", {
     expect_equal({
         snd <- snd.read("H.wav")
@@ -368,6 +391,329 @@ test_that("snd.write", {
         unlink(f)
         identical(snd, snd2)
     }, TRUE)
+})
+
+
+test_that("snd.cut", {
+    expect_error(snd.cut(snd.sample(), numeric(0)))
+    expect_error(snd.cut(snd.sample(), NA))
+    expect_error(snd.cut(snd.sample(), 0.3, 0.2))
+    expect_error(snd.cut(snd.sample(), 1, 6000, units = "samples"))
+    expect_error(snd.cut(snd.sample(), 0, 5, units = "samples"))
+
+    expect_equal({
+        snd <- list(sig = 200:3000, fs = 100)
+        snd <- snd.cut(snd,  Start = 0.3)
+        c(length(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[2771], snd$sig[1], snd$sig[2771])},
+        c(2771, 100, 2771, 1, 16, 2771, 27.71, 0.3, 28, 230, 3000))
+
+    expect_equal({
+        snd <- list(sig = 200:3000, fs = 100)
+        snd <- snd.cut(snd,  Start = 0.2, End = 0.3)
+        c(length(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1], snd$sig[11])},
+        c(11, 100, 11, 1, 16, 11, 0.11, 0.2, 0.3, 220, 230))
+
+    expect_equal({
+        snd <- list(sig = 200:3000, fs = 100)
+        snd <- snd.cut(snd,  End = 0.1)
+        c(length(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1], snd$sig[11])},
+        c(11, 100, 11, 1, 16, 11, 0.11, 0, 0.1, 200, 210))
+
+    expect_equal({
+        snd <- list(sig = 200:3000, fs = 100)
+        snd <- snd.cut(snd,  Start = -0.1, End = 0.1)
+        c(length(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1], snd$sig[11])},
+        c(11, 100, 11, 1, 16, 11, 0.11, 0, 0.1, 200, 210))
+
+    expect_equal({
+        snd <- list(sig = 200:3000, fs = 100)
+        snd <- snd.cut(snd,  Start = 500, units = "samples")
+        c(length(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[2302], snd$sig[1], snd$sig[2302])},
+        c(2302, 100, 2302, 1, 16, 2302, 23.02, 4.99, 28, 699, 3000))
+
+    expect_equal({
+        snd <- list(sig = 200:3000, fs = 100)
+        snd <- snd.cut(snd,  Start = 500, End = 600, units = "samples")
+        c(length(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[101], snd$sig[1], snd$sig[101])},
+        c(101, 100, 101, 1, 16, 101, 1.01, 4.99, 5.99, 699, 799))
+
+    expect_equal({
+        snd <- list(sig = 200:3000, fs = 100)
+        snd <- snd.cut(snd,  End = 1000, units = "samples")
+        c(length(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[1000], snd$sig[1], snd$sig[1000])},
+        c(1000, 100, 1000, 1, 16, 1000, 10, 0, 9.99, 200, 1199))
+
+
+
+
+    expect_equal({
+        snd <- list(sig = matrix(200:3000, ncol = 1), fs = 100)
+        snd <- snd.cut(snd,  Start = 0.3)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[2771], snd$sig[1, 1], snd$sig[2771, 1])},
+        c(2771, 1, 100, 2771, 1, 16, 2771, 27.71, 0.3, 28, 230, 3000))
+
+    expect_equal({
+        snd <- list(sig = matrix(200:3000, ncol = 1), fs = 100)
+        snd <- snd.cut(snd,  Start = 0.2, End = 0.3)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1, 1], snd$sig[11, 1])},
+        c(11, 1, 100, 11, 1, 16, 11, 0.11, 0.2, 0.3, 220, 230))
+
+    expect_equal({
+        snd <- list(sig = matrix(200:3000, ncol = 1), fs = 100)
+        snd <- snd.cut(snd,  End = 0.1)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1, 1], snd$sig[11, 1])},
+        c(11, 1, 100, 11, 1, 16, 11, 0.11, 0, 0.1, 200, 210))
+
+    expect_equal({
+        snd <- list(sig = matrix(200:3000, ncol = 1), fs = 100)
+        snd <- snd.cut(snd,  Start = -0.1, End = 0.1)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1, 1], snd$sig[11, 1])},
+        c(11, 1, 100, 11, 1, 16, 11, 0.11, 0, 0.1, 200, 210))
+
+    expect_equal({
+        snd <- list(sig = matrix(200:3000, ncol = 1), fs = 100)
+        snd <- snd.cut(snd,  Start = 500, units = "samples")
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[2302], snd$sig[1, 1], snd$sig[2302, 1])},
+        c(2302, 1, 100, 2302, 1, 16, 2302, 23.02, 4.99, 28, 699, 3000))
+
+    expect_equal({
+        snd <- list(sig = matrix(200:3000, ncol = 1), fs = 100)
+        snd <- snd.cut(snd,  Start = 500, End = 600, units = "samples")
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[101], snd$sig[1, 1], snd$sig[101, 1])},
+        c(101, 1, 100, 101, 1, 16, 101, 1.01, 4.99, 5.99, 699, 799))
+
+    expect_equal({
+        snd <- list(sig = matrix(200:3000, ncol = 1), fs = 100)
+        snd <- snd.cut(snd,  End = 1000, units = "samples")
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[1000], snd$sig[1, 1], snd$sig[1000, 1])},
+        c(1000, 1, 100, 1000, 1, 16, 1000, 10, 0, 9.99, 200, 1199))
+
+
+
+
+    expect_equal({
+        snd <- list(sig = matrix(c(200:3000, 300:3100), ncol = 2), fs = 100)
+        snd <- snd.cut(snd,  Start = 0.3)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[2771], snd$sig[1, 1], snd$sig[2771, 1], snd$sig[1, 2], snd$sig[2771, 2])},
+        c(2771, 2, 100, 2771, 2, 16, 2771, 27.71, 0.3, 28, 230, 3000, 330, 3100))
+
+    expect_equal({
+        snd <- list(sig = matrix(c(200:3000, 300:3100), ncol = 2), fs = 100)
+        snd <- snd.cut(snd,  Start = 0.2, End = 0.3)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1, 1], snd$sig[11, 1], snd$sig[1, 2], snd$sig[11, 2])},
+        c(11, 2, 100, 11, 2, 16, 11, 0.11, 0.2, 0.3, 220, 230, 320, 330))
+
+    expect_equal({
+        snd <- list(sig = matrix(c(200:3000, 300:3100), ncol = 2), fs = 100)
+        snd <- snd.cut(snd,  End = 0.1)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1, 1], snd$sig[11, 1], snd$sig[1, 2], snd$sig[11, 2])},
+        c(11, 2, 100, 11, 2, 16, 11, 0.11, 0, 0.1, 200, 210, 300, 310))
+
+    expect_equal({
+        snd <- list(sig = matrix(c(200:3000, 300:3100), ncol = 2), fs = 100)
+        snd <- snd.cut(snd,  Start = -0.1, End = 0.1)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1, 1], snd$sig[11, 1], snd$sig[1, 2], snd$sig[11, 2])},
+        c(11, 2, 100, 11, 2, 16, 11, 0.11, 0, 0.1, 200, 210, 300, 310))
+
+    expect_equal({
+        snd <- list(sig = matrix(c(200:3000, 300:3100), ncol = 2), fs = 100)
+        snd <- snd.cut(snd,  Start = 500, units = "samples")
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[2302], snd$sig[1, 1], snd$sig[2302, 1], snd$sig[1, 2], snd$sig[2302, 2])},
+        c(2302, 2, 100, 2302, 2, 16, 2302, 23.02, 4.99, 28, 699, 3000, 799, 3100))
+
+    expect_equal({
+        snd <- list(sig = matrix(c(200:3000, 300:3100), ncol = 2), fs = 100)
+        snd <- snd.cut(snd,  Start = 500, End = 600, units = "samples")
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[101], snd$sig[1, 1], snd$sig[101, 1], snd$sig[1, 2], snd$sig[101, 2])},
+        c(101, 2, 100, 101, 2, 16, 101, 1.01, 4.99, 5.99, 699, 799, 799, 899))
+
+    expect_equal({
+        snd <- list(sig = matrix(c(200:3000, 300:3100), ncol = 2), fs = 100)
+        snd <- snd.cut(snd,  End = 1000, units = "samples")
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[1000], snd$sig[1, 1], snd$sig[1000, 1], snd$sig[1, 2], snd$sig[1000, 2])},
+        c(1000, 2, 100, 1000, 2, 16, 1000, 10, 0, 9.99, 200, 1199, 300, 1299))
+})
+
+test_that("snd.cut0", {
+    expect_error(snd.cut0(snd.sample(), numeric(0)))
+    expect_error(snd.cut0(snd.sample(), NA))
+    expect_error(snd.cut0(snd.sample(), 0.3, 0.2))
+    expect_error(snd.cut0(snd.sample(), 1, 6000, units = "samples"))
+    expect_error(snd.cut0(snd.sample(), 0, 5, units = "samples"))
+
+    expect_equal({
+        snd <- list(sig = 200:3000, fs = 100)
+        snd <- snd.cut0(snd,  Start = 0.3)
+        c(length(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[2771], snd$sig[1], snd$sig[2771])},
+        c(2771, 100, 2771, 1, 16, 2771, 27.71, 0, 27.7, 230, 3000))
+
+    expect_equal({
+        snd <- list(sig = 200:3000, fs = 100)
+        snd <- snd.cut0(snd,  Start = 0.2, End = 0.3)
+        c(length(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1], snd$sig[11])},
+        c(11, 100, 11, 1, 16, 11, 0.11, 0, 0.1, 220, 230))
+
+    expect_equal({
+        snd <- list(sig = 200:3000, fs = 100)
+        snd <- snd.cut0(snd,  End = 0.1)
+        c(length(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1], snd$sig[11])},
+        c(11, 100, 11, 1, 16, 11, 0.11, 0, 0.1, 200, 210))
+
+    expect_equal({
+        snd <- list(sig = 200:3000, fs = 100)
+        snd <- snd.cut0(snd,  Start = -0.1, End = 0.1)
+        c(length(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1], snd$sig[11])},
+        c(11, 100, 11, 1, 16, 11, 0.11, 0, 0.1, 200, 210))
+
+    expect_equal({
+        snd <- list(sig = 200:3000, fs = 100)
+        snd <- snd.cut0(snd,  Start = 500, units = "samples")
+        c(length(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[2302], snd$sig[1], snd$sig[2302])},
+        c(2302, 100, 2302, 1, 16, 2302, 23.02, 0, 23.01, 699, 3000))
+
+    expect_equal({
+        snd <- list(sig = 200:3000, fs = 100)
+        snd <- snd.cut0(snd,  Start = 500, End = 600, units = "samples")
+        c(length(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[101], snd$sig[1], snd$sig[101])},
+        c(101, 100, 101, 1, 16, 101, 1.01, 0, 1, 699, 799))
+
+    expect_equal({
+        snd <- list(sig = 200:3000, fs = 100)
+        snd <- snd.cut0(snd,  End = 1000, units = "samples")
+        c(length(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[1000], snd$sig[1], snd$sig[1000])},
+        c(1000, 100, 1000, 1, 16, 1000, 10, 0, 9.99, 200, 1199))
+
+
+
+
+    expect_equal({
+        snd <- list(sig = matrix(200:3000, ncol = 1), fs = 100)
+        snd <- snd.cut0(snd,  Start = 0.3)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[2771], snd$sig[1, 1], snd$sig[2771, 1])},
+        c(2771, 1, 100, 2771, 1, 16, 2771, 27.71, 0, 27.7, 230, 3000))
+
+    expect_equal({
+        snd <- list(sig = matrix(200:3000, ncol = 1), fs = 100)
+        snd <- snd.cut0(snd,  Start = 0.2, End = 0.3)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1, 1], snd$sig[11, 1])},
+        c(11, 1, 100, 11, 1, 16, 11, 0.11, 0, 0.1, 220, 230))
+
+    expect_equal({
+        snd <- list(sig = matrix(200:3000, ncol = 1), fs = 100)
+        snd <- snd.cut0(snd,  End = 0.1)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1, 1], snd$sig[11, 1])},
+        c(11, 1, 100, 11, 1, 16, 11, 0.11, 0, 0.1, 200, 210))
+
+    expect_equal({
+        snd <- list(sig = matrix(200:3000, ncol = 1), fs = 100)
+        snd <- snd.cut0(snd,  Start = -0.1, End = 0.1)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1, 1], snd$sig[11, 1])},
+        c(11, 1, 100, 11, 1, 16, 11, 0.11, 0, 0.1, 200, 210))
+
+    expect_equal({
+        snd <- list(sig = matrix(200:3000, ncol = 1), fs = 100)
+        snd <- snd.cut0(snd,  Start = 500, units = "samples")
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[2302], snd$sig[1, 1], snd$sig[2302, 1])},
+        c(2302, 1, 100, 2302, 1, 16, 2302, 23.02, 0, 23.01, 699, 3000))
+
+    expect_equal({
+        snd <- list(sig = matrix(200:3000, ncol = 1), fs = 100)
+        snd <- snd.cut0(snd,  Start = 500, End = 600, units = "samples")
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[101], snd$sig[1, 1], snd$sig[101, 1])},
+        c(101, 1, 100, 101, 1, 16, 101, 1.01, 0, 1, 699, 799))
+
+    expect_equal({
+        snd <- list(sig = matrix(200:3000, ncol = 1), fs = 100)
+        snd <- snd.cut0(snd,  End = 1000, units = "samples")
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[1000], snd$sig[1, 1], snd$sig[1000, 1])},
+        c(1000, 1, 100, 1000, 1, 16, 1000, 10, 0, 9.99, 200, 1199))
+
+
+
+
+    expect_equal({
+        snd <- list(sig = matrix(c(200:3000, 300:3100), ncol = 2), fs = 100)
+        snd <- snd.cut0(snd,  Start = 0.3)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[2771], snd$sig[1, 1], snd$sig[2771, 1], snd$sig[1, 2], snd$sig[2771, 2])},
+        c(2771, 2, 100, 2771, 2, 16, 2771, 27.71, 0, 27.7, 230, 3000, 330, 3100))
+
+    expect_equal({
+        snd <- list(sig = matrix(c(200:3000, 300:3100), ncol = 2), fs = 100)
+        snd <- snd.cut0(snd,  Start = 0.2, End = 0.3)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1, 1], snd$sig[11, 1], snd$sig[1, 2], snd$sig[11, 2])},
+        c(11, 2, 100, 11, 2, 16, 11, 0.11, 0, 0.1, 220, 230, 320, 330))
+
+    expect_equal({
+        snd <- list(sig = matrix(c(200:3000, 300:3100), ncol = 2), fs = 100)
+        snd <- snd.cut0(snd,  End = 0.1)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1, 1], snd$sig[11, 1], snd$sig[1, 2], snd$sig[11, 2])},
+        c(11, 2, 100, 11, 2, 16, 11, 0.11, 0, 0.1, 200, 210, 300, 310))
+
+    expect_equal({
+        snd <- list(sig = matrix(c(200:3000, 300:3100), ncol = 2), fs = 100)
+        snd <- snd.cut0(snd,  Start = -0.1, End = 0.1)
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[11], snd$sig[1, 1], snd$sig[11, 1], snd$sig[1, 2], snd$sig[11, 2])},
+        c(11, 2, 100, 11, 2, 16, 11, 0.11, 0, 0.1, 200, 210, 300, 310))
+
+    expect_equal({
+        snd <- list(sig = matrix(c(200:3000, 300:3100), ncol = 2), fs = 100)
+        snd <- snd.cut0(snd,  Start = 500, units = "samples")
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[2302], snd$sig[1, 1], snd$sig[2302, 1], snd$sig[1, 2], snd$sig[2302, 2])},
+        c(2302, 2, 100, 2302, 2, 16, 2302, 23.02, 0, 23.01, 699, 3000, 799, 3100))
+
+    expect_equal({
+        snd <- list(sig = matrix(c(200:3000, 300:3100), ncol = 2), fs = 100)
+        snd <- snd.cut0(snd,  Start = 500, End = 600, units = "samples")
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[101], snd$sig[1, 1], snd$sig[101, 1], snd$sig[1, 2], snd$sig[101, 2])},
+        c(101, 2, 100, 101, 2, 16, 101, 1.01, 0, 1, 699, 799, 799, 899))
+
+    expect_equal({
+        snd <- list(sig = matrix(c(200:3000, 300:3100), ncol = 2), fs = 100)
+        snd <- snd.cut0(snd,  End = 1000, units = "samples")
+        c(dim(snd$sig), snd$fs, length(snd$t), snd$nChannels, snd$nBits, snd$nSamples, snd$duration,
+          snd$t[1], snd$t[1000], snd$sig[1, 1], snd$sig[1000, 1], snd$sig[1, 2], snd$sig[1000, 2])},
+        c(1000, 2, 100, 1000, 2, 16, 1000, 10, 0, 9.99, 200, 1199, 300, 1299))
 })
 
 
@@ -976,6 +1322,122 @@ test_that("pitch.toFrame", {
 })
 
 
+
+test_that("pitch.cut", {
+    expect_error(pitch.cut(pitch.sample(), numeric(0)))
+    expect_error(pitch.cut(pitch.sample(), NA))
+    expect_equal({
+        pitch <- pitch.cut(pitch.sample(),  tStart = 3)
+        c(pitch$xmin, pitch$xmax, pitch$nx, pitch$dx, pitch$x1, pitch$ceiling, pitch$maxnCandidates,
+          length(pitch$t), length(pitch$frame), pitch$t[1], pitch$t[10], pitch$t[37],
+          pitch$frame[[1]]$intensity,
+          pitch$frame[[10]]$frequency[3],
+          pitch$frame[[37]]$strength[2],
+          pitch$frame[[37]]$nCandidates
+          )},
+        c(3, 3.617125, 60, 0.01, 3.0035625, 600, 15,
+          60, 60, 3.0035625, 3.0935625, 3.3635625,
+          0.484152153555306, 101.020145550848994, 0.426781452899758, 5))
+
+    expect_equal({
+        pitch <- pitch.cut(pitch.toArray(pitch.sample()),  tStart = 2, tEnd = 3)
+        c(pitch$xmin, pitch$xmax, pitch$nx, pitch$dx, pitch$x1, pitch$ceiling, pitch$maxnCandidates,
+          length(pitch$t), dim(pitch$frequencyArray), dim(pitch$strengthArray), length(pitch$intensityVector), pitch$t[1], pitch$t[10], pitch$t[81],
+          pitch$intensityVector[1],
+          pitch$frequencyArray[3, 10],
+          pitch$strengthArray[2, 81],
+          sum(!is.na(pitch$frequencyArray[, 81]))
+        )},
+        c(2, 3, 100, 0.01, 2.0035625, 600, 15,
+          100, 15, 100, 15, 100, 100,
+          2.0035625, 2.0935625, 2.8035625,
+          0.167664363451655, 128.946628414461003, 0.463514355386774, 6))
+
+    expect_equal({
+        pitch <- pitch.cut(pitch.sample(),  tEnd = 1)
+        c(pitch$xmin, pitch$xmax, pitch$nx, pitch$dx, pitch$x1, pitch$ceiling, pitch$maxnCandidates,
+          length(pitch$t), length(pitch$frame), pitch$t[1], pitch$t[10], pitch$t[71],
+          pitch$frame[[1]]$intensity,
+          pitch$frame[[10]]$frequency[3],
+          pitch$frame[[71]]$strength[2],
+          pitch$frame[[71]]$nCandidates
+        )},
+        c(0, 1, 98, 0.01, 2.35625e-2, 600, 15,
+          98, 98, 2.35625e-2, 1.135625e-1, 7.235625e-1, 6.61166360756471e-03, 1.09982215319168e+02, 6.55327098328991e-01, 3))
+
+    expect_equal({
+        pitch <- pitch.cut(pitch.sample(),  tStart = -1, tEnd = 1)
+        c(pitch$xmin, pitch$xmax, pitch$nx, pitch$dx, pitch$x1, pitch$ceiling, pitch$maxnCandidates,
+          length(pitch$t), length(pitch$frame), pitch$t[1], pitch$t[10], pitch$t[71],
+          pitch$frame[[1]]$intensity,
+          pitch$frame[[10]]$frequency[3],
+          pitch$frame[[71]]$strength[2],
+          pitch$frame[[71]]$nCandidates
+        )},
+        c(-1, 1, 98, 0.01, 2.35625e-2, 600, 15, 98, 98, 2.35625e-2, 1.135625e-1, 7.235625e-1, 6.61166360756471e-03, 1.09982215319168e+02,
+          6.55327098328991e-01, 3))
+    expect_error(pitch.cut(pitch.sample(), 3, 2))
+})
+
+test_that("pitch.cut0", {
+    expect_error(pitch.cut0(pitch.sample(), numeric(0)))
+    expect_error(pitch.cut0(pitch.sample(), NA))
+    expect_equal({
+        pitch <- pitch.cut0(pitch.sample(),  tStart = 3)
+        c(pitch$xmin, pitch$xmax, pitch$nx, pitch$dx, pitch$x1, pitch$ceiling, pitch$maxnCandidates,
+          length(pitch$t), length(pitch$frame), pitch$t[1], pitch$t[10], pitch$t[37],
+          pitch$frame[[1]]$intensity,
+          pitch$frame[[10]]$frequency[3],
+          pitch$frame[[37]]$strength[2],
+          pitch$frame[[37]]$nCandidates
+        )},
+        c(0, 0.617125, 60, 0.01, 3.56250000000014e-03, 600, 15,
+          60, 60, 3.56250000000014e-03, 9.35625e-2, 3.635625e-1,
+          0.484152153555306, 101.020145550848994, 0.426781452899758, 5))
+
+    expect_equal({
+        pitch <- pitch.cut0(pitch.toArray(pitch.sample()),  tStart = 2, tEnd = 3)
+        c(pitch$xmin, pitch$xmax, pitch$nx, pitch$dx, pitch$x1, pitch$ceiling, pitch$maxnCandidates,
+          length(pitch$t), dim(pitch$frequencyArray), dim(pitch$strengthArray), length(pitch$intensityVector), pitch$t[1], pitch$t[10], pitch$t[81],
+          pitch$intensityVector[1],
+          pitch$frequencyArray[3, 10],
+          pitch$strengthArray[2, 81],
+          sum(!is.na(pitch$frequencyArray[, 81]))
+        )},
+        c(0, 1, 100, 0.01, 3.5625e-3, 600, 15,
+          100, 15, 100, 15, 100, 100,
+          3.5625e-3, 9.35625e-2, 8.035625e-1,
+          0.167664363451655, 128.946628414461003, 0.463514355386774, 6))
+
+    expect_equal({
+        pitch <- pitch.cut0(pitch.sample(),  tEnd = 1)
+        c(pitch$xmin, pitch$xmax, pitch$nx, pitch$dx, pitch$x1, pitch$ceiling, pitch$maxnCandidates,
+          length(pitch$t), length(pitch$frame), pitch$t[1], pitch$t[10], pitch$t[71],
+          pitch$frame[[1]]$intensity,
+          pitch$frame[[10]]$frequency[3],
+          pitch$frame[[71]]$strength[2],
+          pitch$frame[[71]]$nCandidates
+        )},
+        c(0, 1, 98, 0.01, 2.35625e-2, 600, 15,
+          98, 98, 2.35625e-2, 1.135625e-1, 7.235625e-1, 6.61166360756471e-03, 1.09982215319168e+02, 6.55327098328991e-01, 3))
+
+    expect_equal({
+        pitch <- pitch.cut0(pitch.sample(),  tStart = -1, tEnd = 1)
+        c(pitch$xmin, pitch$xmax, pitch$nx, pitch$dx, pitch$x1, pitch$ceiling, pitch$maxnCandidates,
+          length(pitch$t), length(pitch$frame), pitch$t[1], pitch$t[10], pitch$t[71],
+          pitch$frame[[1]]$intensity,
+          pitch$frame[[10]]$frequency[3],
+          pitch$frame[[71]]$strength[2],
+          pitch$frame[[71]]$nCandidates
+        )},
+        c(0, 2, 98, 0.01, 1.0235625, 600, 15, 98, 98, 1.0235625, 1.1135625, 1.7235625, 6.61166360756471e-03, 1.09982215319168e+02,
+          6.55327098328991e-01, 3))
+    expect_error(pitch.cut0(pitch.sample(), 3, 2))
+})
+
+
+
+
 context("Formant")
 
 test_that("formant.read", {
@@ -1029,6 +1491,122 @@ test_that("normIntensity", {
         normIntensity(-3:3, 1, 9)
     }, c(NaN, NaN, NaN, NaN, 1, 6.047438028572, 9))
 })
+
+
+test_that("formant.cut", {
+    expect_error(formant.cut(formant.sample(), numeric(0)))
+    expect_error(formant.cut(formant.sample(), NA))
+    expect_equal({
+        formant <- formant.cut(formant.sample(),  tStart = 3)
+        c(formant$xmin, formant$xmax, formant$nx, formant$dx, formant$x1, formant$maxnFormants,
+          length(formant$t), length(formant$frame), formant$t[1], formant$t[10], formant$t[37],
+          formant$frame[[1]]$intensity,
+          formant$frame[[10]]$frequency[3],
+          formant$frame[[37]]$bandwidth[2],
+          formant$frame[[37]]$nFormants
+        )},
+        c(3, 3.617125, 95, 0.00625, 3.0023, 5,
+          95, 95, 3.0023, 3.0586, 3.2273,
+          0.115475924340128, 2246.300000000000182, 197.400000000000006, 5))
+
+    expect_equal({
+        formant <- formant.cut(formant.toArray(formant.sample()),  tStart = 2, tEnd = 3)
+        c(formant$xmin, formant$xmax, formant$nx, formant$dx, formant$x1, formant$maxnFormants,
+          length(formant$t), dim(formant$frequencyArray), dim(formant$bandwidthArray), length(formant$intensityVector), formant$t[1], formant$t[10], formant$t[81],
+          formant$intensityVector[1],
+          formant$frequencyArray[3, 10],
+          formant$bandwidthArray[2, 81],
+          sum(!is.na(formant$frequencyArray[, 81]))
+        )},
+        c(2, 3, 160, 6.25e-3, 2.0023, 5,
+          160, 5, 160, 5, 160, 160,
+          2.0023, 2.0586, 2.5023,
+          1.51760972487329e-02, 2.7425e3, 2.969e2, 4))
+
+    expect_equal({
+        formant <- formant.cut(formant.sample(),  tEnd = 1)
+        c(formant$xmin, formant$xmax, formant$nx, formant$dx, formant$x1, formant$maxnFormants,
+          length(formant$t), length(formant$frame), formant$t[1], formant$t[10], formant$t[71],
+          formant$frame[[1]]$intensity,
+          formant$frame[[10]]$frequency[3],
+          formant$frame[[71]]$bandwidth[2],
+          formant$frame[[71]]$nFormants
+        )},
+        c(0, 1, 156, 6.25e-3, 2.73e-2, 5,
+          156, 156, 2.73e-2, 8.36e-2, 4.648e-1, 2.93217978222906e-06, 2.4366e+3, 1.1551e+3, 5))
+
+    expect_equal({
+        formant <- formant.cut(formant.sample(),  tStart = -1, tEnd = 1)
+        c(formant$xmin, formant$xmax, formant$nx, formant$dx, formant$x1, formant$maxnFormants,
+          length(formant$t), length(formant$frame), formant$t[1], formant$t[10], formant$t[71],
+          formant$frame[[1]]$intensity,
+          formant$frame[[10]]$frequency[3],
+          formant$frame[[71]]$bandwidth[2],
+          formant$frame[[71]]$nFormants
+        )},
+        c(-1, 1, 156, 6.25e-3, 2.73e-2, 5, 156, 156, 2.73e-2, 8.36e-2, 4.648e-1, 2.93217978222906e-06, 2.4366e+03,
+          1.1551e+3, 5))
+    expect_error(formant.cut(formant.sample(), 3, 2))
+})
+
+
+test_that("formant.cut0", {
+    expect_error(formant.cut0(formant.sample(), numeric(0)))
+    expect_error(formant.cut0(formant.sample(), NA))
+    expect_equal({
+        formant <- formant.cut0(formant.sample(),  tStart = 3)
+        c(formant$xmin, formant$xmax, formant$nx, formant$dx, formant$x1, formant$maxnFormants,
+          length(formant$t), length(formant$frame), formant$t[1], formant$t[10], formant$t[37],
+          formant$frame[[1]]$intensity,
+          formant$frame[[10]]$frequency[3],
+          formant$frame[[37]]$bandwidth[2],
+          formant$frame[[37]]$nFormants
+        )},
+        c(0, 0.617125, 95, 0.00625, 2.29999999999997e-03, 5,
+          95, 95, 2.29999999999997e-03, 5.86000000000002e-2, 2.273e-1,
+          0.115475924340128, 2246.300000000000182, 197.400000000000006, 5))
+
+    expect_equal({
+        formant <- formant.cut0(formant.toArray(formant.sample()),  tStart = 2, tEnd = 3)
+        c(formant$xmin, formant$xmax, formant$nx, formant$dx, formant$x1, formant$maxnFormants,
+          length(formant$t), dim(formant$frequencyArray), dim(formant$bandwidthArray), length(formant$intensityVector), formant$t[1], formant$t[10], formant$t[81],
+          formant$intensityVector[1],
+          formant$frequencyArray[3, 10],
+          formant$bandwidthArray[2, 81],
+          sum(!is.na(formant$frequencyArray[, 81]))
+        )},
+        c(0, 1, 160, 6.25e-3, 2.29999999999997e-3, 5,
+          160, 5, 160, 5, 160, 160,
+          2.29999999999997e-03, 5.86000000000002e-02, 5.02300000000000e-01,
+          1.51760972487329e-02, 2.7425e3, 2.969e2, 4))
+
+    expect_equal({
+        formant <- formant.cut0(formant.sample(),  tEnd = 1)
+        c(formant$xmin, formant$xmax, formant$nx, formant$dx, formant$x1, formant$maxnFormants,
+          length(formant$t), length(formant$frame), formant$t[1], formant$t[10], formant$t[71],
+          formant$frame[[1]]$intensity,
+          formant$frame[[10]]$frequency[3],
+          formant$frame[[71]]$bandwidth[2],
+          formant$frame[[71]]$nFormants
+        )},
+        c(0, 1, 156, 6.25e-3, 2.73e-2, 5,
+          156, 156, 2.73e-2, 8.36e-2, 4.648e-1, 2.93217978222906e-06, 2.4366e+3, 1.1551e+3, 5))
+
+    expect_equal({
+        formant <- formant.cut0(formant.sample(),  tStart = -1, tEnd = 1)
+        c(formant$xmin, formant$xmax, formant$nx, formant$dx, formant$x1, formant$maxnFormants,
+          length(formant$t), length(formant$frame), formant$t[1], formant$t[10], formant$t[71],
+          formant$frame[[1]]$intensity,
+          formant$frame[[10]]$frequency[3],
+          formant$frame[[71]]$bandwidth[2],
+          formant$frame[[71]]$nFormants
+        )},
+        c(0, 2, 156, 6.25e-3, 1.0273, 5, 156, 156, 1.0273, 1.0836, 1.4648, 2.93217978222906e-06, 2.4366e+03,
+          1.1551e+3, 5))
+    expect_error(formant.cut0(formant.sample(), 3, 2))
+})
+
+
 
 
 context("Collection")
