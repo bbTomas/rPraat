@@ -58,7 +58,7 @@ Mouse Double-click: Default zoom
 
 Shift + mouse drag: plot scroll
 
-## Read and plot Sound, TextGrid, PitchTier, IntensityTier, Formant
+## Read and plot Sound, TextGrid, PitchTier, Pitch, IntensityTier, Formant
 
 ```{r, echo=FALSE}
 library(rPraat)
