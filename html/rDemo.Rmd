@@ -15,7 +15,7 @@ We have invested a lot of time and effort in creating mPraat toolbox / rPraat pa
 
 [Download Tools rPraat and mPraat manuscript .pdf](boril_skarnitzl_2016_Tools_rPraat_and_mPraat_[manuscript].pdf)
 
-The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-5_42](http://dx.doi.org/10.1007/978-3-319-45510-5_42)
+The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-5_42](https://dx.doi.org/10.1007/978-3-319-45510-5_42)
 
 
 [Download BibTeX reference mpraatrpraat2016.bib](mpraatrpraat2016.bib)
@@ -23,7 +23,7 @@ The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-
 
 # Installation and help
 
-rPraat and mPraat homepage: [http://fu.ff.cuni.cz/praat/](http://fu.ff.cuni.cz/praat/)
+rPraat and mPraat homepage: [https://fu.ff.cuni.cz/praat/](https://fu.ff.cuni.cz/praat/)
 
 CRAN link: [https://CRAN.R-project.org/package=rPraat](https://CRAN.R-project.org/package=rPraat)
 
@@ -48,7 +48,7 @@ or read .pdf documentation at [https://github.com/bbTomas/rPraat/blob/master/rPr
 
 
 # Demo files
-To reproduce the following examples, you will need some sample files. Download and extract [rpraat_demo.zip](http://fu.ff.cuni.cz/praat/rpraat_demo.zip) to your Working Directory, it creates `demo` subdirectory.
+To reproduce the following examples, you will need some sample files. Download and extract [rpraat_demo.zip](https://fu.ff.cuni.cz/praat/rpraat_demo.zip) to your Working Directory, it creates `demo` subdirectory.
 
 ## Interactive plots using dygraphs (zooming and scrolling)
 

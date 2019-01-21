@@ -17,7 +17,7 @@ CRAN link: <https://CRAN.R-project.org/package=rPraat>
 See also: [mPraat toolbox](https://github.com/bbTomas/mPraat) for
 Matlab.
 
-rPraat and mPraat homepage: <http://fu.ff.cuni.cz/praat/>
+rPraat and mPraat homepage: <https://fu.ff.cuni.cz/praat/>
 
 Installation
 ------------
@@ -54,13 +54,13 @@ rPraat package, please cite it when using it for data analysis.
 > Dialogue (pp. 367–374). Springer International Publishing.
 
 [Download Tools rPraat and mPraat manuscript
-.pdf](http://fu.ff.cuni.cz/praat/boril_skarnitzl_2016_Tools_rPraat_and_mPraat_%5Bmanuscript%5D.pdf)
+.pdf](https://fu.ff.cuni.cz/praat/boril_skarnitzl_2016_Tools_rPraat_and_mPraat_%5Bmanuscript%5D.pdf)
 
 The final publication is available at Springer via [DOI
-10.1007/978-3-319-45510-5\_42](http://dx.doi.org/10.1007/978-3-319-45510-5_42)
+10.1007/978-3-319-45510-5\_42](https://dx.doi.org/10.1007/978-3-319-45510-5_42)
 
 [Download BibTeX reference
-mpraatrpraat2016.bib](http://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
+mpraatrpraat2016.bib](https://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
 
 What is new
 -----------
