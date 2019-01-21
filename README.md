@@ -7,7 +7,7 @@ software for phonetic analyses, Praat, and R.
 Version 1.2.0.
 
 For demonstration, see
-[html/rDemo.html](http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html)
+[html/rDemo.html](https://fu.ff.cuni.cz/praat/rDemo.html)
 
 Package documentation
 <https://github.com/bbTomas/rPraat/blob/master/rPraat.pdf>

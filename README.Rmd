@@ -9,7 +9,7 @@ rPraat package for R constitutes an interface between the most popular software 
 
 Version 1.2.0.
 
-For demonstration, see [html/rDemo.html](http://htmlpreview.github.com/?https://github.com/bbTomas/rPraat/blob/master/html/rDemo.html)
+For demonstration, see [html/rDemo.html](https://fu.ff.cuni.cz/praat/rDemo.html)
 
 Package documentation [https://github.com/bbTomas/rPraat/blob/master/rPraat.pdf](https://github.com/bbTomas/rPraat/blob/master/rPraat.pdf)
 
