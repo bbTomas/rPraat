@@ -15,7 +15,7 @@
 detectEncoding <- function(fileName) {
     # Inspired by Weirong Chen.
 
-    encodings <- c("UTF-8", "UTF-16", "UTF-16BE", "UTF-16LE")
+    encodings <- c("UTF-8", "UTF-16", "UTF-16BE")   # "UTF-16LE" does not work anymore
     encodingWeight <- numeric(length(encodings))
 
     for (I in 1:length(encodings)) {

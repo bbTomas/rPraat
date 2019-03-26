@@ -1,3 +1,7 @@
+v1.2.0-1 (2019/03/16)
+---------------------
+- detectEncoding(): removed "UTF-16LE" (does not work anymore), tg.read(fileName, encoding = "auto") works again
+
 v1.2.0 (2018/12/08)
 -------------------
 - pitch.write(), formant.write(), col.write()

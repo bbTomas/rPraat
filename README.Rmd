@@ -7,7 +7,7 @@ output: md_document
 
 rPraat package for R constitutes an interface between the most popular software for phonetic analyses, Praat, and R.
 
-Version 1.2.0.
+Version 1.2.0-1.
 
 For demonstration, see [html/rDemo.html](https://fu.ff.cuni.cz/praat/rDemo.html)
 
@@ -62,6 +62,8 @@ The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-
 [Download BibTeX reference mpraatrpraat2016.bib](https://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
 
 ## What is new
+
+v1.2.0-1 (2019/03/16): detectEncoding(): removed "UTF-16LE" (does not work anymore), tg.read(fileName, encoding = "auto") works again
 
 v1.2.0 (2018/12/08): pitch.write(), formant.write(), col.write()
 
