@@ -11,7 +11,7 @@ BugReports: https://github.com/bbTomas/rPraat/issues
 License: MIT + file LICENSE
 LazyData: TRUE
 Depends:
-    R (>= 3.5.0)
+    R (>= 3.4.0)
 Imports:
     graphics (>= 3.1.0),
     dplyr (>= 0.7.8),
