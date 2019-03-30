@@ -469,7 +469,7 @@ pt.legendre <- function(pt, npoints = 1000, npolynomials = 4) {
     y <- pt$f
 
 
-    lP <- npoints # počet vzorků polynomu
+    lP <- npoints # number of points to interpolate the polynomial
     nP <- npolynomials
 
     B <- matrix(nrow = nP, ncol = lP)  # báze
@@ -489,7 +489,7 @@ pt.legendre <- function(pt, npoints = 1000, npolynomials = 4) {
     c <- numeric(nP)
     for (I in 1: nP) {
         c[I] <- t(matrix(y)) %*% matrix(B[I, ], nrow = lP, ncol = 1) / lP * ((I-1)*2+1)
-        # koeficient ((I-1)*2+1) odpovídá výkonům komponent, které lze spočítat i takto: mean((P.^2).')
+        # coefficient ((I-1)*2+1) corresponds to power of components, and can also be calculated this way: mean((P.^2).')
     }
 
     return(c)
@@ -529,10 +529,10 @@ pt.legendreSynth <- function(c, npoints = 1000) {
         stop("npoints must be integer >= 0.")
     }
 
-    lP <- npoints # počet vzorků polynomu
+    lP <- npoints # number of points to interpolate the polynomial
     nP <- length(c)
 
-    B <- matrix(nrow = nP, ncol = lP)  # báze
+    B <- matrix(nrow = nP, ncol = lP)  # basis
     x <- seq(-1, 1, length.out = lP)
 
     for (i in seqM(1, nP)) {

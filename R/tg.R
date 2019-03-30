@@ -1458,7 +1458,7 @@ tg.duplicateTierMergeSegments <- function(tg, originalInd, newInd = Inf, newTier
 
     t1Last <- NA
 
-    # pozor, nějak se též vypořádat s prázdnými labely - ideálně je zachovat a brát je též jako oddělovač, tedy v rámci jedné "part" nemůže být uvnitř prázdný label
+    # pozor, nejak se tez vyporadat s prazdnymi labely - idealne je zachovat a brat je tez jako oddelovac, tedy v ramci jedne "part" nemuze byt uvnitr prazdny label
 
     for (I in seqM(1, length(tOrig$label))) {
         if (labTemp == "") {
@@ -3175,7 +3175,7 @@ tg.findLabels <- function(tg, tierInd, labelVector, returnTime = FALSE) {
     }
     else {
         indStart <- which(tg[[tierInd]]$label == labelVector[1])
-        indStart <- indStart[indStart <= length(tg[[tierInd]]$label) - nlabs + 1]  # pokud zbývá do konce méně labelů, než hledáme, nemá smysl hledat
+        indStart <- indStart[indStart <= length(tg[[tierInd]]$label) - nlabs + 1]  # pokud zbyva do konce mene labelu, nez hledame, nema smysl hledat
 
         indLab <- list()
 
