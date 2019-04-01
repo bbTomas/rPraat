@@ -54,6 +54,8 @@ formant.read <- function(fileNameFormant, encoding = "UTF-8") {
         close(fid)
     }
 
+    flines <- enc2utf8(flines)
+
     if (length(flines) < 1) {
         stop("Empty file.")
     }

@@ -92,6 +92,8 @@ tg.read <- function(fileNameTextGrid, encoding = "UTF-8") {
         close(fid)
     }
 
+    flines <- enc2utf8(flines)
+
     find <- 4   # index of line to read, we ignore the first three
 
     tg_ind <- tg.read_lines(flines, find)

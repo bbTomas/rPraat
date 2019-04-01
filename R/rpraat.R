@@ -50,7 +50,7 @@ wrLine <- function(string, fid, collectionFullText = FALSE) {
     if (collectionFullText) {
         writeBin(charToRaw("        "), fid, endian = "little")
     }
-    writeBin(c(charToRaw(string), as.raw(c(13, 10))), fid, endian = "little")
+    writeBin(c(charToRaw(enc2utf8(string)), as.raw(c(13, 10))), fid, endian = "little")
 }
 
 

@@ -4,7 +4,7 @@ rPraat package for R
 rPraat package for R constitutes an interface between the most popular
 software for phonetic analyses, Praat, and R.
 
-Version 1.2.0-1.
+Version 1.2.0-2.
 
 For demonstration, see
 [html/rDemo.html](https://fu.ff.cuni.cz/praat/rDemo.html)
@@ -51,7 +51,7 @@ rPraat package, please cite it when using it for data analysis.
 
 > Bořil, T., & Skarnitzl, R. (2016). Tools rPraat and mPraat. In P.
 > Sojka, A. Horák, I. Kopeček, & K. Pala (Eds.), Text, Speech, and
-> Dialogue (pp. 367–374). Springer International Publishing.
+> Dialogue (pp. 367–374). Springer International Publishing.
 
 [Download Tools rPraat and mPraat manuscript
 .pdf](https://fu.ff.cuni.cz/praat/boril_skarnitzl_2016_Tools_rPraat_and_mPraat_%5Bmanuscript%5D.pdf)
@@ -65,8 +65,10 @@ mpraatrpraat2016.bib](https://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
 What is new
 -----------
 
-v1.2.0-1 (2019/03/16): detectEncoding(): removed “UTF-16LE” (does not
-work anymore), tg.read(fileName, encoding = “auto”) works again
+v1.2.0-2 (2019/04/01): "UTF-16" TextGrids are properly saved in "UTF-8"
+
+v1.2.0-1 (2019/03/16): detectEncoding(): removed "UTF-16LE" (does not
+work anymore), tg.read(fileName, encoding = "auto") works again
 
 v1.2.0 (2018/12/08): pitch.write(), formant.write(), col.write()
 
@@ -92,8 +94,8 @@ col.read() can read formant objects
 
 v1.1.2-1 (2018/10/20): tg.plot(): right-aligned labels; pitch.sample(),
 as.tg(), as.pt(), as.it(), as.pitch(); .read(), .sample() and
-tg.createNewTextGrid(): class(object)\[“type”\] set to “TextGrid”,
-“PitchTier” etc. and class(object)\[“name”\] set according to fileName
+tg.createNewTextGrid(): class(object)\["type"\] set to "TextGrid",
+"PitchTier" etc. and class(object)\["name"\] set according to fileName
 
 v1.1.2 (2018/08/04): tg.cut(), tg.cut0()
 
@@ -112,13 +114,13 @@ Weirong Chen for his DetectEncoding idea in mPraat toolbox).
 v1.0.8-3 (2017/11/27): tg.write(): fix for possible UTF-8 encoding and
 Windows OS locale mismatch
 
-v1.0.8-2 (2017/11/04): tg.write() and pt.write() format support: “text”
-(full text format), “short” (short text format), and in addition for pt:
-“spreadsheet” and “headerless”; tg.read(), pt.read() and pitch.read():
-optional file encoding parameter (default: “UTF-8”)
+v1.0.8-2 (2017/11/04): tg.write() and pt.write() format support: "text"
+(full text format), "short" (short text format), and in addition for pt:
+"spreadsheet" and "headerless"; tg.read(), pt.read() and pitch.read():
+optional file encoding parameter (default: "UTF-8")
 
 v1.0.8-1 (2017/09/01): bugfix, short-text TextGrid with multiple lines
-in a label no longer produces “missing sppasFormat variable” error
+in a label no longer produces "missing sppasFormat variable" error
 
 v1.0.8 (2017/07/16): pitch.read() to read Pitch-object files with time
 frames of pitch candidates
@@ -137,12 +139,11 @@ License
 
 License: MIT
 
-Copyright (c) 2016 Tomáš Bořil,
-<a href="mailto:borilt@gmail.com" class="email">borilt@gmail.com</a>
+Copyright (c) 2016 Tomáš Bořil, <borilt@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
-“Software”), to deal in the Software without restriction, including
+"Software"), to deal in the Software without restriction, including
 without limitation the rights to use, copy, modify, merge, publish,
 distribute, sublicense, and/or sell copies of the Software, and to
 permit persons to whom the Software is furnished to do so, subject to
@@ -151,7 +152,7 @@ the following conditions:
 The above copyright notice and this permission notice shall be included
 in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY

@@ -1,3 +1,7 @@
+v1.2.0-2 (2019/04/01)
+---------------------
+"UTF-16" TextGrids are properly saved in "UTF-8"
+
 v1.2.0-1 (2019/03/16)
 ---------------------
 - detectEncoding(): removed "UTF-16LE" (does not work anymore), tg.read(fileName, encoding = "auto") works again

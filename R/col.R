@@ -65,6 +65,8 @@ col.read <- function(fileName, encoding = "UTF-8") {
         close(fid)
     }
 
+    flines <- enc2utf8(flines)
+
     if (length(flines) < 3) {
         stop("This is not a Collection file!")
     }
