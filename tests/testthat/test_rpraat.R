@@ -217,6 +217,14 @@ test_that("it.read", {
         it <- it.read("maminka_short.IntensityTier")
         c(length(unique(it$t)), it$tmin, it$tmax, length(it$t), it$t[1], it$t[16], it$t[29], it$t[40], it$i[1], it$i[16], it$i[29], it$i[40])
     }, c(40, 0, 0.5460770975056689, 40, 0.0501814058956916, 0.22160997732426302, 0.3701814058956916, 0.4958956916099773, 59.5715903919772, 71.63843325188716, 64.17176220056767, 64.98963270408825))
+    expect_equal({
+        it <- it.read("maminka_UTF-16.IntensityTier", encoding = "UTF-16")
+        c(length(unique(it$t)), it$tmin, it$tmax, length(it$t), it$t[1], it$t[16], it$t[29], it$t[40], it$i[1], it$i[16], it$i[29], it$i[40])
+    }, c(40, 0, 0.5460770975056689, 40, 0.0501814058956916, 0.22160997732426302, 0.3701814058956916, 0.4958956916099773, 59.5715903919772, 71.63843325188716, 64.17176220056767, 64.98963270408825))
+    expect_equal({
+        it <- it.read("maminka_short_UTF-16.IntensityTier", encoding = "UTF-16")
+        c(length(unique(it$t)), it$tmin, it$tmax, length(it$t), it$t[1], it$t[16], it$t[29], it$t[40], it$i[1], it$i[16], it$i[29], it$i[40])
+    }, c(40, 0, 0.5460770975056689, 40, 0.0501814058956916, 0.22160997732426302, 0.3701814058956916, 0.4958956916099773, 59.5715903919772, 71.63843325188716, 64.17176220056767, 64.98963270408825))
 })
 
 test_that("it.write", {

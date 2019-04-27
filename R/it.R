@@ -22,15 +22,16 @@ it.read <- function(fileNameIntensityTier, encoding = "UTF-8") {
     if (!isString(encoding)) {
         stop("Invalid 'encoding' parameter.")
     }
+    enc <- encoding
 
     if (encoding == "auto") {
-        encoding <- detectEncoding(fileNameIntensityTier)
+        enc <- detectEncoding(fileNameIntensityTier)
     }
 
-    if (encoding == "UTF-8") {
+    if (enc == "UTF-8") {
         flines <- readr::read_lines(fileNameIntensityTier, locale = readr::locale(encoding = "UTF-8"))  # Does not support UTF-16 at this point :-(
     } else {
-        fid <- file(fileNameIntensityTier, open = "r", encoding = encoding)
+        fid <- file(fileNameIntensityTier, open = "r", encoding = enc)
         flines <- readLines(fid)
         close(fid)
     }
@@ -40,6 +41,12 @@ it.read <- function(fileNameIntensityTier, encoding = "UTF-8") {
 
     if (length(flines) < 1) {
         stop("Empty file.")
+    }
+
+    if (encoding == "UTF-8" & flines[1] != 'File type = "ooTextFile"') {
+        warning('Not an UTF-8 IntensityTier format, trying encoding = "auto"...')
+        x <- it.read(fileNameIntensityTier, encoding = "auto")
+        return(x)
     }
 
     it_ind <- it.read_lines(flines)

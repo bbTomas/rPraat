@@ -79,15 +79,16 @@ tg.read <- function(fileNameTextGrid, encoding = "UTF-8") {
     if (!isString(encoding)) {
         stop("Invalid 'encoding' parameter.")
     }
+    enc <- encoding
 
     if (encoding == "auto") {
-        encoding <- detectEncoding(fileNameTextGrid)
+        enc <- detectEncoding(fileNameTextGrid)
     }
 
-    if (encoding == "UTF-8") {
+    if (enc == "UTF-8") {
         flines <- readr::read_lines(fileNameTextGrid, locale = readr::locale(encoding = "UTF-8"))  # Does not support UTF-16 at this point :-(
     } else {
-        fid <- file(fileNameTextGrid, open = "r", encoding = encoding)
+        fid <- file(fileNameTextGrid, open = "r", encoding = enc)
         flines <- readLines(fid)   # does not work with tests/testthat/utf8.TextGrid  :-(
         close(fid)
     }
@@ -95,6 +96,12 @@ tg.read <- function(fileNameTextGrid, encoding = "UTF-8") {
     flines <- enc2utf8(flines)
 
     find <- 4   # index of line to read, we ignore the first three
+
+    if (encoding == "UTF-8" & flines[1] != 'File type = "ooTextFile"') {
+        warning('Not an UTF-8 TextGrid format, trying encoding = "auto"...')
+        x <- tg.read(fileNameTextGrid, encoding = "auto")
+        return(x)
+    }
 
     tg_ind <- tg.read_lines(flines, find)
     class(tg_ind[[1]])["type"] <- "TextGrid"

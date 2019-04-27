@@ -7,7 +7,7 @@ output: md_document
 
 rPraat package for R constitutes an interface between the most popular software for phonetic analyses, Praat, and R.
 
-Version 1.2.0-2.
+Version 1.2.0-3.
 
 For demonstration, see [html/rDemo.html](https://fu.ff.cuni.cz/praat/rDemo.html)
 
@@ -62,6 +62,8 @@ The final publication is available at Springer via [DOI 10.1007/978-3-319-45510-
 [Download BibTeX reference mpraatrpraat2016.bib](https://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
 
 ## What is new
+
+v1.2.0-3 (2019/04/27): if "UTF-8" encoding is specified in .read() functions (i.e., default value) and input file cannot be read properly, then "auto" encoding is tried automatically with a warning message notification
 
 v1.2.0-2 (2019/04/01): "UTF-16" TextGrids are properly saved in "UTF-8"
 

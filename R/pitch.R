@@ -44,15 +44,16 @@ pitch.read <- function(fileNamePitch, encoding = "UTF-8") {
     if (!isString(encoding)) {
         stop("Invalid 'encoding' parameter.")
     }
+    enc <- encoding
 
     if (encoding == "auto") {
-        encoding <- detectEncoding(fileNamePitch)
+        enc <- detectEncoding(fileNamePitch)
     }
 
-    if (encoding == "UTF-8") {
+    if (enc == "UTF-8") {
         flines <- readr::read_lines(fileNamePitch, locale = readr::locale(encoding = "UTF-8"))  # Does not support UTF-16 at this point :-(
     } else {
-        fid <- file(fileNamePitch, open = "r", encoding = encoding)
+        fid <- file(fileNamePitch, open = "r", encoding = enc)
         flines <- readLines(fid)   # does not work with tests/testthat/utf8.TextGrid  :-(
         close(fid)
     }
@@ -61,6 +62,12 @@ pitch.read <- function(fileNamePitch, encoding = "UTF-8") {
 
     if (length(flines) < 1) {
         stop("Empty file.")
+    }
+
+    if (encoding == "UTF-8" & flines[1] != 'File type = "ooTextFile"') {
+        warning('Not an UTF-8 Pitch format, trying encoding = "auto"...')
+        x <- pitch.read(fileNamePitch, encoding = "auto")
+        return(x)
     }
 
     pitch_ind <- pitch.read_lines(flines)

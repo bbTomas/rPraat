@@ -67,6 +67,16 @@ col.read <- function(fileName, encoding = "UTF-8") {
 
     flines <- enc2utf8(flines)
 
+    if (length(flines) < 1) {
+        stop("Empty file.")
+    }
+
+    if (encoding == "UTF-8" & flines[1] != 'File type = "ooTextFile"') {
+        warning('Not an UTF-8 Collection format, trying encoding = "auto"...')
+        x <- col.read(fileName, encoding = "auto")
+        return(x)
+    }
+
     if (length(flines) < 3) {
         stop("This is not a Collection file!")
     }

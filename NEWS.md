@@ -1,6 +1,10 @@
+v1.2.0-3 (2019/04/27)
+---------------------
+- if "UTF-8" encoding is specified in .read() functions (i.e., default value) and input file cannot be read properly, then "auto" encoding is tried automatically with a warning message notification
+
 v1.2.0-2 (2019/04/01)
 ---------------------
-"UTF-16" TextGrids are properly saved in "UTF-8"
+- "UTF-16" TextGrids are properly saved in "UTF-8"
 
 v1.2.0-1 (2019/03/16)
 ---------------------
@@ -23,7 +27,6 @@ v1.1.3-4 (2018/12/03)
 
 v1.1.3-3 (2018/12/03)
 ---------------------
-
 - formant.toFrame(), pitch.toArray(), pitch.toFrame()
 - pitch.plot()
 - tg.plot() can plot TextGrid together with Pitch object
