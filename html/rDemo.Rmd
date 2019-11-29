@@ -288,7 +288,7 @@ tg$word$label[4]
 tg$word$label[5:8]
 ```
 
-## Vectorized operations
+## Vectorized operations, labels-of-interest
 
 ```{r, fig.height=3.5}
 labelsOfInterest <- c("i", "i:", "e", "e:", "a", "a:", "o", "o:", "u", "u:")
@@ -299,6 +299,12 @@ sum(condition) # How many labels satisfy the condition?
 dur <- tg$phone$t2[condition] - tg$phone$t1[condition]
 mean(dur)
 hist(dur, breaks = 10)
+
+# let's put them into a table
+tab <- data.frame(Vowel = tg$phone$label[condition], Duration = tg$phone$t2[condition] - tg$phone$t1[condition])
+
+library(dplyr)
+tab %>% group_by(Vowel) %>% summarise(DurMean = mean(Duration))
 ```
 
 ## Cut TextGrid
@@ -701,6 +707,7 @@ col.write(col, "demo/temp.Collection")
 
 # Process all files in folder
 
+## Template
 ```{R, eval = FALSE}
 inputFolder <- "experiment1/data"
 listFiles <- list.files(path = inputFolder, pattern = "\\.TextGrid$" , ignore.case = TRUE)
@@ -730,3 +737,45 @@ for (I in seq_along(listFiles)) {
 }
 ```
 
+## Descriptive statistics of all PitchTiers in folder
+```{R, eval = FALSE}
+library(rPraat)
+
+inputFolder <- "experiment1/data"
+listFiles <- list.files(path = inputFolder, pattern = "\\.PitchTier$" , ignore.case = TRUE)
+
+tab <- data.frame(file = listFiles)   # table with file names
+tab$median <- NA
+tab$mean <- NA
+tab$q10 <- NA
+tab$q90 <- NA
+tab$min <- NA
+tab$max <- NA
+tab$sd <- NA
+
+for (I in seq_along(listFiles)) {
+    file <- listFiles[I]
+    filePitchTier <- paste0(inputFolder, "/", file)
+    
+    pt <- pt.read(filePitchTier)
+    pt <- pt.Hz2ST(pt)
+    
+    tab$median[I] <- median(pt$f)
+    tab$mean[I]   <- mean(pt$f)
+    tab$q10[I]    <- quantile(pt$f, 0.1)
+    tab$q90[I]    <- quantile(pt$f, 0.9)
+    tab$min[I]    <- min(pt$f)
+    tab$max[I]    <- max(pt$f)
+    tab$sd[I]     <- sd(pt$f)
+}
+
+plot(tab$median, tab$mean, main = cor(tab$median, tab$mean))
+plot(tab$q90 - tab$q10, tab$sd, main = cor(tab$q90 - tab$q10, tab$sd))
+plot(tab$max - tab$min, tab$sd, main = cor(tab$max - tab$min, tab$sd))
+plot(tab$max - tab$min, tab$q90 - tab$q10, main = cor(tab$max - tab$min, tab$q90 - tab$q10))
+plot(tab$median, tab$q90 - tab$q10, main = cor(tab$median, tab$q90 - tab$q10))
+
+# save results
+library(openxlsx)
+write.xlsx(tab, "table.xlsx")
+```
