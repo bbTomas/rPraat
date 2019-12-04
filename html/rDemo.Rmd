@@ -202,8 +202,22 @@ tg.plot(tg[c("phone", "word")]) # Plot selected tiers only
 tg.write(tg, "demo/new_file.TextGrid")  # save variable into a new file
 ```
 
+## Boundary magnet
+
+Align boundaries of intervals in the "word" tier according to closest boundaries in the "phone" tier. If there is no boundary within the tolerance limit in the pattern tier, the boundary position in the target tier is kept at its original position.
+
+```{r, eval=FALSE}
+tg <- tg.read("demo/H_shifted.TextGrid")
+tg.plot(tg)
+tg2 <- tg.boundaryMagnet(tg, targetTier = "word", patternTier = "phone")
+tg.plot(tg2)
+```
+
+![](before-after.png)
+
 ## Get basic info
 ```{r}
+tg <- tg.read("demo/H.TextGrid")
 tg.getNumberOfTiers(tg)
 length(tg)   # get number of tiers, "low-level access"
 

@@ -51,7 +51,7 @@ test_that("snd.sample", {
     expect_equal(snd.sample()$nBits, 16)
     expect_equal(snd.sample()$nSamples, 5484)
     expect_equal(snd.sample()$duration, 0.6855)
-    expect_equal(class(snd.sample()$sig), "matrix")
+    expect_equal("matrix" %in% class(snd.sample()$sig), TRUE)
     expect_equal(dim(snd.sample()$sig), c(5484, 1))
     expect_equal(snd.sample()$sig[1, 1], 0)
     expect_equal(snd.sample()$sig[2, 1], 0.00116)
@@ -993,86 +993,86 @@ test_that("tg.findLabels", {
     expect_equal(length(tg.findLabels(tg.sample(), "word", character(0))), 0)
     expect_equal({
         q <- tg.findLabels(tg.sample(), "word", "")
-        c(class(q), length(q), q[[1]], q[[2]])},
-        c("list", 2, 1, 13))
+        c("list" %in% class(q), length(q), q[[1]], q[[2]])},
+        c(TRUE, 2, 1, 13))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "phoneme", "")
-        c(class(q), length(q))},
-        c("list", 0))
+        c("list" %in% class(q), length(q))},
+        c(TRUE, 0))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "word", "nic")
-        c(class(q), length(q))},
-        c("list", 0))
+        c("list" %in% class(q), length(q))},
+        c(TRUE, 0))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "word", "reknu")
-        c(class(q), length(q), q[[1]])},
-        c("list", 1, 4))
+        c("list" %in% class(q), length(q), q[[1]])},
+        c(TRUE, 1, 4))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "phone", "a")
-        c(class(q), length(q), q[[1]], q[[2]], q[[3]], q[[4]], q[[5]])},
-        c("list", 5, 29, 40, 42, 44, 46))
+        c("list" %in% class(q), length(q), q[[1]], q[[2]], q[[3]], q[[4]], q[[5]])},
+        c(TRUE, 5, 29, 40, 42, 44, 46))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "phoneme", c("n"))
-        c(class(q), length(q), q[[1]], q[[2]], q[[3]], q[[4]])},
-        c("list", 4, 8, 18, 25, 42))
+        c("list" %in% class(q), length(q), q[[1]], q[[2]], q[[3]], q[[4]])},
+        c(TRUE, 4, 8, 18, 25, 42))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "word", c("ti", "reknu", "co"))
-        c(class(q), length(q), q[[1]][1], q[[1]][2], q[[1]][3])},
-        c("list", 1, 3, 4, 5))
+        c("list" %in% class(q), length(q), q[[1]][1], q[[1]][2], q[[1]][3])},
+        c(TRUE, 1, 3, 4, 5))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "phone", c("?", "a"))
-        c(class(q), length(q), q[[1]][1], q[[1]][2], q[[2]][1], q[[2]][2])},
-        c("list", 2, 39, 40, 41, 42))
+        c("list" %in% class(q), length(q), q[[1]][1], q[[1]][2], q[[2]][1], q[[2]][2])},
+        c(TRUE, 2, 39, 40, 41, 42))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "phoneme", c("n", "e"))
-        c(class(q), length(q), q[[1]][1], q[[1]][2])},
-        c("list", 1, 18, 19))
+        c("list" %in% class(q), length(q), q[[1]][1], q[[1]][2])},
+        c(TRUE, 1, 18, 19))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "phoneme", c("n", "a"))
-        c(class(q), length(q), q[[1]][1], q[[1]][2], q[[2]][1], q[[2]][2])},
-        c("list", 2, 25, 26, 42, 43))
+        c("list" %in% class(q), length(q), q[[1]][1], q[[1]][2], q[[2]][1], q[[2]][2])},
+        c(TRUE, 2, 25, 26, 42, 43))
 
     expect_equal(length(tg.findLabels(tg.sample(), "word", character(0), TRUE)), 0)
     expect_equal({
         q <- tg.findLabels(tg.sample(), "word", "", TRUE)
-        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2])},
-        c("list", 2, 2, 2, 0.008, 0.0965724658757064, 3.495928125, 3.616))
+        c("list" %in% class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2])},
+        c(TRUE, 2, 2, 2, 0.008, 0.0965724658757064, 3.495928125, 3.616))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "phoneme", "", TRUE)
-        c(class(q), length(q), length(q$t1), length(q$t2))},
-        c("list", 2, 0, 0))
+        c("list" %in% class(q), length(q), length(q$t1), length(q$t2))},
+        c(TRUE, 2, 0, 0))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "word", "nic", TRUE)
-        c(class(q), length(q), length(q$t1), length(q$t2))},
-        c("list", 2, 0, 0))
+        c(TRUE, length(q), length(q$t1), length(q$t2))},
+        c("list" %in% class(q), 2, 0, 0))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "word", "reknu", TRUE)
-        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1])},
-        c("list", 2, 1, 1, 0.352156565444145, 0.632200305451128))
+        c("list" %in% class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1])},
+        c(TRUE, 2, 1, 1, 0.352156565444145, 0.632200305451128))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "phone", "a", TRUE)
-        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2], q$t1[3], q$t2[3], q$t1[4], q$t2[4], q$t1[5], q$t2[5])},
-        c("list", 2, 5, 5, 2.24830876409774, 2.30352886461156, 2.96666963493613, 3.02360108418367, 3.07030520488411, 3.10631502016129, 3.18439423076923, 3.2390296474359, 3.3053099702381, 3.35952210541475))
+        c("list" %in% class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2], q$t1[3], q$t2[3], q$t1[4], q$t2[4], q$t1[5], q$t2[5])},
+        c(TRUE, 2, 5, 5, 2.24830876409774, 2.30352886461156, 2.96666963493613, 3.02360108418367, 3.07030520488411, 3.10631502016129, 3.18439423076923, 3.2390296474359, 3.3053099702381, 3.35952210541475))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "phoneme", c("n"), TRUE)
-        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2], q$t1[3], q$t2[3], q$t1[4], q$t2[4])},
-        c("list", 2, 4, 4, 0.562717206724197, 0.562717206724197, 1.88902324993668, 1.88902324993668, 2.22032423657473, 2.22032423657473, 3.38647934980882, 3.38647934980882))
+        c("list" %in% class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2], q$t1[3], q$t2[3], q$t1[4], q$t2[4])},
+        c(TRUE, 2, 4, 4, 0.562717206724197, 0.562717206724197, 1.88902324993668, 1.88902324993668, 2.22032423657473, 2.22032423657473, 3.38647934980882, 3.38647934980882))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "word", c("ti", "reknu", "co"), TRUE)
-        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1])},
-        c("list", 2, 1, 1, 0.215988182773109, 0.760009490030675))
+        c("list" %in% class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1])},
+        c(TRUE, 2, 1, 1, 0.215988182773109, 0.760009490030675))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "phone", c("?", "a"), TRUE)
-        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2])},
-        c("list", 2, 2, 2, 2.91140769675926, 3.02360108418367, 3.02360108418367, 3.10631502016129))
+        c("list" %in% class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2])},
+        c(TRUE, 2, 2, 2, 2.91140769675926, 3.02360108418367, 3.02360108418367, 3.10631502016129))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "phoneme", c("n", "e"), TRUE)
-        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1])},
-        c("list", 2, 1, 1, 1.88902324993668, 1.92282441350142))
+        c("list" %in% class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1])},
+        c(TRUE, 2, 1, 1, 1.88902324993668, 1.92282441350142))
     expect_equal({
         q <- tg.findLabels(tg.sample(), "phoneme", c("n", "a"), TRUE)
-        c(class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2])},
-        c("list", 2, 2, 2, 2.22032423657473, 2.27591881435465, 3.38647934980882, 3.45468235960145))
+        c("list" %in% class(q), length(q), length(q$t1), length(q$t2), q$t1[1], q$t2[1], q$t1[2], q$t2[2])},
+        c(TRUE, 2, 2, 2, 2.22032423657473, 2.27591881435465, 3.38647934980882, 3.45468235960145))
 })
 
 test_that("tg.duplicateTierMergeSegments", {
@@ -1281,6 +1281,21 @@ test_that("tg.cut0", {
         c(tg.getStartTime(tg2), tg.getEndTime(tg2))
     }, c(0, 0))
 
+})
+
+test_that("tg.boundaryMagnet", {
+    expect_equal({
+        tg <- tg.read("H_shifted.TextGrid")
+        tg2 <- tg.boundaryMagnet(tg, "word", "phone", boundaryTolerance = 0.05, verbose = FALSE)
+        c(tg2$word$t1, tg2$word$t2)
+    }, c(0.00800000, 0.09657247, 0.21598818, 0.35215657, 0.63220031, 0.76000949, 1.38898762, 0.09657247, 0.21598818, 0.35215657, 0.63220031, 0.76000949, 1.38898762, 1.82325822))
+
+    expect_equal({
+        tg2 <- tg.boundaryMagnet(tg, "word", "phone", verbose = FALSE)
+        c(tg2$word$t1, tg2$word$t2)
+    }, c(0.00800000, 0.09657247, 0.21598818, 0.35215657, 0.63220031, 0.76000949, 1.32072156, 0.09657247, 0.21598818, 0.35215657, 0.63220031, 0.76000949, 1.32072156, 1.82325822))
+
+    expect_error(tg.boundaryMagnet(tg, "phone", "word", verbose = FALSE))
 })
 
 
@@ -1768,16 +1783,16 @@ test_that("seqM works", {
     expect_equal(seqM(to=2, by=0, len=3), c(2, 2, 2))
     expect_warning(seqM(from=1, by=1, len=0), "length.out == 0, return empty vector")
     expect_warning(seqM(to=1, by=1, len=0), "length.out == 0, return empty vector")
-    expect_equal(class(seqM(3, 1, len=3)), "numeric")
-    expect_equal(class(seqM(1, 3, len=3)), "numeric")
-    expect_equal(class(seqM(3, 1, by=-1)), "integer")
-    expect_equal(class(seqM(3, 1, by=-5)), "integer")
-    expect_equal(class(seqM(1, 3, by=1)), "integer")
-    expect_equal(class(seqM(1, 3, by=2)), "integer")
-    expect_equal(class(seqM(from=1, by=3, len=5)), "integer")
-    expect_equal(class(seqM(to=1, by=3, len=5)), "integer")
-    expect_equal(class(seqM(from=1, by=-3, len=5)), "integer")
-    expect_equal(class(seqM(to=1, by=-3, len=5)), "integer")
+    expect_equal("numeric" %in% class(seqM(3, 1, len=3)), TRUE)
+    expect_equal("numeric" %in% class(seqM(1, 3, len=3)), TRUE)
+    expect_equal("integer" %in% class(seqM(3, 1, by=-1)), TRUE)
+    expect_equal("integer" %in% class(seqM(3, 1, by=-5)), TRUE)
+    expect_equal("integer" %in% class(seqM(1, 3, by=1)), TRUE)
+    expect_equal("integer" %in% class(seqM(1, 3, by=2)), TRUE)
+    expect_equal("integer" %in% class(seqM(from=1, by=3, len=5)), TRUE)
+    expect_equal("integer" %in% class(seqM(to=1, by=3, len=5)), TRUE)
+    expect_equal("integer" %in% class(seqM(from=1, by=-3, len=5)), TRUE)
+    expect_equal("integer" %in% class(seqM(to=1, by=-3, len=5)), TRUE)
 })
 
 

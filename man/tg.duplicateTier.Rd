@@ -33,5 +33,5 @@ tg2 <- tg.duplicateTier(tg, "word", 1, "NEW")
 tg.plot(tg2)
 }
 \seealso{
-\code{\link{tg.duplicateTierMergeSegments}}, \code{\link{tg.setTierName}}, \code{\link{tg.removeTier}}
+\code{\link{tg.duplicateTierMergeSegments}}, \code{\link{tg.setTierName}}, \code{\link{tg.removeTier}}, \code{\link{tg.boundaryMagnet}}
 }

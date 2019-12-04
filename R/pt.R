@@ -363,7 +363,7 @@ pt.plot <- function(pt, group = "") {
 #' pt.plot(pt2)
 #' }
 pt.interpolate <- function(pt, t) {
-    if (class(t) != "numeric"  &  class(t) != "integer") {
+    if (!("numeric" %in% class(t)) &  !("integer" %in% class(t))) {
         stop("t must be numeric vector")
     }
 
@@ -536,7 +536,7 @@ pt.legendre <- function(pt, npoints = 1000, npolynomials = 4) {
 #' lines(ptLeg$t, ptLeg$f, col = "blue")
 #' }
 pt.legendreSynth <- function(c, npoints = 1000) {
-    if (class(c) != "numeric"  &  class(c) != "integer") {
+    if (!("numeric" %in% class(c)) &  !("integer" %in% class(c))) {
         stop("c must be numeric vector")
     }
 

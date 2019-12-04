@@ -1314,7 +1314,7 @@ tg.countLabels <- function(tg, tierInd, label) {
 #'
 #' @return TextGrid object
 #' @export
-#' @seealso \code{\link{tg.duplicateTierMergeSegments}}, \code{\link{tg.setTierName}}, \code{\link{tg.removeTier}}
+#' @seealso \code{\link{tg.duplicateTierMergeSegments}}, \code{\link{tg.setTierName}}, \code{\link{tg.removeTier}}, \code{\link{tg.boundaryMagnet}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -2165,20 +2165,20 @@ tg.insertNewIntervalTier <- function(tg, newInd = Inf, newTierName, tMin=NA, tMa
         stop("newTierName must be a character string")
     }
 
-    if (class(tMin) != "logical" & !isNum(tMin)) {
+    if (!("logical" %in% class(tMin)) & !isNum(tMin)) {
         stop("tMin must be a number")
     }
-    if (class(tMin) == "logical" & length(tMin) != 1) {
+    if (("logical" %in% class(tMin)) & length(tMin) != 1) {
         stop("tMin must be a number")
     }
     if (!isNum(tMin) & !is.na(tMin)) {
         stop("tMin must be a number")
     }
 
-    if (class(tMax) != "logical" & !isNum(tMax)) {
+    if (!("logical" %in% class(tMax)) & !isNum(tMax)) {
         stop("tMax must be a number")
     }
-    if (class(tMax) == "logical" & length(tMax) != 1) {
+    if (("logical" %in% class(tMax)) & length(tMax) != 1) {
         stop("tMax must be a number")
     }
     if (!isNum(tMax) & !is.na(tMax)) {
@@ -2800,7 +2800,7 @@ tg.removeIntervalBothBoundaries <- function(tg, tierInd, index) {
 #'
 #' @return TextGrid object
 #' @export
-#' @seealso \code{\link{tg.insertInterval}}, \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}, \code{\link{tg.duplicateTierMergeSegments}}
+#' @seealso \code{\link{tg.insertInterval}}, \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}, \code{\link{tg.boundaryMagnet}}, \code{\link{tg.duplicateTierMergeSegments}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -2946,7 +2946,7 @@ tg.insertBoundary <- function(tg, tierInd, time, label="") {
 #'
 #' @return TextGrid object
 #' @export
-#' @seealso \code{\link{tg.insertBoundary}}, \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}, \code{\link{tg.duplicateTierMergeSegments}}
+#' @seealso \code{\link{tg.insertBoundary}}, \code{\link{tg.removeIntervalLeftBoundary}}, \code{\link{tg.removeIntervalRightBoundary}}, \code{\link{tg.removeIntervalBothBoundaries}}, \code{\link{tg.boundaryMagnet}}, \code{\link{tg.duplicateTierMergeSegments}}
 #'
 #' @examples
 #' tg <- tg.sample()
@@ -3162,7 +3162,7 @@ tg.findLabels <- function(tg, tierInd, labelVector, returnTime = FALSE) {
     tierInd <- tg.checkTierInd(tg, tierInd)
     ntiers <- length(tg)
 
-    if (class(labelVector) != "character") {
+    if (!("character" %in% class(labelVector))) {
         stop("labelVector must be a character string or vector of character strings")
     }
 
@@ -3415,6 +3415,111 @@ tg.cut0 <- function(tg, tStart = -Inf, tEnd = Inf) {
 
     return(tgNew)
 }
+
+
+#' tg.boundaryMagnet
+#'
+#' Aligns boundaries of intervals in the target tier (typically: "word") to the closest boundaries in the pattern tier (typically: "phone").
+#' If there is no boundary within the tolerance limit in the pattern tier, the boundary position in the target tier is kept at its original position.
+#'
+#' @param tg TextGrid object
+#' @param targetTier index or "name" of the tier to be aligned
+#' @param patternTier index or "name" of the pattern tier
+#' @param boundaryTolerance if there is not any boundary in the pattern tier within this tolerance, the target boundary is kept at its position [default: \code{Inf}]
+#' @param verbose if TRUE, every boundary shift is printed [default: \code{TRUE}]
+#'
+#' @return TextGrid object
+#' @export
+#' @seealso \code{\link{tg.insertBoundary}}, \code{\link{tg.insertInterval}}, \code{\link{tg.duplicateTier}}
+#'
+#' @examples
+#' \dontrun{
+#' tg <- tg.sample()
+#' tg <- tg.removeTier(tg, "phoneme")
+#' tg <- tg.removeTier(tg, "syllable")
+#' tg <- tg.removeTier(tg, "phrase")
+#'
+#' # garble times in "word" tier a little
+#' n <- length(tg$word$label)
+#' deltaT <- runif(n - 1, min = -0.01, max = 0.015)
+#' tg$word$t2[1: (n-1)] <- tg$word$t2[1: (n-1)] + deltaT
+#' tg$word$t1[2: n] <- tg$word$t2[1: (n-1)]
+#' tg.plot(tg)
+#'
+#' # align "word" tier according to "phone tier"
+#' tg2 <- tg.boundaryMagnet(tg, targetTier = "word", patternTier = "phone")
+#' tg.plot(tg2)
+#' }
+tg.boundaryMagnet <- function(tg, targetTier, patternTier, boundaryTolerance = Inf, verbose = TRUE) {
+    targetTier <- tg.checkTierInd(tg, targetTier)
+    patternTier <- tg.checkTierInd(tg, patternTier)
+
+    if (!tg.isIntervalTier(tg, targetTier)) {
+        stop("targetTier must be IntervalTier")
+    }
+
+    if (!tg.isIntervalTier(tg, patternTier)) {
+        stop("targetTier must be patternTier")
+    }
+
+    target <- tg[[targetTier]]
+    pattern <- tg[[patternTier]]
+
+    tPattern <- unique(c(pattern$t1, pattern$t2))
+
+    lastT <- tg.getStartTime(tg)
+    # two rules: 1. t1 >= last t2, 2. t2 > t1
+
+    for (ind in seqM(1, length(target$label))) {
+        tPattern <- tPattern[tPattern >= lastT]  # rule 1.
+        if (length(tPattern) < 1) {
+            stop("No more boundaries left for aligning in the pattern tier")
+        }
+
+        delta <- abs(tPattern - target$t1[ind])
+        iMin <- which.min(delta)
+        if (delta[iMin] != 0) {
+            if (delta[iMin] < boundaryTolerance) {
+                target$t1[ind] <- tPattern[iMin]
+                if (verbose) {
+                    cat(ind, "[", target$label[ind], "] \n", sep = "")
+                }
+            } else {
+                if (verbose) {
+                    cat(ind, "\nWarning! [", target$label[ind], "].t1 Close boundary not found in tolerance limit.\n", sep = "")
+                }
+            }
+        }
+        lastT <- target$t1[ind] # rule 1.
+
+        tPattern <- tPattern[tPattern > lastT]  # rule 2.
+        if (length(tPattern) < 1) {
+            stop("No more boundaries left for aligning in the pattern tier")
+        }
+
+        delta <- abs(tPattern - target$t2[ind])
+        iMin <- which.min(delta)
+        if (delta[iMin] != 0) {
+            if (delta[iMin] < boundaryTolerance) {
+                target$t2[ind] <- tPattern[iMin]
+                if (verbose) {
+                    cat(ind, "[", target$label[ind], "] - ", sep = "")
+                }
+            } else {
+                if (verbose) {
+                    cat(ind, "\nWarning! [", target$label[ind], "].t2 Close boundary not found in tolerance limit.\n", sep = "")
+                }
+            }
+        }
+
+        lastT <- target$t2[ind] # rule 2.
+    }
+
+    tg[[targetTier]] <- target
+
+    return(tg)
+}
+
 
 #' as.tg
 #'

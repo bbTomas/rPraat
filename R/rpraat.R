@@ -161,12 +161,12 @@ strTrim <- function (string) {
 seqM <- function(from=NA, to=NA, by=NA, length.out=NA) {
     # nonsense or default parameters
 
-    if (!is.na(from) & class(from) != "numeric" & class(from) != "integer")
+    if (!is.na(from) & !("numeric" %in% class(from)) &  !("integer" %in% class(from)))
         stop("'from' must be numeric or integer")
     if (!is.na(from) & length(from) != 1)
         stop("'from' must be 1 number")
 
-    if (!is.na(to) & class(to) != "numeric" & class(to) != "integer")
+    if (!is.na(to) & !("numeric" %in% class(to)) &  !("integer" %in% class(to)))
         stop("'to' must be numeric or integer")
     if (!is.na(to) & length(to) != 1)
         stop("'to' must be 1 number")
@@ -174,14 +174,14 @@ seqM <- function(from=NA, to=NA, by=NA, length.out=NA) {
     if (length(by) != 1)
         stop("'by' must be 1 number")
     if (!is.na(by)) {
-        if (class(by) != "numeric" & class(by) != "integer")
+        if (!("numeric" %in% class(by)) &  !("integer" %in% class(by)))
             stop("'by' must be numeric or integer")
     }
 
     if (length(length.out) != 1)
         stop("'length.out' must be 1 number")
     if (!is.na(length.out)) {
-        if (class(length.out) != "numeric" & class(length.out) != "integer")
+        if (!("numeric" %in% class(length.out)) &  !("integer" %in% class(length.out)))
             stop("'length.out' must be numeric or integer")
     }
 

@@ -4,7 +4,7 @@ rPraat package for R
 rPraat package for R constitutes an interface between the most popular
 software for phonetic analyses, Praat, and R.
 
-Version 1.2.0-3.
+Version 1.3.
 
 For demonstration, see
 [html/rDemo.html](https://fu.ff.cuni.cz/praat/rDemo.html)
@@ -64,6 +64,9 @@ mpraatrpraat2016.bib](https://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
 
 What is new
 -----------
+
+v1.3 (2019/12/04): tg.boundaryMagnet(): align interval boundaries in a
+target tier according to a pattern tier
 
 v1.2.0-3 (2019/04/27): if “UTF-8” encoding is specified in .read()
 functions (i.e., default value) and input file cannot be read properly,

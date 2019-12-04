@@ -1,3 +1,7 @@
+v1.3 (2019/12/04)
+-----------------
+- tg.boundaryMagnet(): align interval boundaries in a target tier according to a pattern tier
+
 v1.2.0-3 (2019/04/27)
 ---------------------
 - if "UTF-8" encoding is specified in .read() functions (i.e., default value) and input file cannot be read properly, then "auto" encoding is tried automatically with a warning message notification
