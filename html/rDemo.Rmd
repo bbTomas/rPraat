@@ -125,12 +125,19 @@ tg.plot(tg.sample(), pitch = pitch.sample(), pitchShowStrength = TRUE, pt = pt.s
 
 ## Read, write and plot Sound file
 
-```{r, fig.height=3}
+```{r, fig.height=3, eval=FALSE}
 snd <- snd.read("demo/H.wav")
 snd.plot(snd)
 ```
 
-```{r}
+![](img/snd1.png)
+
+```{r, fig.height=3, echo=FALSE}
+snd <- snd.read("demo/H.wav")
+```
+
+
+```{r, eval=FALSE}
 snd.write(snd, "demo/temp.wav")
 ```
 
@@ -145,16 +152,25 @@ head(snd$sig)
 ```
 
 ### Stereo sound (2-channel)
-```{r, fig.height=3}
+```{r, fig.height=3, eval=FALSE}
 snd <- snd.read("demo/cali.wav")
 snd.plot(snd)
+```
+
+![](img/snd2.png)
+
+```{r, fig.height=3, echo=FALSE}
+snd <- snd.read("demo/cali.wav")
+```
+
+```{r}
 snd$nChannels
 head(snd$t)
 head(snd$sig)
 ```
 
 ## Create a new sound object
-```{r, fig.height=3}
+```{r, fig.height=3, eval=FALSE}
 fs <- 48000   # Hz
 duration <- 0.005 # sec
 f <- 1000     # Hz
@@ -163,8 +179,25 @@ sig <- 1*sin(2*pi*f*t)
 
 snd <- list(sig = sig, fs = fs)
 snd.plot(snd)
-snd.plot(snd, stemPlot = TRUE)
+```
+![](img/snd3.png)
 
+```{r, fig.height=3, echo=FALSE}
+fs <- 48000   # Hz
+duration <- 0.005 # sec
+f <- 1000     # Hz
+t <- seq(0, duration*fs-1)/fs
+sig <- 1*sin(2*pi*f*t)
+
+snd <- list(sig = sig, fs = fs)
+```
+
+```{r, fig.height=3, eval=FALSE}
+snd.plot(snd, stemPlot = TRUE)
+```
+![](img/snd4.png)
+
+```{r}
 snd$nBits = 16
 snd.write(snd, "demo/temp.wav")
 
@@ -178,29 +211,50 @@ mean(snd$sig)
 
 ## Cut Sound object
 
-```{r,fig.height=2.5}
+```{r,echo=FALSE}
+snd <- snd.sample()
+snd2 <- snd.cut(snd, Start = 0.2, End = 0.3)
+snd3 <- snd.cut0(snd, Start = 2000, End = 3000, units = "samples")
+```
+
+```{r,fig.height=2.5, eval=FALSE}
 snd <- snd.sample()
 snd.plot(snd)
+```
+![](img/snd5.png)
+
+```{r,fig.height=2.5, eval=FALSE}
 snd2 <- snd.cut(snd, Start = 0.2, End = 0.3)
 snd.plot(snd2)
+```
+![](img/snd6.png)
+
+```{r,fig.height=2.5, eval=FALSE}
 snd3 <- snd.cut0(snd, Start = 2000, End = 3000, units = "samples")
 snd.plot(snd3)
 ```
+![](img/snd7.png)
 
 
 # TextGrid
 
 ## Read, write and plot TextGrid
 
-```{r, fig.height=3.5}
+```{r, echo=FALSE}
+tg <- tg.read("demo/H.TextGrid")
+```
+
+```{r, fig.height=3.5, eval=FALSE}
 tg <- tg.read("demo/H.TextGrid")
 tg.plot(tg)
 ```
+![](img/tg1.png)
 
-```{r, fig.height=2.5}
+```{r, fig.height=2.5, eval=FALSE}
 tg.plot(tg[c("phone", "word")]) # Plot selected tiers only
 tg.write(tg, "demo/new_file.TextGrid")  # save variable into a new file
 ```
+![](img/tg2.png)
 
 ## Boundary magnet
 
@@ -213,7 +267,7 @@ tg2 <- tg.boundaryMagnet(tg, targetTier = "word", patternTier = "phone")
 tg.plot(tg2)
 ```
 
-![](before-after.png)
+![](img/before-after.png)
 
 ## Get basic info
 ```{r}
@@ -322,11 +376,15 @@ tab %>% group_by(Vowel) %>% summarise(DurMean = mean(Duration))
 ```
 
 ## Cut TextGrid
-```{r, fig.height=3.5}
+```{r, fig.height=3.5, eval=FALSE}
 tg.plot(tg.cut(tg.sample(), 2, 2.2)) # preserve times
+```
+![](img/tg3.png)
+
+```{r, fig.height=3.5, eval=FALSE}
 tg.plot(tg.cut0(tg.sample(), 2, 2.2)) # time from 0
 ```
-
+![](img/tg4.png)
 
 
 ## Find labels in TextGrid
@@ -390,23 +448,28 @@ Edit the collapsed string with labels - insert separators to mark boundaries of 
 * There can be segments with empty labels in the original tier (pauses), do not specify them in the pattern.
 * Beware of labels that appear empty but they are not (space, new line character etc.) - these segments are handled as classical non-empty labels. See example - one label is " ", therefore it must be specified in the pattern.
 
-```{r, fig.height=3}
+```{r, fig.height=3, eval=FALSE}
 pattern <- "ja:-ci-P\\ek-nu-t_so-?u-J\\e-la:S- -nej-dP\\i:f-naj-deZ-h\\ut_S-ku-?a-?a-ta-ma-na:"
 
 tg2 <- tg.duplicateTierMergeSegments(tg, "phone", 1, "syll", pattern, sep = "-")
 tg.plot(tg2[c("syll", "phone")])
 ```
 
+![](img/tg5.png)
 
 
 ## Overview of some TextGrid operations
 
 For all functions, see help `?functionName` for its description and example of use.
 
-```{r, fig.height=3.5}
+```{r, fig.height=3.5, eval=FALSE}
 tg <- tg.read("demo/H.TextGrid")
 tg.plot(tg)
+```
+![](img/tg6.png)
 
+
+```{r, fig.height=3.5, eval=FALSE}
 tg <- tg.removeTier(tg, "syllable")
 tg <- tg.removeTier(tg, "phrase")
 tg <- tg.removeTier(tg, "phone")
@@ -425,7 +488,10 @@ tg <- tg.insertInterval(tg, "WORD2", tStart = 0.9, tEnd = 1.7, label = "NEW LAB"
 ind <- tg.getIntervalIndexAtTime(tg, "WORD2", time = 2.3)
 tg <- tg.removeIntervalBothBoundaries(tg, "WORD2", ind)
 tg.plot(tg)
+```
+![](img/tg7.png)
 
+```{r, fig.height=3.5, eval=FALSE}
 tgNew <- tg.createNewTextGrid(tMin = 0, tMax = 5)
 tgNew <- tg.insertNewIntervalTier(tgNew, newInd = 1, "word")   # the first tier
 tgNew <- tg.insertInterval(tgNew, tierInd = 1, tStart = 2, tEnd = 3.5, "hello")
@@ -440,8 +506,7 @@ tgNew <- tg.insertPoint(tgNew, tierInd = "pointTierLast", time = 3, label = "poi
 tg.plot(tgNew)
 tg.write(tgNew, "demo/ex_output.TextGrid")
 ```
-
-
+![](img/tg8.png)
 
 ## Repair continuity problem of TextGrid
 
@@ -460,40 +525,58 @@ tgNew2 <- tg.repairContinuity(tgNew) # no problem in repaired TextGrid
 **Example.** Transform Hz to semitones (ST), cut the original PitchTier along the TextGrid, make interpolated contour.
 
 ## Read, write and plot PitchTier
-```{r, fig.height=2.5}
+```{r, fig.height=2.5, eval=FALSE}
 pt <- pt.read("demo/H.PitchTier")
 pt.plot(pt) %>% dygraphs::dyAxis("y", label = "Frequency (Hz)")
 pt.write(pt, "demo/new_file.PitchTier")  # save variable into a new file
 ```
+![](img/pt1.png)
 
 ## Transform Hz to semitones (ST)
-```{r, fig.height=2.5}
+```{r, fig.height=2.5, eval=FALSE}
 pt <- pt.Hz2ST(pt, ref = 100)  # conversion of Hz to Semitones, reference 0 ST = 100 Hz.
 
 pt.plot(pt) %>% dygraphs::dyAxis("y", label = "Frequency (ST re 100 Hz)")
 ```
+![](img/pt2.png)
 
 ## Plot PitchTier together with TextGrid
-```{r, fig.height=3}
+
+```{r, echo=FALSE}
+tg <- tg.read("demo/H.TextGrid")
+```
+
+
+```{r, fig.height=3, eval=FALSE}
 tg <- tg.read("demo/H.TextGrid")
 tg.plot(tg["word"], pt = pt) # plot "word" tier only together with PitchTier
 ```
+![](img/pt3.png)
 
 ## Cut PitchTier along the TextGrid
+
 ```{r, fig.height=2.5}
 t <- tg.findLabels(tg, "word", c("já", "ti", "řeknu"), returnTime = TRUE)
 print(t)
+```
+
+```{r, eval=FALSE}
 pt2 <- pt.cut0(pt, tStart = t$t1[1], tEnd = t$t2[1]) # "já ti řeknu"
 pt.plot(pt2) %>% dygraphs::dyAxis("y", label = "Frequency (ST re 100 Hz)")
 ```
+![](img/pt4.png)
+
+```{r, echo=FALSE}
+pt2 <- pt.cut0(pt, tStart = t$t1[1], tEnd = t$t2[1]) # "já ti řeknu"
+```
 
 ## Interpolate PitchTier
-```{r, fig.height=2.5}
+```{r, fig.height=2.5, eval=FALSE}
 pt2interp <- pt.interpolate(pt2, seq(pt2$t[1], pt2$t[length(pt2$t)], by = 0.001))
 pt.plot(pt2interp) %>% dygraphs::dyAxis("y", label = "Frequency (ST re 100 Hz)")
-
 pt.write(pt2interp, "demo/H_cut_interp.PitchTier")
 ```
+![](img/pt5.png)
 
 # Legendre polynomials modelling of PitchTiers
 
@@ -535,13 +618,11 @@ p$frame[[5]]$frequency[2]
 p$frame[[5]]$strength[2]
 ```
 
-```{r}
+```{r, eval=FALSE}
 pitch.write(p, "demo/temp.Pitch")
-```
-
-```{r}
 pitch.plot(p, scaleIntensity = TRUE, showStrength = TRUE)
 ```
+![](img/pitch1.png)
 
 ## Convert Pitch object from frames to arrays and vice versa
 ```{r, fig.height=3.5}
@@ -553,15 +634,17 @@ pitch$frame[[1]]
 ```
 
 ## Plot Pitch object with PitchTier together
-```{r}
+```{r, eval=FALSE}
 pitch.plot(pitch.sample(), pt = pt.sample(), showStrength = TRUE)
 ```
+![](img/pitch2.png)
 
 ## Cut Pitch object
-```{r,fig.height=3.5}
+```{r,fig.height=3.5, eval=FALSE}
 pitch <- pitch.sample() %>% pitch.cut(tStart = 0.7, tEnd = 1.5)
 pitch.plot(pitch, showStrength = TRUE)
 ```
+![](img/pitch3.png)
 
 
 # Formant object
@@ -579,13 +662,11 @@ f$frame[[4]]$frequency[2]
 f$frame[[4]]$bandwidth[2]
 ```
 
-```{r}
+```{r, eval=FALSE}
 formant.write(f, "demo/temp.Formant")
-```
-
-```{r}
 formant.plot(f, scaleIntensity = TRUE, drawBandwidth = TRUE)
 ```
+![](img/formant1.png)
 
 
 ## Convert Formant object from frames to arrays and vice versa
@@ -597,15 +678,17 @@ formant <- formant.toFrame(fArray)
 ```
 
 ## Plot TextGrid with Formant object together
-```{r, fig.height=7}
+```{r, fig.height=7, eval=FALSE}
 tg.plot(tg.sample(), formant = formant.sample())
 ```
+![](img/formant2.png)
 
 ## Cut Formant object
-```{r,fig.height=3.5}
+```{r,fig.height=3.5, eval=FALSE}
 formant <- formant.sample() %>% formant.cut(tStart = 1, tEnd = 1.5)
 formant.plot(formant)
 ```
+![](img/formant3.png)
 
 
 # IntensityTier
@@ -613,11 +696,16 @@ formant.plot(formant)
 Intensity tier files have very similar structure to PitchTiers. Using this package, you can also interpolate, cut or model Intensity tiers with Legendre polynomials.
 
 ## Read, write and plot IntensityTier
-```{r, fig.height=2.5}
+```{r, echo=fArray}
+it <- it.read('demo/maminka.IntensityTier')
+```
+
+```{r, fig.height=2.5, eval=FALSE}
 it <- it.read('demo/maminka.IntensityTier')
 it.plot(it) %>% dygraphs::dyAxis("y", label = "Intensity (dB)")
 it.write(it, "demo/new_file.IntensityTier")  # save variable into a new file
 ```
+![](img/it1.png)
 
 ## Cut the IntensityTier
 ```{r}
@@ -650,13 +738,17 @@ length(coll)  # number of objects in collection
 ## Access objects in Collection
 
 ### 1st object: IntensityTier "1"
+
 ```{r, fig.height=2.5}
 class(coll[[1]])["type"]  # 1st object type
 class(coll[[1]])["name"]  # 1st object name
-it <- coll[[1]]  # 1st object
+```
 
+```{r, eval=FALSE}
+it <- coll[[1]]  # 1st object
 it.plot(it)
 ```
+![](img/col1.png)
 
 ### 2nd object: TextGrid "HC101bA"
 ```{r, fig.height=3}
@@ -665,9 +757,12 @@ class(coll[[2]])["name"]  # 2nd object name
 tg <- coll[[2]]  # 2nd object
 length(tg)  # number of tiers in TextGrid
 tg$word$label
+```
 
+```{r, eval=FALSE}
 tg.plot(tg)
 ```
+![](img/col2.png)
 
 ### 3rd object: Pitch "sound_short"
 ```{r, fig.height=3.5}
@@ -680,18 +775,24 @@ pitch$t[4]        # time instance of the 4th frame
 pitch$frame[[4]]  # 4th frame: pitch candidates
 pitch$frame[[4]]$frequency[2]
 pitch$frame[[4]]$strength[2]
+```
 
+```{r, eval=FALSE}
 pitch.plot(pitch, showStrength = TRUE)
 ```
+![](img/col3.png)
 
 ### 4th object: PitchTier "H_shortTextFile"
 ```{r, fig.height=2.5}
 class(coll[[4]])["type"]  # 4th object type
 class(coll[[4]])["name"]  # 4th object name
-pt <- coll[[4]]  # 2nd object
+```
 
+```{r, eval=FALSE}
+pt <- coll[[4]]  # 2nd object
 pt.plot(pt)
 ```
+![](img/col4.png)
 
 ### 5th object: Formant "maminka"
 ```{r, fig.height=3.5}
@@ -704,9 +805,12 @@ formant$t[4]        # time instance of the 4th frame
 formant$frame[[4]]  # 4th frame: formants
 formant$frame[[4]]$frequency[2]
 formant$frame[[4]]$bandwidth[2]
+```
 
+```{r, eval=FALSE}
 formant.plot(formant)
 ```
+![](img/col5.png)
 
 ## Write Collection to file
 
