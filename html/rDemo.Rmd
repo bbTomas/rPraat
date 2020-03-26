@@ -894,6 +894,6 @@ plot(tab$max - tab$min, tab$q90 - tab$q10, main = cor(tab$max - tab$min, tab$q90
 plot(tab$median, tab$q90 - tab$q10, main = cor(tab$median, tab$q90 - tab$q10))
 
 # save results
-library(openxlsx)
-write.xlsx(tab, "table.xlsx")
+library(writexl)
+write_xlsx(tab, "table.xlsx")
 ```
