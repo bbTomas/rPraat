@@ -139,8 +139,19 @@ pitch.read_lines <- function(flines, find = 1, collection = FALSE) {
                     }
                     iline <- iline + 1
 
-                    frequency[Ic] <- as.numeric(substr(strTrim(flines[iline]), 13, nchar(strTrim(flines[iline])))); iline <- iline + 1
-                    strength[Ic] <-  as.numeric(substr(strTrim(flines[iline]), 12, nchar(strTrim(flines[iline])))); iline <- iline + 1
+                    nmbr <- substr(strTrim(flines[iline]), 13, nchar(strTrim(flines[iline]))); iline <- iline + 1
+                    if (nmbr != "--undefined--") {
+                        frequency[Ic] <- as.numeric(nmbr)
+                    } else {
+                        frequency[Ic] <- NA
+                    }
+
+                    nmbr <- substr(strTrim(flines[iline]), 12, nchar(strTrim(flines[iline]))); iline <- iline + 1
+                    if (nmbr != "--undefined--") {
+                        strength[Ic] <-  as.numeric(nmbr)
+                    } else {
+                        strength[Ic] <-  NA
+                    }
                 }
 
                 frame[[I]] <- list(intensity = intensity, nCandidates = nCandidates,
@@ -168,8 +179,19 @@ pitch.read_lines <- function(flines, find = 1, collection = FALSE) {
                 strength <- numeric(nCandidates)
 
                 for (Ic in seqM(1, nCandidates)) {
-                    frequency[Ic] <- as.numeric(flines[iline]); iline <- iline + 1
-                    strength[Ic] <- as.numeric(flines[iline]); iline <- iline + 1
+                    nmbr <- flines[iline]; iline <- iline + 1
+                    if (nmbr != "--undefined--") {
+                        frequency[Ic] <- as.numeric(nmbr)
+                    } else {
+                        frequency[Ic] <- NA
+                    }
+
+                    nmbr <- flines[iline]; iline <- iline + 1
+                    if (nmbr != "--undefined--") {
+                        strength[Ic] <- as.numeric(nmbr)
+                    } else {
+                        strength[Ic] <- NA
+                    }
                 }
 
                 frame[[I]] <- list(intensity = intensity, nCandidates = nCandidates,
@@ -671,7 +693,7 @@ pitch.write0 <- function(pitch, fileNamePitch, format = "short", fid = NULL, col
         wrLine(as.character(pitch$nx), fid)
         wrLine(as.character(round2(pitch$dx, -15)), fid)
         wrLine(as.character(round2(pitch$x1, -15)), fid)
-        wrLine(as.character(round2(pitch$ceiling), -15), fid)
+        wrLine(as.character(round2(pitch$ceiling, -15)), fid)
         wrLine(as.character(pitch$maxnCandidates), fid)
     } else if (format == "text") {
         wrLine(paste0("xmin = ", as.character(round2(pitch$xmin, -15)), " "), fid, collection)
@@ -701,12 +723,29 @@ pitch.write0 <- function(pitch, fileNamePitch, format = "short", fid = NULL, col
 
         for (I in seqM(1, pitch$frame[[N]]$nCandidate)) {
             if (format == "short") {
-                wrLine(as.character(pitch$frame[[N]]$frequency[I], -15), fid)
-                wrLine(as.character(pitch$frame[[N]]$strength[I], -15), fid)
+                if (!is.na(pitch$frame[[N]]$frequency[I])) {
+                    wrLine(as.character(round2(pitch$frame[[N]]$frequency[I], -15)), fid)
+                } else {
+                    wrLine("--undefined--", fid)
+                }
+                if (!is.na(pitch$frame[[N]]$strength[I])) {
+                    wrLine(as.character(round2(pitch$frame[[N]]$strength[I], -15)), fid)
+                } else {
+                    wrLine("--undefined--", fid)
+                }
             } else if (format == "text") {
                 wrLine(paste0("            candidate [", as.character(I), "]:"), fid, collection)
-                wrLine(paste0("                frequency = ", as.character(pitch$frame[[N]]$frequency[I], -15), " "), fid, collection)
-                wrLine(paste0("                strength = ", as.character(pitch$frame[[N]]$strength[I], -15), " "), fid, collection)
+                if (!is.na(pitch$frame[[N]]$frequency[I])) {
+                    wrLine(paste0("                frequency = ", as.character(round2(pitch$frame[[N]]$frequency[I], -15)), " "), fid, collection)
+                } else {
+                    wrLine(paste0("                frequency = --undefined-- "), fid, collection)
+                }
+                if (!is.na(pitch$frame[[N]]$strength[I])) {
+                    wrLine(paste0("                strength = ", as.character(round2(pitch$frame[[N]]$strength[I], -15)), " "), fid, collection)
+                } else {
+                    wrLine(paste0("                strength = --undefined-- "), fid, collection)
+                }
+
             }
         }
     }

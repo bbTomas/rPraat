@@ -134,8 +134,19 @@ formant.read_lines <- function(flines, find = 1, collection = FALSE) {
                     }
                     iline <- iline + 1
 
-                    frequency[If] <- as.numeric(substr(strTrim(flines[iline]), 13, nchar(strTrim(flines[iline])))); iline <- iline + 1
-                    bandwidth[If] <- as.numeric(substr(strTrim(flines[iline]), 13, nchar(strTrim(flines[iline])))); iline <- iline + 1
+                    nmbr <- substr(strTrim(flines[iline]), 13, nchar(strTrim(flines[iline]))); iline <- iline + 1
+                    if (nmbr != "--undefined--") {
+                        frequency[If] <- as.numeric(nmbr)
+                    } else {
+                        frequency[If] <- NA
+                    }
+
+                    nmbr <- substr(strTrim(flines[iline]), 13, nchar(strTrim(flines[iline]))); iline <- iline + 1
+                    if (nmbr != "--undefined--") {
+                        bandwidth[If] <- as.numeric(nmbr)
+                    } else {
+                        bandwidth[If] <- NA
+                    }
                 }
 
                 frame[[I]] <- list(intensity = intensity, nFormants = nFormants,
@@ -162,8 +173,19 @@ formant.read_lines <- function(flines, find = 1, collection = FALSE) {
                 bandwidth <- numeric(nFormants)
 
                 for (If in seqM(1, nFormants)) {
-                    frequency[If] <- as.numeric(flines[iline]); iline <- iline + 1
-                    bandwidth[If] <- as.numeric(flines[iline]); iline <- iline + 1
+                    nmbr <- flines[iline]; iline <- iline + 1
+                    if (nmbr != "--undefined--") {
+                        frequency[If] <- as.numeric(nmbr)
+                    } else {
+                        frequency[If] <- NA
+                    }
+
+                    nmbr <- flines[iline]; iline <- iline + 1
+                    if (nmbr != "--undefined--") {
+                        bandwidth[If] <- as.numeric(nmbr)
+                    } else {
+                        bandwidth[If] <- NA
+                    }
                 }
 
                 frame[[I]] <- list(intensity = intensity, nFormants = nFormants,
@@ -645,12 +667,28 @@ formant.write0 <- function(formant, fileNameFormant, format = "short", fid = NUL
 
         for (I in seqM(1, formant$frame[[N]]$nFormants)) {
             if (format == "short") {
-                wrLine(as.character(formant$frame[[N]]$frequency[I], -15), fid)
-                wrLine(as.character(formant$frame[[N]]$bandwidth[I], -15), fid)
+                if (!is.na(formant$frame[[N]]$frequency[I])) {
+                    wrLine(as.character(round2(formant$frame[[N]]$frequency[I], -15)), fid)
+                } else {
+                    wrLine("--undefined--", fid)
+                }
+                if (!is.na(formant$frame[[N]]$bandwidth[I])) {
+                    wrLine(as.character(round2(formant$frame[[N]]$bandwidth[I], -15)), fid)
+                } else {
+                    wrLine("--undefined--", fid)
+                }
             } else if (format == "text") {
                 wrLine(paste0("            formant [", as.character(I), "]:"), fid, collection)
-                wrLine(paste0("                frequency = ", as.character(formant$frame[[N]]$frequency[I], -15), " "), fid, collection)
-                wrLine(paste0("                bandwidth = ", as.character(formant$frame[[N]]$bandwidth[I], -15), " "), fid, collection)
+                if (!is.na(formant$frame[[N]]$frequency[I])) {
+                    wrLine(paste0("                frequency = ", as.character(round2(formant$frame[[N]]$frequency[I], -15)), " "), fid, collection)
+                } else {
+                    wrLine(paste0("                frequency = --undefined-- "), fid, collection)
+                }
+                if (!is.na(formant$frame[[N]]$bandwidth[I])) {
+                    wrLine(paste0("                bandwidth = ", as.character(round2(formant$frame[[N]]$bandwidth[I], -15)), " "), fid, collection)
+                } else {
+                    wrLine(paste0("                bandwidth = --undefined-- "), fid, collection)
+                }
             }
         }
     }

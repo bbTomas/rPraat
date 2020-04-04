@@ -1,3 +1,7 @@
+v1.3.1-1 (2020/04/04)
+-------------------
+- formant.read(), formant.write(), pitch.read(), pitch.write(): better handling of --undefined-- values
+
 v1.3.1 (2020/04/04)
 -------------------
 - tg.plot(): can plot formant and pitch objects in frame and array formats
