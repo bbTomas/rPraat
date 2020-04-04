@@ -4,8 +4,13 @@
 \alias{snd.read}
 \title{snd.read}
 \usage{
-snd.read(fileNameSound, fileType = "auto", from = 1, to = Inf,
-  units = "samples")
+snd.read(
+  fileNameSound,
+  fileType = "auto",
+  from = 1,
+  to = Inf,
+  units = "samples"
+)
 }
 \arguments{
 \item{fileNameSound}{Sound file name (.wav or .mp3)}

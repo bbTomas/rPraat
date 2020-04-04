@@ -697,7 +697,11 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
 
 
     if (!is.null(formant)) {
-        fArray <- formant.toArray(formant)  ### formant
+        if (!("frame" %in% names(formant))) {
+            fArray <- formant
+        } else {
+            fArray <- formant.toArray(formant)
+        }
 
         if (formantScaleIntensity) {
             intensityNorm <- normIntensity(fArray$intensityVector, 1, 6)  # minimum, maximum radius
@@ -758,7 +762,11 @@ tg.plot <- function(tg, group = "", pt = NULL, it = NULL, formant = NULL, forman
         }
     }
     if (!is.null(pitch)) {
-        pArray <- pitch.toArray(pitch)  ### pitch
+        if (!("frame" %in% names(pitch))) {
+            pArray <- pitch
+        } else {
+            pArray <- pitch.toArray(pitch)
+        }
 
         if (pitchScaleIntensity) {
             intensityNorm <- normIntensity(pArray$intensityVector, 0.5, 6)  # minimum, maximum radius

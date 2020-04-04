@@ -4,8 +4,13 @@
 \alias{tg.boundaryMagnet}
 \title{tg.boundaryMagnet}
 \usage{
-tg.boundaryMagnet(tg, targetTier, patternTier, boundaryTolerance = Inf,
-  verbose = TRUE)
+tg.boundaryMagnet(
+  tg,
+  targetTier,
+  patternTier,
+  boundaryTolerance = Inf,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{tg}{TextGrid object}

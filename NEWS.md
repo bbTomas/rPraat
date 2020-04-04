@@ -1,3 +1,7 @@
+v1.3.1 (2020/04/04)
+-------------------
+- tg.plot(): can plot formant and pitch objects in frame and array formats
+
 v1.3 (2019/12/04)
 -----------------
 - tg.boundaryMagnet(): align interval boundaries in a target tier according to a pattern tier

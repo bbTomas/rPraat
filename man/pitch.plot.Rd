@@ -4,8 +4,13 @@
 \alias{pitch.plot}
 \title{pitch.plot}
 \usage{
-pitch.plot(pitch, scaleIntensity = TRUE, showStrength = FALSE,
-  group = "", pt = NULL)
+pitch.plot(
+  pitch,
+  scaleIntensity = TRUE,
+  showStrength = FALSE,
+  group = "",
+  pt = NULL
+)
 }
 \arguments{
 \item{pitch}{Pitch object}

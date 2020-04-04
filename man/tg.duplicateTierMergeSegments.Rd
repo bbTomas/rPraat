@@ -4,8 +4,14 @@
 \alias{tg.duplicateTierMergeSegments}
 \title{tg.duplicateTierMergeSegments}
 \usage{
-tg.duplicateTierMergeSegments(tg, originalInd, newInd = Inf, newTierName,
-  pattern, sep = "-")
+tg.duplicateTierMergeSegments(
+  tg,
+  originalInd,
+  newInd = Inf,
+  newTierName,
+  pattern,
+  sep = "-"
+)
 }
 \arguments{
 \item{tg}{TextGrid object}

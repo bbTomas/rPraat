@@ -4,10 +4,19 @@
 \alias{tg.plot}
 \title{tg.plot}
 \usage{
-tg.plot(tg, group = "", pt = NULL, it = NULL, formant = NULL,
-  formantScaleIntensity = TRUE, formantDrawBandwidth = TRUE,
-  pitch = NULL, pitchScaleIntensity = TRUE,
-  pitchShowStrength = FALSE, snd = NULL)
+tg.plot(
+  tg,
+  group = "",
+  pt = NULL,
+  it = NULL,
+  formant = NULL,
+  formantScaleIntensity = TRUE,
+  formantDrawBandwidth = TRUE,
+  pitch = NULL,
+  pitchScaleIntensity = TRUE,
+  pitchShowStrength = FALSE,
+  snd = NULL
+)
 }
 \arguments{
 \item{tg}{TextGrid object}

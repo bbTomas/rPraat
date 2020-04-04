@@ -4,8 +4,7 @@
 \alias{tg.insertNewIntervalTier}
 \title{tg.insertNewIntervalTier}
 \usage{
-tg.insertNewIntervalTier(tg, newInd = Inf, newTierName, tMin = NA,
-  tMax = NA)
+tg.insertNewIntervalTier(tg, newInd = Inf, newTierName, tMin = NA, tMax = NA)
 }
 \arguments{
 \item{tg}{TextGrid object}
