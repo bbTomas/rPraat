@@ -18,6 +18,7 @@
 #' \code{duration}  ... duration of signal (seconds), \code{snd$duration == snd$nSamples/snd$fs}
 #'
 #' @export
+#' @seealso \code{\link{snd.write}}, \code{\link{snd.plot}}, \code{\link{snd.cut}}, \code{\link{snd.getPointIndexNearestTime}}
 #'
 #' @examples
 #' \dontrun{
@@ -152,7 +153,7 @@ snd.plot <- function(snd, group = "", stemPlot = FALSE) {
 #' snd.write(list(sig = signal, fs = 8000, nBits = 16), "temp2.wav")
 #'
 #' left  <- 0.3*sin(seq(0, 2*pi*440, length.out = 4000))
-#' rigth <- 0.5*sin(seq(0, 2*pi*220, length.out = 4000))
+#' right <- 0.5*sin(seq(0, 2*pi*220, length.out = 4000))
 #' snd.write(list(sig = matrix(c(left, right), ncol = 2), fs = 8000, nBits = 16), "temp3.wav")
 #' }
 snd.write <- function(snd, fileNameSound) {
@@ -485,3 +486,123 @@ as.snd <- function(snd, name = "") {
     return(snd)
 }
 
+
+
+#' snd.getPointIndexHigherThanTime
+#'
+#' Returns index of sample which is nearest the given time from right, i.e.
+#' \code{time} <= sampleTime.
+#'
+#' @param snd Sound object
+#' @param time time which is going to be found in samples
+#'
+#' @return integer
+#' @export
+#' @seealso \code{\link{snd.getPointIndexNearestTime}}, \code{\link{snd.getPointIndexLowerThanTime}}
+#'
+#' @examples
+#' snd <- snd.sample()
+#' snd.getPointIndexHigherThanTime(snd, 0.5)
+snd.getPointIndexHigherThanTime <- function(snd, time) {
+    if (!isNum(time)) {
+        stop("Time must be a number.")
+    }
+
+    snd <- as.snd(snd)
+
+    ind <- NA
+
+    npoints <- length(snd$t)
+    for (I in seqM(1, npoints)) {
+        if (time <= snd$t[I]) {
+            ind <- I
+            break
+        }
+    }
+
+
+    return(ind)
+}
+
+
+
+
+#' snd.getPointIndexLowerThanTime
+#'
+#' Returns index of sample which is nearest the given time from left, i.e.
+#' sampleTime <= \code{time}.
+#'
+#' @param snd Sound object
+#' @param time time which is going to be found in samples
+#'
+#' @return integer
+#' @export
+#' @seealso \code{\link{snd.getPointIndexNearestTime}}, \code{\link{snd.getPointIndexHigherThanTime}}
+#'
+#' @examples
+#' snd <- snd.sample()
+#' snd.getPointIndexLowerThanTime(snd, 0.5)
+snd.getPointIndexLowerThanTime <- function(snd, time) {
+    if (!isNum(time)) {
+        stop("Time must be a number.")
+    }
+
+    snd <- as.snd(snd)
+
+    ind <- NA
+
+    npoints <- length(snd$t)
+    for (I in seqM(npoints, 1, by = -1)) {
+        if (time >= snd$t[I]) {
+            ind <- I
+            break
+        }
+    }
+
+
+    return(ind)
+}
+
+
+
+
+#' snd.getPointIndexNearestTime
+#'
+#' Returns index of sample which is nearest the given \code{time} (from both sides).
+#'
+#' @param snd Sound object
+#' @param time time which is going to be found in samples
+#'
+#' @return integer
+#' @export
+#' @seealso \code{\link{snd.getPointIndexLowerThanTime}}, \code{\link{snd.getPointIndexHigherThanTime}}
+#'
+#' @examples
+#' snd <- snd.sample()
+#' snd.getPointIndexNearestTime(snd, 0.5)
+snd.getPointIndexNearestTime <- function(snd, time) {
+    if (!isNum(time)) {
+        stop("Time must be a number.")
+    }
+
+    snd <- as.snd(snd)
+
+    ind <- NA
+
+    npoints <- length(snd$t)
+    minDist <- Inf
+    minInd <- NA
+
+    for (I in seqM(1, npoints)) {
+        dist <- abs(snd$t[I] - time)
+        if (dist < minDist) {
+            minDist <- dist
+            minInd <- I
+        }
+    }
+
+    ind <- minInd
+
+
+    return(ind)
+}

@@ -32,5 +32,5 @@ pt.plot(pt2)
 }
 }
 \seealso{
-\code{\link{pt.read}}, \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.legendre}}
+\code{\link{pt.getPointIndexNearestTime}}, \code{\link{pt.read}}, \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.legendre}}
 }

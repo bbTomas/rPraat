@@ -56,5 +56,5 @@ f$frame[[4]]$bandwidth[2]
 }
 }
 \seealso{
-\code{\link{pitch.read}}, \code{\link{pt.read}}, \code{\link{tg.read}}, \code{\link{it.read}}, \code{\link{col.read}}
+\code{\link{formant.write}}, \code{\link{formant.plot}}, \code{\link{formant.cut}}, \code{\link{formant.getPointIndexNearestTime}}, \code{\link{pitch.read}}, \code{\link{pt.read}}, \code{\link{tg.read}}, \code{\link{it.read}}, \code{\link{col.read}}
 }

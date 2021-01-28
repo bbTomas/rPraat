@@ -205,6 +205,29 @@ test_that("pt.cut0", {
     expect_error(pt.cut0(pt.sample(), 3, 2))
 })
 
+test_that("pt.getPointIndexHigherThanTime", {
+    expect_equal({
+        pt <- pt.sample()
+        c(pt.getPointIndexHigherThanTime(pt, 0.5), pt.getPointIndexHigherThanTime(pt, 0.01),
+          is.na(pt.getPointIndexHigherThanTime(pt, 4)), pt.getPointIndexHigherThanTime(pt, pt$t[3]))
+    }, c(36, 1, 1, 3))
+})
+
+test_that("pt.getPointIndexLowerThanTime", {
+    expect_equal({
+        pt <- pt.sample()
+        c(pt.getPointIndexLowerThanTime(pt, 0.5), is.na(pt.getPointIndexLowerThanTime(pt, 0.01)),
+          pt.getPointIndexLowerThanTime(pt, 4), pt.getPointIndexLowerThanTime(pt, pt$t[3]))
+    }, c(35, 1, 209, 3))
+})
+
+test_that("pt.getPointIndexNearestTime", {
+    expect_equal({
+        pt <- pt.sample()
+        c(pt.getPointIndexNearestTime(pt, 0.5), pt.getPointIndexNearestTime(pt, 0.01),
+          pt.getPointIndexNearestTime(pt, 4), pt.getPointIndexNearestTime(pt, pt$t[3]))
+    }, c(35, 1, 209, 3))
+})
 
 context("IntensityTier")
 
@@ -330,6 +353,30 @@ test_that("it.cut0", {
         c(it$tmin, it$tmax, length(it$t), length(it$i), it$t[1], it$t[35], it$t[71], it$i[1], it$i[35], it$i[71])},
         c(0, 2, 71, 71, 1.055229, 1.508563, 1.988563, 40.856357, 62.639656, 67.697852))
     expect_error(it.cut0(it.sample(), 0.3, 0.2))
+})
+
+test_that("it.getPointIndexHigherThanTime", {
+    expect_equal({
+        it <- it.sample()
+        c(it.getPointIndexHigherThanTime(it, 0.5), it.getPointIndexHigherThanTime(it, 0.01),
+          is.na(it.getPointIndexHigherThanTime(it, 4)), it.getPointIndexHigherThanTime(it, it$t[3]))
+    }, c(35, 1, 1, 3))
+})
+
+test_that("it.getPointIndexLowerThanTime", {
+    expect_equal({
+        it <- it.sample()
+        c(it.getPointIndexLowerThanTime(it, 0.5), is.na(it.getPointIndexLowerThanTime(it, 0.01)),
+          it.getPointIndexLowerThanTime(it, 4), it.getPointIndexLowerThanTime(it, it$t[3]))
+    }, c(34, 1, 264, 3))
+})
+
+test_that("it.getPointIndexNearestTime", {
+    expect_equal({
+        it <- it.sample()
+        c(it.getPointIndexNearestTime(it, 0.5), it.getPointIndexNearestTime(it, 0.01),
+          it.getPointIndexNearestTime(it, 4), it.getPointIndexNearestTime(it, it$t[3]))
+    }, c(34, 1, 264, 3))
 })
 
 
@@ -723,6 +770,32 @@ test_that("snd.cut0", {
           snd$t[1], snd$t[1000], snd$sig[1, 1], snd$sig[1000, 1], snd$sig[1, 2], snd$sig[1000, 2])},
         c(1000, 2, 100, 1000, 2, 16, 1000, 10, 0, 9.99, 200, 1199, 300, 1299))
 })
+
+
+test_that("snd.getPointIndexHigherThanTime", {
+    expect_equal({
+        snd <- snd.sample()
+        c(snd.getPointIndexHigherThanTime(snd, 0.0002), snd.getPointIndexHigherThanTime(snd, -0.2),
+          is.na(snd.getPointIndexHigherThanTime(snd, 0.7)), snd.getPointIndexHigherThanTime(snd, snd$t[3]))
+    }, c(3, 1, 1, 3))
+})
+
+test_that("snd.getPointIndexLowerThanTime", {
+    expect_equal({
+        snd <- snd.sample()
+        c(snd.getPointIndexLowerThanTime(snd, 0.0002), is.na(snd.getPointIndexLowerThanTime(snd, -0.2)),
+          snd.getPointIndexLowerThanTime(snd, 0.7), snd.getPointIndexLowerThanTime(snd, snd$t[3]))
+    }, c(2, 1, 5484, 3))
+})
+
+test_that("snd.getPointIndexNearestTime", {
+    expect_equal({
+        snd <- snd.sample()
+        c(snd.getPointIndexNearestTime(snd, 0.0002), snd.getPointIndexNearestTime(snd, -0.2),
+          snd.getPointIndexNearestTime(snd, 0.7), snd.getPointIndexNearestTime(snd, snd$t[3]))
+    }, c(3, 1, 5484, 3))
+})
+
 
 
 
@@ -1477,6 +1550,30 @@ test_that("pitch.cut0", {
     expect_error(pitch.cut0(pitch.sample(), 3, 2))
 })
 
+test_that("pitch.getPointIndexHigherThanTime", {
+    expect_equal({
+        pitch <- pitch.sample()
+        c(pitch.getPointIndexHigherThanTime(pitch, 0.5), pitch.getPointIndexHigherThanTime(pitch, 0.01),
+          is.na(pitch.getPointIndexHigherThanTime(pitch, 4)), pitch.getPointIndexHigherThanTime(pitch, pitch$t[3]))
+    }, c(49, 1, 1, 3))
+})
+
+test_that("pitch.getPointIndexLowerThanTime", {
+    expect_equal({
+        pitch <- pitch.sample()
+        c(pitch.getPointIndexLowerThanTime(pitch, 0.5), is.na(pitch.getPointIndexLowerThanTime(pitch, 0.01)),
+          pitch.getPointIndexLowerThanTime(pitch, 4), pitch.getPointIndexLowerThanTime(pitch, pitch$t[3]))
+    }, c(48, 1, 358, 3))
+})
+
+test_that("pitch.getPointIndexNearestTime", {
+    expect_equal({
+        pitch <- pitch.sample()
+        c(pitch.getPointIndexNearestTime(pitch, 0.5), pitch.getPointIndexNearestTime(pitch, 0.01),
+          pitch.getPointIndexNearestTime(pitch, 4), pitch.getPointIndexNearestTime(pitch, pitch$t[3]))
+    }, c(49, 1, 358, 3))
+})
+
 
 
 
@@ -1668,6 +1765,29 @@ test_that("formant.cut0", {
     expect_error(formant.cut0(formant.sample(), 3, 2))
 })
 
+test_that("formant.getPointIndexHigherThanTime", {
+    expect_equal({
+        formant <- formant.sample()
+        c(formant.getPointIndexHigherThanTime(formant, 0.5), formant.getPointIndexHigherThanTime(formant, 0.01),
+          is.na(formant.getPointIndexHigherThanTime(formant, 4)), formant.getPointIndexHigherThanTime(formant, formant$t[3]))
+    }, c(77, 1, 1, 3))
+})
+
+test_that("formant.getPointIndexLowerThanTime", {
+    expect_equal({
+        formant <- formant.sample()
+        c(formant.getPointIndexLowerThanTime(formant, 0.5), is.na(formant.getPointIndexLowerThanTime(formant, 0.01)),
+          formant.getPointIndexLowerThanTime(formant, 4), formant.getPointIndexLowerThanTime(formant, formant$t[3]))
+    }, c(76, 1, 571, 3))
+})
+
+test_that("formant.getPointIndexNearestTime", {
+    expect_equal({
+        formant <- formant.sample()
+        c(formant.getPointIndexNearestTime(formant, 0.5), formant.getPointIndexNearestTime(formant, 0.01),
+          formant.getPointIndexNearestTime(formant, 4), formant.getPointIndexNearestTime(formant, formant$t[3]))
+    }, c(77, 1, 571, 3))
+})
 
 
 

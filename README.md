@@ -1,10 +1,9 @@
-rPraat package for R
-====================
+# rPraat package for R
 
 rPraat package for R constitutes an interface between the most popular
 software for phonetic analyses, Praat, and R.
 
-Version 1.3.1-1
+Version 1.3.2
 
 For demonstration, see
 [html/rDemo.html](https://fu.ff.cuni.cz/praat/rDemo.html)
@@ -19,8 +18,7 @@ Matlab.
 
 rPraat and mPraat homepage: <https://fu.ff.cuni.cz/praat/>
 
-Installation
-------------
+## Installation
 
 One-time installation (internet connection needed).
 
@@ -43,8 +41,7 @@ needed).
 
     tg.sample() %>% tg.plot()  # demo test
 
-How to cite this package?
--------------------------
+## How to cite this package?
 
 We have invested a lot of time and effort in creating mPraat toolbox /
 rPraat package, please cite it when using it for data analysis.
@@ -62,8 +59,11 @@ The final publication is available at Springer via [DOI
 [Download BibTeX reference
 mpraatrpraat2016.bib](https://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
 
-What is new
------------
+## What is new
+
+v1.3.2 (2021/01/28): pt., it., pitch., formant., snd.
+getPointIndexHigherThanTime(), getPointIndexLowerThanTime(),
+getPointIndexNearestTime()
 
 v1.3.1-1 (2020/04/04): formant.read(), formant.write(), pitch.read(),
 pitch.write(): better handling of –undefined– values
@@ -148,13 +148,11 @@ pt.legendreDemo()
 
 v1.0.4 (2017/03/06): pt.interpolate(), pt.Hz2ST()
 
-License
--------
+## License
 
 License: MIT
 
-Copyright (c) 2016 Tomáš Bořil,
-<a href="mailto:borilt@gmail.com" class="email">borilt@gmail.com</a>
+Copyright (c) 2016 Tomáš Bořil, <borilt@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the

@@ -1,3 +1,7 @@
+v1.3.2 (2021/01/28)
+-------------------
+- pt., it., pitch., formant., snd. getPointIndexHigherThanTime(), getPointIndexLowerThanTime(), getPointIndexNearestTime()
+
 v1.3.1-1 (2020/04/04)
 -------------------
 - formant.read(), formant.write(), pitch.read(), pitch.write(): better handling of --undefined-- values

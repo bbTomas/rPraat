@@ -338,7 +338,7 @@ it.plot <- function(it, group = "", snd = NULL) {
 #'
 #' @return IntensityTier object
 #' @export
-#' @seealso \code{\link{it.read}}, \code{\link{it.write}}, \code{\link{it.plot}}, \code{\link{it.cut}}, \code{\link{it.cut0}}, \code{\link{it.legendre}}
+#' @seealso \code{\link{it.getPointIndexNearestTime}}, \code{\link{it.read}}, \code{\link{it.write}}, \code{\link{it.plot}}, \code{\link{it.cut}}, \code{\link{it.cut0}}, \code{\link{it.legendre}}
 #'
 #' @examples
 #' it <- it.sample()
@@ -707,3 +707,117 @@ as.it <- function(it, name = "") {
     return(it)
 }
 
+
+
+#' it.getPointIndexHigherThanTime
+#'
+#' Returns index of point which is nearest the given time from right, i.e.
+#' \code{time} <= pointTime.
+#'
+#' @param it IntensityTier object
+#' @param time time which is going to be found in points
+#'
+#' @return integer
+#' @export
+#' @seealso \code{\link{it.getPointIndexNearestTime}}, \code{\link{it.getPointIndexLowerThanTime}}
+#'
+#' @examples
+#' it <- it.sample()
+#' it.getPointIndexHigherThanTime(it, 0.5)
+it.getPointIndexHigherThanTime <- function(it, time) {
+    if (!isNum(time)) {
+        stop("Time must be a number.")
+    }
+
+    ind <- NA
+
+    npoints <- length(it$t)
+    for (I in seqM(1, npoints)) {
+        if (time <= it$t[I]) {
+            ind <- I
+            break
+        }
+    }
+
+
+    return(ind)
+}
+
+
+
+
+#' it.getPointIndexLowerThanTime
+#'
+#' Returns index of point which is nearest the given time from left, i.e.
+#' pointTime <= \code{time}.
+#'
+#' @param it IntensityTier object
+#' @param time time which is going to be found in points
+#'
+#' @return integer
+#' @export
+#' @seealso \code{\link{it.getPointIndexNearestTime}}, \code{\link{it.getPointIndexHigherThanTime}}
+#'
+#' @examples
+#' it <- it.sample()
+#' it.getPointIndexLowerThanTime(it, 0.5)
+it.getPointIndexLowerThanTime <- function(it, time) {
+    if (!isNum(time)) {
+        stop("Time must be a number.")
+    }
+
+    ind <- NA
+
+    npoints <- length(it$t)
+    for (I in seqM(npoints, 1, by = -1)) {
+        if (time >= it$t[I]) {
+            ind <- I
+            break
+        }
+    }
+
+
+    return(ind)
+}
+
+
+
+
+#' it.getPointIndexNearestTime
+#'
+#' Returns index of point which is nearest the given \code{time} (from both sides).
+#'
+#' @param it IntensityTier object
+#' @param time time which is going to be found in points
+#'
+#' @return integer
+#' @export
+#' @seealso \code{\link{it.getPointIndexLowerThanTime}}, \code{\link{it.getPointIndexHigherThanTime}}
+#'
+#' @examples
+#' it <- it.sample()
+#' it.getPointIndexNearestTime(it, 0.5)
+it.getPointIndexNearestTime <- function(it, time) {
+    if (!isNum(time)) {
+        stop("Time must be a number.")
+    }
+
+    ind <- NA
+
+    npoints <- length(it$t)
+    minDist <- Inf
+    minInd <- NA
+
+    for (I in seqM(1, npoints)) {
+        dist <- abs(it$t[I] - time)
+        if (dist < minDist) {
+            minDist <- dist
+            minInd <- I
+        }
+    }
+
+    ind <- minInd
+
+
+    return(ind)
+}

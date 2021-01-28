@@ -31,5 +31,5 @@ it.plot(it2)
 }
 }
 \seealso{
-\code{\link{it.read}}, \code{\link{it.write}}, \code{\link{it.plot}}, \code{\link{it.cut}}, \code{\link{it.cut0}}, \code{\link{it.legendre}}
+\code{\link{it.getPointIndexNearestTime}}, \code{\link{it.read}}, \code{\link{it.write}}, \code{\link{it.plot}}, \code{\link{it.cut}}, \code{\link{it.cut0}}, \code{\link{it.legendre}}
 }

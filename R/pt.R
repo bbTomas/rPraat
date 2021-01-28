@@ -352,7 +352,7 @@ pt.plot <- function(pt, group = "") {
 #'
 #' @return PitchTier object
 #' @export
-#' @seealso \code{\link{pt.read}}, \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.legendre}}
+#' @seealso \code{\link{pt.getPointIndexNearestTime}}, \code{\link{pt.read}}, \code{\link{pt.write}}, \code{\link{pt.plot}}, \code{\link{pt.Hz2ST}}, \code{\link{pt.cut}}, \code{\link{pt.cut0}}, \code{\link{pt.legendre}}
 #'
 #' @examples
 #' pt <- pt.sample()
@@ -751,5 +751,119 @@ as.pt <- function(pt, name = "") {
     class(pt)["type"] <- "PitchTier"
     class(pt)["name"] <- name
     return(pt)
+}
+
+
+#' pt.getPointIndexHigherThanTime
+#'
+#' Returns index of point which is nearest the given time from right, i.e.
+#' \code{time} <= pointTime.
+#'
+#' @param pt PitchTier object
+#' @param time time which is going to be found in points
+#'
+#' @return integer
+#' @export
+#' @seealso \code{\link{pt.getPointIndexNearestTime}}, \code{\link{pt.getPointIndexLowerThanTime}}
+#'
+#' @examples
+#' pt <- pt.sample()
+#' pt.getPointIndexHigherThanTime(pt, 0.5)
+pt.getPointIndexHigherThanTime <- function(pt, time) {
+    if (!isNum(time)) {
+        stop("Time must be a number.")
+    }
+
+    ind <- NA
+
+    npoints <- length(pt$t)
+    for (I in seqM(1, npoints)) {
+        if (time <= pt$t[I]) {
+            ind <- I
+            break
+        }
+    }
+
+
+    return(ind)
+}
+
+
+
+
+#' pt.getPointIndexLowerThanTime
+#'
+#' Returns index of point which is nearest the given time from left, i.e.
+#' pointTime <= \code{time}.
+#'
+#' @param pt PitchTier object
+#' @param time time which is going to be found in points
+#'
+#' @return integer
+#' @export
+#' @seealso \code{\link{pt.getPointIndexNearestTime}}, \code{\link{pt.getPointIndexHigherThanTime}}
+#'
+#' @examples
+#' pt <- pt.sample()
+#' pt.getPointIndexLowerThanTime(pt, 0.5)
+pt.getPointIndexLowerThanTime <- function(pt, time) {
+    if (!isNum(time)) {
+        stop("Time must be a number.")
+    }
+
+    ind <- NA
+
+    npoints <- length(pt$t)
+    for (I in seqM(npoints, 1, by = -1)) {
+        if (time >= pt$t[I]) {
+            ind <- I
+            break
+        }
+    }
+
+
+    return(ind)
+}
+
+
+
+
+#' pt.getPointIndexNearestTime
+#'
+#' Returns index of point which is nearest the given \code{time} (from both sides).
+#'
+#' @param pt PitchTier object
+#' @param time time which is going to be found in points
+#'
+#' @return integer
+#' @export
+#' @seealso \code{\link{pt.getPointIndexLowerThanTime}}, \code{\link{pt.getPointIndexHigherThanTime}}
+#'
+#' @examples
+#' pt <- pt.sample()
+#' pt.getPointIndexNearestTime(pt, 0.5)
+pt.getPointIndexNearestTime <- function(pt, time) {
+    if (!isNum(time)) {
+        stop("Time must be a number.")
+    }
+
+    ind <- NA
+
+    npoints <- length(pt$t)
+    minDist <- Inf
+    minInd <- NA
+
+    for (I in seqM(1, npoints)) {
+        dist <- abs(pt$t[I] - time)
+        if (dist < minDist) {
+            minDist <- dist
+            minInd <- I
+        }
+    }
+
+    ind <- minInd
+
+
+    return(ind)
 }
 

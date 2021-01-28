@@ -42,3 +42,6 @@ snd <- snd.read("demo/H.wav")
 snd.plot(snd)
 }
 }
+\seealso{
+\code{\link{snd.write}}, \code{\link{snd.plot}}, \code{\link{snd.cut}}, \code{\link{snd.getPointIndexNearestTime}}
+}

@@ -21,7 +21,7 @@
 #' @return      \code{f$frame[[1]]$frequency} ... vector of formant frequencies (in Hz)
 #' @return      \code{f$frame[[1]]$bandwidth} ... vector of formant bandwidths (in Hz)
 #' @export
-#' @seealso \code{\link{pitch.read}}, \code{\link{pt.read}}, \code{\link{tg.read}}, \code{\link{it.read}}, \code{\link{col.read}}
+#' @seealso \code{\link{formant.write}}, \code{\link{formant.plot}}, \code{\link{formant.cut}}, \code{\link{formant.getPointIndexNearestTime}}, \code{\link{pitch.read}}, \code{\link{pt.read}}, \code{\link{tg.read}}, \code{\link{it.read}}, \code{\link{col.read}}
 #'
 #' @examples
 #' \dontrun{
@@ -697,3 +697,118 @@ formant.write0 <- function(formant, fileNameFormant, format = "short", fid = NUL
         close(fid)
     }
 }
+
+
+#' formant.getPointIndexHigherThanTime
+#'
+#' Returns index of frame which is nearest the given time from right, i.e.
+#' \code{time} <= frameTime.
+#'
+#' @param formant Formant object
+#' @param time time which is going to be found in frames
+#'
+#' @return integer
+#' @export
+#' @seealso \code{\link{formant.getPointIndexNearestTime}}, \code{\link{formant.getPointIndexLowerThanTime}}
+#'
+#' @examples
+#' formant <- formant.sample()
+#' formant.getPointIndexHigherThanTime(formant, 0.5)
+formant.getPointIndexHigherThanTime <- function(formant, time) {
+    if (!isNum(time)) {
+        stop("Time must be a number.")
+    }
+
+    ind <- NA
+
+    npoints <- length(formant$t)
+    for (I in seqM(1, npoints)) {
+        if (time <= formant$t[I]) {
+            ind <- I
+            break
+        }
+    }
+
+
+    return(ind)
+}
+
+
+
+
+#' formant.getPointIndexLowerThanTime
+#'
+#' Returns index of frame which is nearest the given time from left, i.e.
+#' frameTime <= \code{time}.
+#'
+#' @param formant Formant object
+#' @param time time which is going to be found in frames
+#'
+#' @return integer
+#' @export
+#' @seealso \code{\link{formant.getPointIndexNearestTime}}, \code{\link{formant.getPointIndexHigherThanTime}}
+#'
+#' @examples
+#' formant <- formant.sample()
+#' formant.getPointIndexLowerThanTime(formant, 0.5)
+formant.getPointIndexLowerThanTime <- function(formant, time) {
+    if (!isNum(time)) {
+        stop("Time must be a number.")
+    }
+
+    ind <- NA
+
+    npoints <- length(formant$t)
+    for (I in seqM(npoints, 1, by = -1)) {
+        if (time >= formant$t[I]) {
+            ind <- I
+            break
+        }
+    }
+
+
+    return(ind)
+}
+
+
+
+
+#' formant.getPointIndexNearestTime
+#'
+#' Returns index of frame which is nearest the given \code{time} (from both sides).
+#'
+#' @param formant Formant object
+#' @param time time which is going to be found in frames
+#'
+#' @return integer
+#' @export
+#' @seealso \code{\link{formant.getPointIndexLowerThanTime}}, \code{\link{formant.getPointIndexHigherThanTime}}
+#'
+#' @examples
+#' formant <- formant.sample()
+#' formant.getPointIndexNearestTime(formant, 0.5)
+formant.getPointIndexNearestTime <- function(formant, time) {
+    if (!isNum(time)) {
+        stop("Time must be a number.")
+    }
+
+    ind <- NA
+
+    npoints <- length(formant$t)
+    minDist <- Inf
+    minInd <- NA
+
+    for (I in seqM(1, npoints)) {
+        dist <- abs(formant$t[I] - time)
+        if (dist < minDist) {
+            minDist <- dist
+            minInd <- I
+        }
+    }
+
+    ind <- minInd
+
+
+    return(ind)
+}
+
