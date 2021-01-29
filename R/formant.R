@@ -7,7 +7,7 @@
 #' @param encoding File encoding (default: \code{"UTF-8"}), \code{"auto"} for auto-detect of Unicode encoding
 #'
 #' @return A Formant object represents formants as a function of time.
-#' @return   [ref: Praat help, http://www.fon.hum.uva.nl/praat/manual/Formant.html]
+#' @return   [ref: Praat help, https://www.fon.hum.uva.nl/praat/manual/Formant.html]
 #' @return   \code{f$xmin} ... start time (seconds)
 #' @return   \code{f$xmax} ... end time (seconds)
 #' @return   \code{f$nx}   ... number of frames

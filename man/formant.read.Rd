@@ -14,7 +14,7 @@ formant.read(fileNameFormant, encoding = "UTF-8")
 \value{
 A Formant object represents formants as a function of time.
 
-[ref: Praat help, http://www.fon.hum.uva.nl/praat/manual/Formant.html]
+[ref: Praat help, https://www.fon.hum.uva.nl/praat/manual/Formant.html]
 
 \code{f$xmin} ... start time (seconds)
 

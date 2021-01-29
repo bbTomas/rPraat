@@ -89,7 +89,7 @@ normIntensity <- function(intensity, minValue = 1, maxValue = 9) {
 #'
 #' Like \code{str_trim()} in \code{stringr} package or \code{trimws()} in R3.2.0 but way faster.
 #'
-#' Source: Hadley Wickham comment at http://stackoverflow.com/questions/2261079/how-to-trim-leading-and-trailing-whitespace-in-r
+#' Source: Hadley Wickham comment at https://stackoverflow.com/questions/2261079/how-to-trim-leading-and-trailing-whitespace-in-r
 #'
 #' @param string character string
 #'

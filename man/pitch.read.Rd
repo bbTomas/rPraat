@@ -14,7 +14,7 @@ pitch.read(fileNamePitch, encoding = "UTF-8")
 \value{
 A Pitch object represents periodicity candidates as a function of time.
 
-[ref: Praat help, http://www.fon.hum.uva.nl/praat/manual/Pitch.html]
+[ref: Praat help, https://www.fon.hum.uva.nl/praat/manual/Pitch.html]
 
 \code{p$xmin} ... start time (seconds)
 

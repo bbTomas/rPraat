@@ -8,7 +8,7 @@
 #' @param encoding File encoding (default: \code{"UTF-8"}), \code{"auto"} for auto-detect of Unicode encoding
 #'
 #' @return A Pitch object represents periodicity candidates as a function of time.
-#' @return   [ref: Praat help, http://www.fon.hum.uva.nl/praat/manual/Pitch.html]
+#' @return   [ref: Praat help, https://www.fon.hum.uva.nl/praat/manual/Pitch.html]
 #' @return   \code{p$xmin} ... start time (seconds)
 #' @return   \code{p$xmax} ... end time (seconds)
 #' @return   \code{p$nx}   ... number of frames
