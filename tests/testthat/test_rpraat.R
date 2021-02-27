@@ -1388,8 +1388,9 @@ test_that("pitch.read", {
         p <- pitch.read("sound.Pitch")
         p2 <- as.pitch(pitch.read("sound_short.Pitch"), "sound.Pitch")
         p3 <- as.pitch(pitch.read("sound_UTF16.Pitch", encoding = "UTF-16"), "sound.Pitch")
-        c(identical(p, p2), identical(p, p3))
-    }, c(TRUE, TRUE))
+        p4 <- as.pitch(pitch.read("sound_new.Pitch"), "sound.Pitch")
+        c(identical(p, p2), identical(p, p3), identical(p, p4))
+    }, c(TRUE, TRUE, TRUE))
 })
 
 test_that("pitch.write", {
@@ -1596,8 +1597,9 @@ test_that("formant.read", {
         f <- formant.read("maminka.Formant")
         f2 <- as.formant(formant.read("maminka_short.Formant"), "maminka.Formant")
         f3 <- as.formant(formant.read("maminka_UTF16.Formant", encoding = "UTF-16"), "maminka.Formant")
-        c(identical(f, f2), identical(f, f3))
-    }, c(TRUE, TRUE))
+        f4 <- as.formant(formant.read("maminka_new.Formant"), "maminka.Formant")
+        c(identical(f, f2), identical(f, f3), identical(f, f4))
+    }, c(TRUE, TRUE, TRUE))
 })
 
 test_that("formant.write", {

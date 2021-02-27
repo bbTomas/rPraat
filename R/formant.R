@@ -118,7 +118,11 @@ formant.read_lines <- function(flines, find = 1, collection = FALSE) {
                 iline <- iline + 1
 
                 intensity <- as.numeric(substr(strTrim(flines[iline]), 13, nchar(strTrim(flines[iline])))); iline <- iline + 1
-                nFormants <- as.numeric(substr(strTrim(flines[iline]), 13, nchar(strTrim(flines[iline])))); iline <- iline + 1
+                if (!str_contains(flines[iline], "numberOfFormants")) {  # old format: nFormants = 4
+                    nFormants <- as.numeric(substr(strTrim(flines[iline]), 13, nchar(strTrim(flines[iline])))); iline <- iline + 1
+                } else { # new format: numberOfFormants = 4
+                    nFormants <- as.numeric(substr(strTrim(flines[iline]), 20, nchar(strTrim(flines[iline])))); iline <- iline + 1
+                }
 
                 if (!str_contains(flines[iline], "formant []:")) {
                     stop("Unknown Formants format.")

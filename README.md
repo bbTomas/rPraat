@@ -3,7 +3,7 @@
 rPraat package for R constitutes an interface between the most popular
 software for phonetic analyses, Praat, and R.
 
-Version 1.3.2
+Version 1.3.2-1
 
 For demonstration, see
 [html/rDemo.html](https://fu.ff.cuni.cz/praat/rDemo.html)
@@ -60,6 +60,9 @@ The final publication is available at Springer via [DOI
 mpraatrpraat2016.bib](https://fu.ff.cuni.cz/praat/mpraatrpraat2016.bib)
 
 ## What is new
+
+v1.3.2-1 (2021/02/27): pitch.read(), formant.read() fix to new Praat
+text formats
 
 v1.3.2 (2021/01/28): pt., it., pitch., formant., snd.
 getPointIndexHigherThanTime(), getPointIndexLowerThanTime(),

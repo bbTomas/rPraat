@@ -110,14 +110,14 @@ pitch.read_lines <- function(flines, find = 1, collection = FALSE) {
 
             frame <- vector("list", nx)
 
-            if (!str_contains(flines[find-1+ 11], "frame []: ")) {
+            if (!str_contains(flines[find-1+ 11], "frame []: ") & !str_contains(flines[find-1+ 11], "frames []: ")) {
                 stop("Unknown Pitch format.")
             }
 
             iline <- find-1+ 12  # index of line to read
 
             for (I in seqM(1, nx)) {
-                if (strTrim(flines[iline]) != paste0("frame [", I, "]:")) {
+                if (strTrim(flines[iline]) != paste0("frame [", I, "]:") & strTrim(flines[iline]) != paste0("frames [", I, "]:")) {
                     stop(paste0("Unknown Pitch format, wrong frame id (", I, "')."))
                 }
                 iline <- iline + 1
@@ -125,7 +125,7 @@ pitch.read_lines <- function(flines, find = 1, collection = FALSE) {
                 intensity <- as.numeric(substr(strTrim(flines[iline]), 13, nchar(strTrim(flines[iline])))); iline <- iline + 1
                 nCandidates <- as.numeric(substr(strTrim(flines[iline]), 15, nchar(strTrim(flines[iline])))); iline <- iline + 1
 
-                if (!str_contains(flines[iline], "candidate []:")) {
+                if (!str_contains(flines[iline], "candidate []:") & !str_contains(flines[iline], "candidates []:")) {
                     stop("Unknown Pitch format.")
                 }
                 iline <- iline + 1
@@ -134,7 +134,7 @@ pitch.read_lines <- function(flines, find = 1, collection = FALSE) {
                 strength <- numeric(nCandidates)
 
                 for (Ic in seqM(1, nCandidates)) {
-                    if (strTrim(flines[iline]) != paste0("candidate [", Ic, "]:")) {
+                    if (strTrim(flines[iline]) != paste0("candidate [", Ic, "]:") & strTrim(flines[iline]) != paste0("candidates [", Ic, "]:")) {
                         stop(paste0("Unknown Pitch format, wrong candidate nr. (", Ic, ") in frame id (", I, "')."))
                     }
                     iline <- iline + 1

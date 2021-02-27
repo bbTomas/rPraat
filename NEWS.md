@@ -1,3 +1,7 @@
+v1.3.2-1 (2021/02/27)
+---------------------
+- pitch.read(), formant.read() fix to new Praat text formats
+
 v1.3.2 (2021/01/28)
 -------------------
 - pt., it., pitch., formant., snd. getPointIndexHigherThanTime(), getPointIndexLowerThanTime(), getPointIndexNearestTime()
