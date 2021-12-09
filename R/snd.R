@@ -13,7 +13,7 @@
 #' \code{sig} ... signal matrix (\code{nrow(snd$sig)} = number of samples, \code{ncol(snd$sig)} = number of channels, i.e., \code{$sig[, 1]} ... 1st channel)
 #' \code{fs}  ... sample rate (Hz)
 #' \code{nChannels} ... number of signal channels (\code{ncol(snd$sig)}), 1 == mono, 2 == stereo
-#' \code{nBits}     ... number of bits ped one sample
+#' \code{nBits}     ... number of bits per one sample
 #' \code{nSamples}  ... number of samples (\code{nrow(snd$sig)})
 #' \code{duration}  ... duration of signal (seconds), \code{snd$duration == snd$nSamples/snd$fs}
 #'

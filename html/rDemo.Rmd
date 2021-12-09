@@ -64,14 +64,12 @@ Shift + mouse drag: plot scroll
 library(rPraat)
 library(dplyr, warn.conflicts = FALSE)
 library(dygraphs)
-library(tuneR)
 ```
 
 ```{r, eval=FALSE}
 library(rPraat)
 library(dplyr)
 library(dygraphs)
-library(tuneR)  # to read .wav files
 ```
 
 ### Separate plots with synchronised zoom using 'group' argument
@@ -533,6 +531,11 @@ pt.write(pt, "demo/new_file.PitchTier")  # save variable into a new file
 ![](img/pt1.png)
 
 ## Transform Hz to semitones (ST)
+```{r, echo=FALSE}
+pt <- pt.Hz2ST(pt, ref = 100)  # conversion of Hz to Semitones, reference 0 ST = 100 Hz.
+```
+
+
 ```{r, fig.height=2.5, eval=FALSE}
 pt <- pt.Hz2ST(pt, ref = 100)  # conversion of Hz to Semitones, reference 0 ST = 100 Hz.
 
